@@ -19,7 +19,7 @@ public class Schedule extends TimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "groupId")
-    private Group group;
+    private Groups group;
     private String scheduleName;
 
     @Embedded

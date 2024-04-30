@@ -2,7 +2,7 @@ package konkuk.aiku.domain.userItem;
 
 import jakarta.persistence.*;
 import konkuk.aiku.domain.TimeEntity;
-import konkuk.aiku.domain.User;
+import konkuk.aiku.domain.Users;
 import konkuk.aiku.domain.item.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class UserItem extends TimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private User user;
+    private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itemId")

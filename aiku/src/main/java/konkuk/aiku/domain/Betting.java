@@ -16,11 +16,11 @@ public class Betting extends TimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bettorId")
-    private User bettor;
+    private Users bettor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "targetUserId")
-    private User targetUser;
+    private Users targetUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduleId")
