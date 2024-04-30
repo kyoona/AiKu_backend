@@ -16,7 +16,12 @@ public class UserArrivalData extends TimeEntity{
     @Setter(value = AccessLevel.NONE)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "scheduleId")
     private Schedule schedule;
     private LocalDateTime arrivalTime;
     private LocalDateTime timeDifference;
@@ -25,7 +30,7 @@ public class UserArrivalData extends TimeEntity{
     @AttributeOverrides({
             @AttributeOverride(name = "latitude", column = @Column(name = "startLatitude")),
             @AttributeOverride(name = "longitude", column = @Column(name = "startLongitude")),
-            @AttributeOverride(name = "longitude", column = @Column(name = "startLocationName"))
+            @AttributeOverride(name = "locationName", column = @Column(name = "startLocationName"))
     })
     private Location startLocation;
 
@@ -33,7 +38,7 @@ public class UserArrivalData extends TimeEntity{
     @AttributeOverrides({
             @AttributeOverride(name = "latitude", column = @Column(name = "endLatitude")),
             @AttributeOverride(name = "longitude", column = @Column(name = "endLongitude")),
-            @AttributeOverride(name = "longitude", column = @Column(name = "endLocationName"))
+            @AttributeOverride(name = "locationName", column = @Column(name = "endLocationName"))
     })
     private Location endLocation;
 }
