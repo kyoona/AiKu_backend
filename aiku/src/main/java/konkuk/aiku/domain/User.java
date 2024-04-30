@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.management.relation.Role;
 import java.util.List;
 
 @Entity
@@ -28,5 +27,5 @@ public class User extends TimeEntity{
     private int point;
 
     @Enumerated(value = EnumType.STRING)
-    private Role role;
+    private UserRole role;
 }
