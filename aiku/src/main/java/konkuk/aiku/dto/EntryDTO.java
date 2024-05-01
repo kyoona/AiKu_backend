@@ -4,6 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class GroupEntryDTO {
+public class EntryDTO {
     private Boolean enter;
 }
