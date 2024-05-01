@@ -1,4 +1,7 @@
 package konkuk.aiku.repository;
 
-public interface UserPointRepository {
+import konkuk.aiku.domain.UserPoint;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserPointRepository extends JpaRepository<UserPoint, Long> {
 }

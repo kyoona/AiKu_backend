@@ -1,4 +1,7 @@
 package konkuk.aiku.repository;
 
-public interface ItemRepository {
+import konkuk.aiku.domain.item.Item;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ItemRepository extends JpaRepository<Item, Long> {
 }
