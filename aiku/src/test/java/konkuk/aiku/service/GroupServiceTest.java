@@ -1,6 +1,5 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.domain.Groups;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.GroupServiceDTO;
@@ -21,43 +20,39 @@ class GroupServiceTest {
     @Autowired
     private UsersRepository usersRepository;
 
-    private Long userId1, userId2;
-
-    @BeforeEach
-    void beforeEach(){
-        Users user = new Users();
-        user.setUsername("user1");
-        userId1 = usersRepository.save(user)
-                .getId();
-
-        Users user2 = new Users();
-        user2.setUsername("user2");
-        userId2 = usersRepository.save(user2)
-                .getId();
-    }
-
-    @AfterEach
-    void afterEach(){
-        usersRepository.deleteAll();
-    }
     @Test
     @DisplayName("그룹 등록")
     void addGroup() {
+        Users user = new Users();
+        user.setUsername("user1");
+        Long userId1 = usersRepository.save(user)
+                .getId();
+
+        Users user2 = new Users();
+        user2.setUsername("user1");
+        Long userId2 = usersRepository.save(user2)
+                .getId();
+
         GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
         groupServiceDTO.setGroupName("group1");
         groupServiceDTO.setGroupImg(null);
         groupServiceDTO.setDescription("test group1");
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
-        Groups findGroup = groupService.findGroupById(groupId);
-        assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
-        assertThat(findGroup.getGroupImg()).isEqualTo(groupServiceDTO.getGroupImg());
-        assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO.getDescription());
+        GroupServiceDTO findGroupDTO = groupService.findGroupById(groupId);
+        assertThat(findGroupDTO.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
+        assertThat(findGroupDTO.getGroupImg()).isEqualTo(groupServiceDTO.getGroupImg());
+        assertThat(findGroupDTO.getDescription()).isEqualTo(groupServiceDTO.getDescription());
     }
 
     @Test
     @DisplayName("그룹 수정")
     void modifyGroup() throws IllegalAccessException {
+        Users user = new Users();
+        user.setUsername("user1");
+        Long userId1 = usersRepository.save(user)
+                .getId();
+
         GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
         groupServiceDTO.setGroupName("group1");
         groupServiceDTO.setGroupImg(null);
@@ -70,7 +65,7 @@ class GroupServiceTest {
         modifyGroupServiceDTO.setDescription("change the group name");
         groupService.modifyGroup(userId1, groupId, modifyGroupServiceDTO);
 
-        Groups findGroup = groupService.findGroupById(groupId);
+        GroupServiceDTO findGroup = groupService.findGroupById(groupId);
         assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDTO.getGroupName());
         assertThat(findGroup.getGroupImg()).isEqualTo(modifyGroupServiceDTO.getGroupImg());
         assertThat(findGroup.getDescription()).isEqualTo(modifyGroupServiceDTO.getDescription());
@@ -79,6 +74,16 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
     void modifyGroupInFaultCondition() throws IllegalAccessException {
+        Users user = new Users();
+        user.setUsername("user1");
+        Long userId1 = usersRepository.save(user)
+                .getId();
+
+        Users user2 = new Users();
+        user2.setUsername("user1");
+        Long userId2 = usersRepository.save(user2)
+                .getId();
+
         GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
         groupServiceDTO.setGroupName("group1");
         groupServiceDTO.setGroupImg(null);
@@ -96,6 +101,11 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 삭제")
     void deleteGroup(){
+        Users user = new Users();
+        user.setUsername("user1");
+        Long userId1 = usersRepository.save(user)
+                .getId();
+
         GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
         groupServiceDTO.setGroupName("group1");
         groupServiceDTO.setGroupImg(null);

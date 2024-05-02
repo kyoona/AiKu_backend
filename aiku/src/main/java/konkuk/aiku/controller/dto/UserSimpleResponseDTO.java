@@ -8,5 +8,4 @@ public class UserSimpleResponseDTO {
     private Long userId;
     private String username;
     private String userImg;
-    private TitleResponseDTO title;
 }
