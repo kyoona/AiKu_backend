@@ -92,7 +92,7 @@ public class GroupService {
         groupDetailServiceDTO.setGroupId(groups.getId());
         groupDetailServiceDTO.setGroupName(groups.getGroupName());
         groupDetailServiceDTO.setGroupImg(groups.getGroupImg());
-        groupDetailServiceDTO.setDescription(groupDetailServiceDTO.getDescription());
+        groupDetailServiceDTO.setDescription(groups.getDescription());
 
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
@@ -112,7 +112,6 @@ public class GroupService {
     }
 
     private UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
-        log.info("만드는 유저 아이다 {}", user.getId());
         UserSimpleServiceDTO userSimpleServiceDTO = new UserSimpleServiceDTO();
         userSimpleServiceDTO.setUserId(user.getId());
         userSimpleServiceDTO.setUsername(user.getUsername());

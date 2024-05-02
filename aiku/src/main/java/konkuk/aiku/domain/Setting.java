@@ -12,6 +12,9 @@ public class Setting {
     private boolean isScheduleAlarmOn;
     private boolean isPinchAlarmOn;
 
+    public Setting() {
+    }
+
     public Setting(boolean isLocationInformationOn, boolean isVoiceAuthorityOn, boolean isBettingAlarmOn, boolean isScheduleAlarmOn, boolean isPinchAlarmOn) {
         this.isLocationInformationOn = isLocationInformationOn;
         this.isVoiceAuthorityOn = isVoiceAuthorityOn;

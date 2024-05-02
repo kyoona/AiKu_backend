@@ -1,8 +1,12 @@
 package konkuk.aiku.service;
 
+import konkuk.aiku.domain.Setting;
+import konkuk.aiku.domain.UserRole;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.repository.UsersRepository;
+import konkuk.aiku.service.dto.GroupDetailServiceDTO;
 import konkuk.aiku.service.dto.GroupServiceDTO;
+import konkuk.aiku.service.dto.UserSimpleServiceDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -115,5 +119,31 @@ class GroupServiceTest {
         groupService.deleteGroup(userId1, groupId);
 
         assertThat(groupService.findGroupById(groupId)).isNull();
+    }
+
+    @Test
+    @DisplayName("그룹 조회")
+    void findGroupDetailById(){
+        Users user = new Users();
+        user.setUsername("user1");
+        user.setRole(UserRole.USER);
+        user.setSetting(new Setting(false, false, false, false, false));
+        Long userId1 = usersRepository.save(user)
+                .getId();
+
+        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
+        groupServiceDTO.setGroupName("group1");
+        groupServiceDTO.setGroupImg(null);
+        groupServiceDTO.setDescription("test group1");
+        Long groupId = groupService.addGroup(userId1, groupServiceDTO);
+
+        GroupDetailServiceDTO groupDetailServiceDTO = groupService.findGroupDetailById(userId1, groupId);
+        UserSimpleServiceDTO findUserDTO = groupDetailServiceDTO.getUsers().get(0);
+        assertThat(findUserDTO.getUserId()).isEqualTo(user.getId());
+        assertThat(findUserDTO.getUsername()).isEqualTo(user.getUsername());
+
+        assertThat(groupDetailServiceDTO.getGroupId()).isEqualTo(groupId);
+        assertThat(groupDetailServiceDTO.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
+        assertThat(groupDetailServiceDTO.getDescription()).isEqualTo(groupServiceDTO.getDescription());
     }
 }
