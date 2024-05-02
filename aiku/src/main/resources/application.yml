@@ -13,7 +13,14 @@ spring:
         show_sql: true
         format_sql: true
 
+jwt:
+  secret: f48d729a72445f378eb3be26525615782ddd1555889c9997d41ddab82d560c51
+#  공개 금지 (공개시 ignore에 추가 필요)
+
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type : trace
+logging:
+  level:
+    root: trace
 #  org.hibernate.type: trace
