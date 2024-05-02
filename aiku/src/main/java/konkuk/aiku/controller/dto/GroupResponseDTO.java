@@ -1,4 +1,4 @@
-package konkuk.aiku.dto;
+package konkuk.aiku.controller.dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package konkuk.aiku.dto;
+package konkuk.aiku.controller.dto;
 
 import konkuk.aiku.domain.Location;
 import lombok.Getter;

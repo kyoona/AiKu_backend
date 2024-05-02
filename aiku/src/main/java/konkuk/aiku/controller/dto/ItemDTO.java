@@ -1,4 +1,4 @@
-package konkuk.aiku.dto;
+package konkuk.aiku.controller.dto;
 
 import konkuk.aiku.domain.EventStatus;
 import konkuk.aiku.domain.ItemCategory;
