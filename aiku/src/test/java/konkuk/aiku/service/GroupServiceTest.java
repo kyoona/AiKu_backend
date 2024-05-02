@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
 
+
 @Transactional
 @SpringBootTest
 class GroupServiceTest {
@@ -89,6 +90,20 @@ class GroupServiceTest {
         modifyGroupServiceDTO2.setGroupImg(null);
         modifyGroupServiceDTO2.setDescription("can't access");
         assertThatThrownBy(()-> groupService.modifyGroup(userId2, groupId, modifyGroupServiceDTO2))
-                .isExactlyInstanceOf(IllegalAccessException.class);
+                .isExactlyInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("그룹 삭제")
+    void deleteGroup(){
+        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
+        groupServiceDTO.setGroupName("group1");
+        groupServiceDTO.setGroupImg(null);
+        groupServiceDTO.setDescription("test group1");
+        Long groupId = groupService.addGroup(userId1, groupServiceDTO);
+
+        groupService.deleteGroup(userId1, groupId);
+
+        assertThat(groupService.findGroupById(groupId)).isNull();
     }
 }

@@ -38,4 +38,10 @@ public class GroupController {
         groupServiceDTO.setDescription(groupDTO.getDescription());
         groupServiceDTO.setGroupImg(null);
     }
+
+    @DeleteMapping("/{groupId}")
+    public void groupDelete(@PathVariable Long userId,
+                            @PathVariable Long groupId){
+        groupService.deleteGroup(userId, groupId);
+    }
 }

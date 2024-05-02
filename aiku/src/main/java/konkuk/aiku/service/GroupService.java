@@ -49,9 +49,10 @@ public class GroupService {
     }
 
     @Transactional
-    public Long modifyGroup(Long userId, Long groupId, GroupServiceDTO groupServiceDTO) throws IllegalAccessException {
-        boolean hasAthority = userGroupRepository.existsByUserIdAndGroupId(userId, groupId);
-        if(!hasAthority) throw new IllegalAccessException("권한 없지롱"); //TODO
+    public void modifyGroup(Long userId, Long groupId, GroupServiceDTO groupServiceDTO) {
+        if(isNotUserInGroup(userId, groupId)){
+            throw new RuntimeException("권한 없지롱"); //TODO
+        }
 
         Groups group = groupsRepository.findById(groupId).get();
         if(StringUtils.hasText(groupServiceDTO.getGroupName())){
@@ -63,11 +64,24 @@ public class GroupService {
         if(groupServiceDTO != null){
             group.setGroupImg(groupServiceDTO.getGroupImg());
         }
-        return groupId;
+    }
+
+    @Transactional
+    public void deleteGroup(Long userId, Long groupId) {
+        if(isNotUserInGroup(userId, groupId)){
+            throw new RuntimeException("권한 없지롱"); //TODO
+        }
+
+        userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
+        groupsRepository.deleteById(groupId);
     }
 
     public Groups findGroupById(Long id){
         Optional<Groups> group = groupsRepository.findById(id);
         return group.orElse(null);
+    }
+
+    private boolean isNotUserInGroup(Long userId, Long groupId){
+        return !userGroupRepository.existsByUserIdAndGroupId(userId, groupId);
     }
 }
