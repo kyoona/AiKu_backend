@@ -1,10 +1,11 @@
 package konkuk.aiku.service.dto;
 
 import konkuk.aiku.domain.UserRole;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Builder
 public class UserSimpleServiceDTO {
     private Long userId;
     private String username;

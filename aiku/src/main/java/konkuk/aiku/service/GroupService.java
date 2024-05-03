@@ -112,25 +112,27 @@ public class GroupService {
     }
 
     private UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
-        UserSimpleServiceDTO userSimpleServiceDTO = new UserSimpleServiceDTO();
-        userSimpleServiceDTO.setUserId(user.getId());
-        userSimpleServiceDTO.setUsername(user.getUsername());
-        userSimpleServiceDTO.setPhoneNumber(user.getPhoneNumber());
-        userSimpleServiceDTO.setUserImg(user.getUserImg());
-        userSimpleServiceDTO.setSetting(createSettingServiceDTO(user));
-        userSimpleServiceDTO.setPoint(user.getPoint());
-        userSimpleServiceDTO.setRole(user.getRole());
+        UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
+                .userId(user.getId())
+                .username(user.getUsername())
+                .phoneNumber(user.getPhoneNumber())
+                .userImg(user.getUserImg())
+                .setting(createSettingServiceDTO(user))
+                .point(user.getPoint())
+                .role(user.getRole())
+                .build();
         return userSimpleServiceDTO;
     }
 
     private SettingServiceDTO createSettingServiceDTO(Users user){
-        SettingServiceDTO settingServiceDTO = new SettingServiceDTO();
         Setting setting = user.getSetting();
-        settingServiceDTO.setIsBettingAlarmOn(setting.isBettingAlarmOn());
-        settingServiceDTO.setIsPinchAlarmOn(setting.isPinchAlarmOn());
-        settingServiceDTO.setIsLocationInformationOn(setting.isLocationInformationOn());
-        settingServiceDTO.setIsScheduleAlarmOn(setting.isScheduleAlarmOn());
-        settingServiceDTO.setIsVoiceAuthorityOn(setting.isVoiceAuthorityOn());
+        SettingServiceDTO settingServiceDTO = SettingServiceDTO.builder()
+                .isBettingAlarmOn(setting.isBettingAlarmOn())
+                .isPinchAlarmOn(setting.isPinchAlarmOn())
+                .isLocationInformationOn(setting.isLocationInformationOn())
+                .isScheduleAlarmOn(setting.isScheduleAlarmOn())
+                .isVoiceAuthorityOn(setting.isVoiceAuthorityOn())
+                .build();
         return settingServiceDTO;
     }
 }
