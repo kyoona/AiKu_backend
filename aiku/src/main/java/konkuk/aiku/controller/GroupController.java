@@ -1,6 +1,7 @@
 package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
+import konkuk.aiku.controller.dto.EntryDTO;
 import konkuk.aiku.controller.dto.GroupDTO;
 import konkuk.aiku.controller.dto.GroupResponseDTO;
 import konkuk.aiku.controller.dto.UserSimpleResponseDTO;
@@ -63,6 +64,17 @@ public class GroupController {
 
         GroupResponseDTO groupResponseDTO = createGroupResponseDTO(serviceDTO);
         return new ResponseEntity<GroupResponseDTO>(groupResponseDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/{groupId}/entry")
+    public void groupEntry(@PathVariable Long userId,
+                           @PathVariable Long groupId,
+                           @RequestBody EntryDTO entryDTO){
+        if (entryDTO.getEnter()) {
+            groupService.enterGroup(userId, groupId);
+        } else {
+            groupService.exitGroup(userId, groupId);
+        }
     }
 
     private GroupResponseDTO createGroupResponseDTO(GroupDetailServiceDTO serviceDTO) {

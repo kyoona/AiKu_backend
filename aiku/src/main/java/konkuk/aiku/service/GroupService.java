@@ -105,6 +105,21 @@ public class GroupService {
         return groupDetailServiceDTO;
     }
 
+    public void enterGroup(Long userId, Long groupId){
+        Users user = usersRepository.findById(userId).get();
+        Groups group = groupsRepository.findById(groupId).get();
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+    }
+
+    public void exitGroup(Long userId, Long groupId){
+        checkNotUserInGroup(userId, groupId);
+        userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
+    }
+
     private boolean checkNotUserInGroup(Long userId, Long groupId){
         boolean isIn = userGroupRepository.existsByUserIdAndGroupId(userId, groupId);
         if(!isIn){
