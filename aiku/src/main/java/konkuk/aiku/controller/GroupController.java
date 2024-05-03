@@ -30,11 +30,11 @@ public class GroupController {
     @PostMapping
     public void groupAdd(@PathVariable Long userId,
                          @RequestBody @Valid GroupDTO groupDTO){
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setGroupName(groupDTO.getGroupName());
-        groupServiceDTO.setDescription(groupDTO.getDescription());
-        groupServiceDTO.setGroupImg(null);
-
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName(groupDTO.getGroupName())
+                .description(groupDTO.getDescription())
+                .groupImg(null)
+                .build();
         groupService.addGroup(userId, groupServiceDTO);
     }
 
@@ -42,10 +42,12 @@ public class GroupController {
     public void groupModify(@PathVariable Long userId,
                             @PathVariable Long groupId,
                             @RequestBody @Valid GroupDTO groupDTO){
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setGroupName(groupDTO.getGroupName());
-        groupServiceDTO.setDescription(groupDTO.getDescription());
-        groupServiceDTO.setGroupImg(null);
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName(groupDTO.getGroupName())
+                .description(groupDTO.getDescription())
+                .groupImg(null)
+                .build();
+        groupService.modifyGroup(userId, groupId, groupServiceDTO);
     }
 
     @DeleteMapping("/{groupId}")

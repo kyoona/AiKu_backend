@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -74,32 +75,33 @@ public class GroupService {
         Groups group = groupsRepository.findById(id).orElse(null);
         if(group == null) return null;
 
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setId(group.getId());
-        groupServiceDTO.setGroupName(group.getGroupName());
-        groupServiceDTO.setGroupImg(group.getGroupImg());
-        groupServiceDTO.setDescription(group.getDescription());
-
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .id(group.getId())
+                .groupName(group.getGroupName())
+                .description(group.getDescription())
+                .groupImg(group.getGroupImg())
+                .build();
         return groupServiceDTO;
     }
 
     public GroupDetailServiceDTO findGroupDetailById(Long userId, Long groupId) {
         checkNotUserInGroup(userId, groupId);
 
-        GroupDetailServiceDTO groupDetailServiceDTO = new GroupDetailServiceDTO();
-
-        Groups groups = groupsRepository.findById(groupId).get();
-        groupDetailServiceDTO.setGroupId(groups.getId());
-        groupDetailServiceDTO.setGroupName(groups.getGroupName());
-        groupDetailServiceDTO.setGroupImg(groups.getGroupImg());
-        groupDetailServiceDTO.setDescription(groups.getDescription());
-
+        Groups group = groupsRepository.findById(groupId).get();
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
+        List<UserSimpleServiceDTO> userSimpleServiceDTOS = new ArrayList<>();
         for (UserGroup userGroup : userGroups) {
-            UserSimpleServiceDTO userSimpleServiceDTO = createUserSimpleServiceDTO(userGroup.getUser());
-            groupDetailServiceDTO.getUsers().add(userSimpleServiceDTO);
+            userSimpleServiceDTOS.add(createUserSimpleServiceDTO(userGroup.getUser()));
         }
+
+        GroupDetailServiceDTO groupDetailServiceDTO = GroupDetailServiceDTO.builder()
+                .groupId(group.getId())
+                .groupName(group.getGroupName())
+                .groupImg(group.getGroupImg())
+                .description(group.getDescription())
+                .users(userSimpleServiceDTOS)
+                .build();
         return groupDetailServiceDTO;
     }
 

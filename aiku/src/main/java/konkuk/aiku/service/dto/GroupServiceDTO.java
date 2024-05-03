@@ -1,9 +1,10 @@
 package konkuk.aiku.service.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Builder
 public class GroupServiceDTO {
     private Long id;
     private String groupName;

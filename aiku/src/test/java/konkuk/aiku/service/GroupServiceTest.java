@@ -32,15 +32,11 @@ class GroupServiceTest {
         Long userId1 = usersRepository.save(user)
                 .getId();
 
-        Users user2 = new Users();
-        user2.setUsername("user1");
-        Long userId2 = usersRepository.save(user2)
-                .getId();
-
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setGroupName("group1");
-        groupServiceDTO.setGroupImg(null);
-        groupServiceDTO.setDescription("test group1");
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group1")
+                .groupImg("url1")
+                .description("group1입니다.")
+                .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
         GroupServiceDTO findGroupDTO = groupService.findGroupById(groupId);
@@ -57,16 +53,18 @@ class GroupServiceTest {
         Long userId1 = usersRepository.save(user)
                 .getId();
 
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setGroupName("group1");
-        groupServiceDTO.setGroupImg(null);
-        groupServiceDTO.setDescription("test group1");
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group1")
+                .groupImg("url1")
+                .description("group1입니다.")
+                .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
-        GroupServiceDTO modifyGroupServiceDTO = new GroupServiceDTO();
-        modifyGroupServiceDTO.setGroupName("changeName");
-        modifyGroupServiceDTO.setGroupImg(null);
-        modifyGroupServiceDTO.setDescription("change the group name");
+        GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group modify")
+                .groupImg("url2")
+                .description("group1을 수정하였습니다.")
+                .build();
         groupService.modifyGroup(userId1, groupId, modifyGroupServiceDTO);
 
         GroupServiceDTO findGroup = groupService.findGroupById(groupId);
@@ -88,17 +86,19 @@ class GroupServiceTest {
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setGroupName("group1");
-        groupServiceDTO.setGroupImg(null);
-        groupServiceDTO.setDescription("test group1");
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group1")
+                .groupImg("url1")
+                .description("group1입니다.")
+                .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
-        GroupServiceDTO modifyGroupServiceDTO2 = new GroupServiceDTO();
-        modifyGroupServiceDTO2.setGroupName("error");
-        modifyGroupServiceDTO2.setGroupImg(null);
-        modifyGroupServiceDTO2.setDescription("can't access");
-        assertThatThrownBy(()-> groupService.modifyGroup(userId2, groupId, modifyGroupServiceDTO2))
+        GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group modify")
+                .groupImg("url2")
+                .description("group1을 수정하였습니다.")
+                .build();
+        assertThatThrownBy(()-> groupService.modifyGroup(userId2, groupId, modifyGroupServiceDTO))
                 .isExactlyInstanceOf(RuntimeException.class);
     }
 
@@ -110,10 +110,11 @@ class GroupServiceTest {
         Long userId1 = usersRepository.save(user)
                 .getId();
 
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setGroupName("group1");
-        groupServiceDTO.setGroupImg(null);
-        groupServiceDTO.setDescription("test group1");
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group1")
+                .groupImg("url1")
+                .description("group1입니다.")
+                .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
         groupService.deleteGroup(userId1, groupId);
@@ -131,10 +132,11 @@ class GroupServiceTest {
         Long userId1 = usersRepository.save(user)
                 .getId();
 
-        GroupServiceDTO groupServiceDTO = new GroupServiceDTO();
-        groupServiceDTO.setGroupName("group1");
-        groupServiceDTO.setGroupImg(null);
-        groupServiceDTO.setDescription("test group1");
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group1")
+                .groupImg("url1")
+                .description("group1입니다.")
+                .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
         GroupDetailServiceDTO groupDetailServiceDTO = groupService.findGroupDetailById(userId1, groupId);
