@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -35,10 +36,16 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        long now = (new Date()).getTime();
+        Calendar accessTokenCal = Calendar.getInstance();
+        accessTokenCal.setTime(new Date());
+        accessTokenCal.add(Calendar.DATE, 1);
 
-        // AccessToken : 1시간 후 만료
-        Date accessTokenExpiresIn = new Date(now + 3600000);
+        Calendar refreshTokenCal = Calendar.getInstance();
+        refreshTokenCal.setTime(new Date());
+        refreshTokenCal.add(Calendar.MONTH, 1);
+
+        // AccessToken : 1일 후 만료
+        Date accessTokenExpiresIn = accessTokenCal.getTime();
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
@@ -46,8 +53,8 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        // RefreshToken : 1일 후 만료
-        Date refreshTokenExpiresIn = new Date(now + 86400000);
+        // RefreshToken : 1달 후 만료
+        Date refreshTokenExpiresIn = refreshTokenCal.getTime();
         String refreshToken = Jwts.builder()
                 .setExpiration(refreshTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -91,6 +98,7 @@ public class JwtTokenProvider {
             log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
+            // 만료 토큰 재발급 로직 시행
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
@@ -111,4 +119,5 @@ public class JwtTokenProvider {
             return e.getClaims();
         }
     }
+
 }
