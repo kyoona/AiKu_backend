@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @Slf4j
 public class GroupService {
 
@@ -104,6 +105,7 @@ public class GroupService {
         return groupDetailServiceDTO;
     }
 
+    @Transactional
     public void enterGroup(Long userId, Long groupId){
         Users user = usersRepository.findById(userId).get();
         Groups group = groupsRepository.findById(groupId).get();
@@ -114,6 +116,7 @@ public class GroupService {
         userGroupRepository.save(userGroup);
     }
 
+    @Transactional
     public void exitGroup(Long userId, Long groupId){
         checkNotUserInGroup(userId, groupId);
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
