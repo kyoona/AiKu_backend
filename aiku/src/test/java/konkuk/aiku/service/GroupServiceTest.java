@@ -30,11 +30,13 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 등록")
     void addGroup() {
+        //given
         Users user = new Users();
         user.setUsername("user1");
         Long userId1 = usersRepository.save(user)
                 .getId();
 
+        //when
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
                 .groupImg("url1")
@@ -42,6 +44,7 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
+        //then
         GroupServiceDTO findGroupDTO = groupService.findGroupById(groupId);
         assertThat(findGroupDTO.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
         assertThat(findGroupDTO.getGroupImg()).isEqualTo(groupServiceDTO.getGroupImg());
@@ -51,6 +54,7 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 수정")
     void modifyGroup() throws IllegalAccessException {
+        //given
         Users user = new Users();
         user.setUsername("user1");
         Long userId1 = usersRepository.save(user)
@@ -63,6 +67,7 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
+        //when
         GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group modify")
                 .groupImg("url2")
@@ -70,6 +75,7 @@ class GroupServiceTest {
                 .build();
         groupService.modifyGroup(userId1, groupId, modifyGroupServiceDTO);
 
+        //then
         GroupServiceDTO findGroup = groupService.findGroupById(groupId);
         assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDTO.getGroupName());
         assertThat(findGroup.getGroupImg()).isEqualTo(modifyGroupServiceDTO.getGroupImg());
@@ -79,13 +85,14 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
     void modifyGroupInFaultCondition() throws IllegalAccessException {
+        //given
         Users user = new Users();
         user.setUsername("user1");
         Long userId1 = usersRepository.save(user)
                 .getId();
 
         Users user2 = new Users();
-        user2.setUsername("user1");
+        user2.setUsername("user2");
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
@@ -96,6 +103,7 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
+        //when
         GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group modify")
                 .groupImg("url2")
@@ -108,6 +116,7 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 삭제")
     void deleteGroup(){
+        //given
         Users user = new Users();
         user.setUsername("user1");
         Long userId1 = usersRepository.save(user)
@@ -120,14 +129,17 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
+        //when
         groupService.deleteGroup(userId1, groupId);
 
+        //then
         assertThat(groupService.findGroupById(groupId)).isNull();
     }
 
     @Test
     @DisplayName("그룹 조회")
     void findGroupDetailById(){
+        //given
         Users user = new Users();
         user.setUsername("user1");
         user.setRole(UserRole.USER);
@@ -142,7 +154,10 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
+        //when
         GroupDetailServiceDTO groupDetailServiceDTO = groupService.findGroupDetailById(userId1, groupId);
+
+        //then
         UserSimpleServiceDTO findUserDTO = groupDetailServiceDTO.getUsers().get(0);
         assertThat(findUserDTO.getUserId()).isEqualTo(user.getId());
         assertThat(findUserDTO.getUsername()).isEqualTo(user.getUsername());
@@ -155,6 +170,7 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 조회-그룹에 속해 있지 않은 유저")
     void findGroupDetailByIdInFaultCondition(){
+        //given
         Users user = new Users();
         user.setUsername("user1");
         user.setRole(UserRole.USER);
@@ -176,12 +192,14 @@ class GroupServiceTest {
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
+        //when
         assertThatThrownBy(() -> groupService.findGroupDetailById(userId2, groupId)).isInstanceOf(RuntimeException.class);
     }
 
     @Test
     @DisplayName("그룹 참가")
     void enterGroup(){
+        //given
         Users user = new Users();
         user.setUsername("user1");
         user.setRole(UserRole.USER);
@@ -203,14 +221,17 @@ class GroupServiceTest {
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
+        //when
         groupService.enterGroup(userId2, groupId);
 
+        //then
         assertThat(userGroupRepository.existsByUserIdAndGroupId(userId2, groupId)).isTrue();
     }
 
     @Test
     @DisplayName("그룹 퇴장")
     void exitGroup(){
+        //given
         Users user = new Users();
         user.setUsername("user1");
         user.setRole(UserRole.USER);
@@ -225,14 +246,17 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
+        //when
         groupService.exitGroup(userId1, groupId);
 
+        //then
         assertThat(userGroupRepository.existsByUserIdAndGroupId(userId1, groupId)).isFalse();
     }
 
     @Test
     @DisplayName("그룹 퇴장-그룹에 속해 있지 않은 유저")
     void exitGroupInFaultCondition(){
+        //given
         Users user = new Users();
         user.setUsername("user1");
         user.setRole(UserRole.USER);
@@ -254,6 +278,7 @@ class GroupServiceTest {
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
+        //when
         assertThatThrownBy(() -> groupService.exitGroup(userId2, groupId)).isInstanceOf(RuntimeException.class);
     }
 }
