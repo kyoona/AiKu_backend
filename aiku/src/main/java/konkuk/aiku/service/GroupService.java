@@ -34,8 +34,7 @@ public class GroupService {
         group.setGroupImg(groupServiceDTO.getGroupImg());
         group.setDescription(groupServiceDTO.getDescription());
 
-        Long groupId = groupsRepository.save(group)
-                .getId();
+        groupsRepository.save(group);
 
         Users user = usersRepository.findById(userId).get();
 
@@ -44,7 +43,7 @@ public class GroupService {
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
 
-        return groupId;
+        return group.getId();
     }
 
     @Transactional
