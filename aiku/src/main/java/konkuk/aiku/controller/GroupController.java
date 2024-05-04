@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -78,15 +79,18 @@ public class GroupController {
     }
 
     private GroupResponseDTO createGroupResponseDTO(GroupDetailServiceDTO serviceDTO) {
-        GroupResponseDTO responseDTO = new GroupResponseDTO();
-        responseDTO.setGroupId(serviceDTO.getGroupId());
-        responseDTO.setGroupName(serviceDTO.getGroupName());
-        responseDTO.setDescription(serviceDTO.getDescription());
-
-        List<UserSimpleServiceDTO> userServiceDTOS = serviceDTO.getUsers();
-        for (UserSimpleServiceDTO userServiceDTO : userServiceDTOS) {
-            responseDTO.getUsers().add(createUserSimpleServiceDTO(userServiceDTO));
+        List<UserSimpleServiceDTO> userServiceDTOs = serviceDTO.getUsers();
+        List<UserSimpleResponseDTO> userSimpleResponseDTOs = new ArrayList<>();
+        for (UserSimpleServiceDTO userServiceDTO : userServiceDTOs) {
+            userSimpleResponseDTOs.add(createUserSimpleServiceDTO(userServiceDTO));
         }
+
+        GroupResponseDTO responseDTO = GroupResponseDTO.builder()
+                .groupId(serviceDTO.getGroupId())
+                .groupName(serviceDTO.getGroupName())
+                .description(serviceDTO.getDescription())
+                .users(userSimpleResponseDTOs)
+                .build();
 
         return responseDTO;
     }
