@@ -2,6 +2,7 @@ package konkuk.aiku.service;
 
 import jakarta.persistence.EntityManager;
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserGroupRepository;
@@ -9,6 +10,7 @@ import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.LocationServiceDTO;
 import konkuk.aiku.service.dto.ScheduleServiceDTO;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -39,6 +40,7 @@ class ScheduleServiceTest {
     UserGroupRepository userGroupRepository;
 
     @Test
+    @DisplayName("스케줄 등록")
     public void scheduleAdd() throws Exception{
         //given
         String userKaKaoId1 = "kakao1";
@@ -86,5 +88,32 @@ class ScheduleServiceTest {
                 .setParameter("userId", user.getId())
                 .getResultList();
         assertThat(userSchedules.size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("스케줄 등록-그룹에 속해 있지 않은 유저")
+    public void scheduleAddInFaultCondition() throws Exception{
+        //given
+        String userKaKaoId1 = "kakao1";
+        Users user = Users.builder()
+                .username("user1")
+                .kakaoId(userKaKaoId1)
+                .build();
+        usersRepository.save(user);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        //when
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+
+        assertThatThrownBy(() -> scheduleService.scheduleAdd(userKaKaoId1, group.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
     }
 }
