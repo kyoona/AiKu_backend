@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserSimpleServiceDTO {
-    private Long userId;
+    private String userKaKaoId;
     private String username;
     private String phoneNumber;
     private String userImg;

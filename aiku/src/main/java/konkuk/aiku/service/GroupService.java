@@ -29,7 +29,7 @@ public class GroupService {
     }
 
     @Transactional
-    public Long addGroup(Long userId, GroupServiceDTO groupServiceDTO){
+    public Long addGroup(String kakaoId, GroupServiceDTO groupServiceDTO){
         Groups group = new Groups();
         group.setGroupName(groupServiceDTO.getGroupName());
         group.setGroupImg(groupServiceDTO.getGroupImg());
@@ -37,7 +37,7 @@ public class GroupService {
 
         groupsRepository.save(group);
 
-        Users user = usersRepository.findById(userId).get();
+        Users user = findUserByKakaoId(kakaoId);
 
         UserGroup userGroup = new UserGroup();
         userGroup.setUser(user);
@@ -48,7 +48,8 @@ public class GroupService {
     }
 
     @Transactional
-    public void modifyGroup(Long userId, Long groupId, GroupServiceDTO groupServiceDTO) {
+    public void modifyGroup(String kakaoId, Long groupId, GroupServiceDTO groupServiceDTO) {
+        Long userId = findUserByKakaoId(kakaoId).getId();
         checkNotUserInGroup(userId, groupId);
 
         Groups group = groupsRepository.findById(groupId).get();
@@ -64,7 +65,8 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroup(Long userId, Long groupId) {
+    public void deleteGroup(String kakaoId, Long groupId) {
+        Long userId = findUserByKakaoId(kakaoId).getId();
         checkNotUserInGroup(userId, groupId);
 
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
@@ -84,7 +86,8 @@ public class GroupService {
         return groupServiceDTO;
     }
 
-    public GroupDetailServiceDTO findGroupDetailById(Long userId, Long groupId) {
+    public GroupDetailServiceDTO findGroupDetailById(String kakaoId, Long groupId) {
+        Long userId = findUserByKakaoId(kakaoId).getId();
         checkNotUserInGroup(userId, groupId);
 
         Groups group = groupsRepository.findById(groupId).get();
@@ -106,8 +109,8 @@ public class GroupService {
     }
 
     @Transactional
-    public void enterGroup(Long userId, Long groupId){
-        Users user = usersRepository.findById(userId).get();
+    public void enterGroup(String kakaoId, Long groupId){
+        Users user = findUserByKakaoId(kakaoId);
         Groups group = groupsRepository.findById(groupId).get();
 
         UserGroup userGroup = new UserGroup();
@@ -117,7 +120,8 @@ public class GroupService {
     }
 
     @Transactional
-    public void exitGroup(Long userId, Long groupId){
+    public void exitGroup(String kakaoId, Long groupId){
+        Long userId = findUserByKakaoId(kakaoId).getId();
         checkNotUserInGroup(userId, groupId);
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
     }
@@ -130,9 +134,13 @@ public class GroupService {
         return !isIn;
     }
 
+    private Users findUserByKakaoId(String kakaoId){
+        return usersRepository.findByKakaoId(kakaoId).get();
+    }
+
     private UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
         UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                .userId(user.getId())
+                .userKaKaoId(user.getKakaoId())
                 .username(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
                 .userImg(user.getUserImg())
