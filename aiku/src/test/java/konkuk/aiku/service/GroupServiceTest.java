@@ -36,8 +36,7 @@ class GroupServiceTest {
                 .username("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         //when
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
@@ -63,8 +62,7 @@ class GroupServiceTest {
                 .username("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -159,8 +157,7 @@ class GroupServiceTest {
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -192,8 +189,7 @@ class GroupServiceTest {
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -208,8 +204,7 @@ class GroupServiceTest {
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId2)
                 .build();
-        Long userId2 = usersRepository.save(user2)
-                .getId();
+        usersRepository.save(user2);
 
         //when
         assertThatThrownBy(() -> groupService.findGroupDetailById(userKaKaoId2, groupId)).isInstanceOf(RuntimeException.class);
@@ -260,8 +255,7 @@ class GroupServiceTest {
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -274,7 +268,7 @@ class GroupServiceTest {
         groupService.exitGroup(userKaKaoId1, groupId);
 
         //then
-        assertThat(userGroupRepository.findByUserIdAndGroupId(userId1, groupId)).isEmpty();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(user.getId(), groupId)).isEmpty();
     }
 
     @Test
@@ -287,8 +281,7 @@ class GroupServiceTest {
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
