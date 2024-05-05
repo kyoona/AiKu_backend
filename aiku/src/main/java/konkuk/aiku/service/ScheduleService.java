@@ -44,6 +44,7 @@ public class ScheduleService {
         return schedule.getId();
     }
 
+    //TODO
     @Transactional
     public void modifySchedule(String kakaoId, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
         Users user = findUserByKakaoId(kakaoId);
@@ -64,6 +65,15 @@ public class ScheduleService {
         }
     }
 
+    @Transactional
+    public void deleteSchedule(String kakaoId, Long groupId, Long scheduleId) {
+        Users user = findUserByKakaoId(kakaoId);
+        checkUserInGroup(user.getId(), groupId);
+
+        scheduleRepository.deleteById(scheduleId);
+
+    }
+
     private UserGroup checkUserInGroup(Long userId, Long groupId){
         Optional<UserGroup> userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
         if(userGroup.isEmpty()){
@@ -79,5 +89,4 @@ public class ScheduleService {
     private Location createLocation(LocationServiceDTO locationServiceDTO){
         return new Location(locationServiceDTO.getLatitude(), locationServiceDTO.getLongitude(), locationServiceDTO.getLocationName());
     }
-
 }

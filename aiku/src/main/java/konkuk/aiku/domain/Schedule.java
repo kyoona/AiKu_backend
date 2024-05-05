@@ -28,7 +28,7 @@ public class Schedule extends TimeEntity{
     @Enumerated
     private ScheduleStatus status;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSchedule> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule")
