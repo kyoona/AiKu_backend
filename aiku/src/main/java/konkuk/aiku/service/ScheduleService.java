@@ -15,6 +15,6 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     public Long scheduleAdd(String kakaoId, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
-
+        return null;
     }
 }

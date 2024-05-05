@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,9 +51,8 @@ public class GroupService {
     @Transactional
     public void modifyGroup(String kakaoId, Long groupId, GroupServiceDTO groupServiceDTO) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
+        Groups group = checkUserInGroup(userId, groupId);
 
-        Groups group = groupsRepository.findById(groupId).get();
         if(StringUtils.hasText(groupServiceDTO.getGroupName())){
             group.setGroupName(groupServiceDTO.getGroupName());
         }
@@ -67,7 +67,7 @@ public class GroupService {
     @Transactional
     public void deleteGroup(String kakaoId, Long groupId) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
+        checkUserInGroup(userId, groupId);
 
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
         groupsRepository.deleteById(groupId);
@@ -88,9 +88,8 @@ public class GroupService {
 
     public GroupDetailServiceDTO findGroupDetailById(String kakaoId, Long groupId) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
+        Groups group = checkUserInGroup(userId, groupId);
 
-        Groups group = groupsRepository.findById(groupId).get();
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
         List<UserSimpleServiceDTO> userSimpleServiceDTOS = new ArrayList<>();
@@ -122,16 +121,16 @@ public class GroupService {
     @Transactional
     public void exitGroup(String kakaoId, Long groupId){
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
+        checkUserInGroup(userId, groupId);
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
     }
 
-    private boolean checkNotUserInGroup(Long userId, Long groupId){
-        boolean isIn = userGroupRepository.existsByUserIdAndGroupId(userId, groupId);
-        if(!isIn){
+    private Groups checkUserInGroup(Long userId, Long groupId){
+        Optional<Groups> group = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
+        if(group.isEmpty()){
             throw new RuntimeException("권한 없지롱"); //TODO
         }
-        return !isIn;
+        return group.get();
     }
 
     private Users findUserByKakaoId(String kakaoId){

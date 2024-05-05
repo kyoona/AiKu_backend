@@ -246,7 +246,7 @@ class GroupServiceTest {
         groupService.enterGroup(userKaKaoId2, groupId);
 
         //then
-        assertThat(userGroupRepository.existsByUserIdAndGroupId(userId2, groupId)).isTrue();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(userId2, groupId)).isTrue();
     }
 
     @Test
@@ -273,7 +273,7 @@ class GroupServiceTest {
         groupService.exitGroup(userKaKaoId1, groupId);
 
         //then
-        assertThat(userGroupRepository.existsByUserIdAndGroupId(userId1, groupId)).isFalse();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(userId1, groupId)).isFalse();
     }
 
     @Test
