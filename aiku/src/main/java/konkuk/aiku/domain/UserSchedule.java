@@ -6,12 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Setter @Getter
+@Getter
 public class UserSchedule extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userScheduleId")
-    @Setter(value = AccessLevel.NONE)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,4 +20,12 @@ public class UserSchedule extends TimeEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduleId")
     private Schedule schedule;
+
+    public void setUser(Users user){
+        this.user = user;
+    }
+
+    public void setSchedule(Schedule schedule){
+        this.schedule = schedule;
+    }
 }

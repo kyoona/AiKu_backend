@@ -1,20 +1,19 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Schedule extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "scheduleId")
-    @Setter(value = AccessLevel.NONE)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,15 +28,34 @@ public class Schedule extends TimeEntity{
     @Enumerated
     private ScheduleStatus status;
 
-    @OneToMany(mappedBy = "schedule")
-    private List<UserSchedule> users;
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    private List<UserSchedule> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule")
-    private List<Betting> bettings;
+    private List<Betting> bettings = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule")
-    private List<Betting> racings;
+    private List<Betting> racings = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule")
-    private List<UserArrivalData> userArrivalDatas;
+    private List<UserArrivalData> userArrivalDatas = new ArrayList<>();
+
+    @Builder
+    public Schedule(String scheduleName, Location location, LocalDateTime scheduleTime, ScheduleStatus status) {
+        this.scheduleName = scheduleName;
+        this.location = location;
+        this.scheduleTime = scheduleTime;
+        this.status = status;
+    }
+
+    public void setGroup(Groups group){
+        this.group = group;
+        group.addSchedule(this);
+    }
+
+    public void addUser(Users user, UserSchedule userSchedule) {
+        userSchedule.setSchedule(this);
+        userSchedule.setUser(user);
+        this.users.add(userSchedule);
+    }
 }

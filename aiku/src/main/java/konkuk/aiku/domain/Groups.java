@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,8 +19,12 @@ public class Groups extends TimeEntity{
     private String groupName;
     private String groupImg;
 
-    @OneToMany(mappedBy = "group")
-    private List<Schedule> schedules;
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<Schedule> schedules = new ArrayList<>();
 
     private String description;
+
+    public void addSchedule(Schedule schedule){
+        schedules.add(schedule);
+    }
 }
