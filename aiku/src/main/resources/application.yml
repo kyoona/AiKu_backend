@@ -20,7 +20,4 @@ jwt:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type : trace
-logging:
-  level:
-    root: trace
 #  org.hibernate.type: trace

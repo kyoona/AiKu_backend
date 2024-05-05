@@ -2,68 +2,32 @@ package konkuk.aiku.service;
 
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.repository.UsersRepository;
-import konkuk.aiku.security.JwtToken;
-import konkuk.aiku.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserService {
+
     private final UsersRepository usersRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtTokenProvider jwtTokenProvider;
 
-
-    // username + password로 인증용 토큰 생성 -> 일단 카카오 아이디로만 설정
-    @Transactional
-    public JwtToken signIn(String kakaoId) {
-
-        UsernamePasswordAuthenticationToken authenticationFilter
-                = new UsernamePasswordAuthenticationToken(kakaoId, kakaoId);
-
-
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationFilter);
-
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
-
-        Optional<Users> user = usersRepository.findByKakaoId(kakaoId);
-        if (user.isPresent()) {
-            user.get().setRefreshToken(jwtToken.getRefreshToken());
-        }
-
-        return jwtToken;
+    public Users save(Users users) {
+        return usersRepository.save(users);
     }
 
-    // username + password로 인증용 토큰 생성 -> 일단 카카오 아이디로만 설정
-    @Transactional
-    public String refresh(String kakaoId, String refreshToken) {
-
-        String refreshDBToken = usersRepository.findByKakaoId(kakaoId)
-                .map(user -> user.getRefreshToken())
-                .orElseThrow(() -> new UsernameNotFoundException("해당하는 회원을 찾을 수 없습니다."));
-
-        if (!refreshDBToken.equals(refreshToken)) {
-            throw new SecurityException("Invalid JWT Token");
-        }
-
-        UsernamePasswordAuthenticationToken authenticationFilter
-                = new UsernamePasswordAuthenticationToken(kakaoId, kakaoId);
-
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationFilter);
-
-        return jwtTokenProvider.refreshAccessToken(authentication);
+    public Users findById(Long id) {
+        return usersRepository.findById(id).orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
     }
+
+    public Users findByKakaoId(String kakaoId) {
+        return usersRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+    }
+
+    public void logout(String kakaoId) {
+        Users user = findByKakaoId(kakaoId);
+        user.setRefreshToken(null);
+    }
+
+
 
 }

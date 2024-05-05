@@ -1,10 +1,12 @@
 package konkuk.aiku.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class RefreshTokenDTO {
+@AllArgsConstructor
+public class AccessTokenDTO {
     private String kakaoId;
-//    private String refreshToken;
+    private String accessToken;
 }
