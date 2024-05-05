@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
 //                                .anyRequest().permitAll()
+                                .requestMatchers("/users").permitAll() // 모든 사용자 허용
                                 .requestMatchers("/login/sign-in").permitAll() // 모든 사용자 허용
                                 .requestMatchers("/login/refresh").permitAll() // 모든 사용자 허용
                                 .requestMatchers("/login/test").hasRole("USER") // User 권한에 한해 허용
