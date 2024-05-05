@@ -3,6 +3,8 @@ package konkuk.aiku.service.dto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class GroupServiceDTO {
@@ -10,4 +12,6 @@ public class GroupServiceDTO {
     private String groupName;
     private String groupImg;
     private String description;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 }

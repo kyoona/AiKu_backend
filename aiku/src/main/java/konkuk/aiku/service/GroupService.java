@@ -54,9 +54,15 @@ public class GroupService {
     public void modifyGroup(String kakaoId, Long groupId, GroupServiceDTO groupServiceDTO) {
         Long userId = findUserByKakaoId(kakaoId).getId();
         Groups group = checkUserInGroup(userId, groupId).getGroup();
-        group.setGroupName(groupServiceDTO.getGroupName());
-        group.setDescription(groupServiceDTO.getDescription());
-        group.setGroupImg(groupServiceDTO.getGroupImg());
+        if(StringUtils.hasText(groupServiceDTO.getGroupName())){
+            group.setGroupName(groupServiceDTO.getGroupName());
+        }
+        if(StringUtils.hasText(groupServiceDTO.getDescription())){
+            group.setDescription(groupServiceDTO.getDescription());
+        }
+        if(StringUtils.hasText(groupServiceDTO.getGroupImg())){
+            group.setGroupImg(groupServiceDTO.getGroupImg());
+        }
     }
 
     @Transactional
@@ -77,6 +83,8 @@ public class GroupService {
                 .groupName(group.getGroupName())
                 .description(group.getDescription())
                 .groupImg(group.getGroupImg())
+                .createdAt(group.getCreatedAt())
+                .modifiedAt(group.getModifiedAt())
                 .build();
         return groupServiceDTO;
     }
@@ -98,6 +106,8 @@ public class GroupService {
                 .groupImg(group.getGroupImg())
                 .description(group.getDescription())
                 .users(userSimpleServiceDTOS)
+                .createdAt(group.getCreatedAt())
+                .modifiedAt(group.getModifiedAt())
                 .build();
         return groupDetailServiceDTO;
     }
@@ -141,6 +151,8 @@ public class GroupService {
                 .setting(createSettingServiceDTO(user))
                 .point(user.getPoint())
                 .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .modifiedAt(user.getModifiedAt())
                 .build();
         return userSimpleServiceDTO;
     }

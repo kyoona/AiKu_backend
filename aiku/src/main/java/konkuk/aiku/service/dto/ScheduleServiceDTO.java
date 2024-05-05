@@ -15,4 +15,6 @@ public class ScheduleServiceDTO {
     private LocationServiceDTO location;
     private LocalDateTime scheduleTime;
     private ScheduleStatus status;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 }
