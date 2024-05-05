@@ -46,11 +46,16 @@ public class Users extends TimeEntity implements UserDetails {
 //                .collect(Collectors.toList());
     }
 
+    private String refreshToken;
+
     @Override
     public String getPassword() {
         return kakaoId;
     }
 
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
     @Override
     public boolean isAccountNonExpired() {

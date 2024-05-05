@@ -65,8 +65,26 @@ public class JwtTokenProvider {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
 
+    public String refreshAccessToken(Authentication authentication) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
 
+        Calendar accessTokenCal = Calendar.getInstance();
+        accessTokenCal.setTime(new Date());
+        accessTokenCal.add(Calendar.DATE, 1);
+
+        // AccessToken : 1일 후 만료
+        Date accessTokenExpiresIn = accessTokenCal.getTime();
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("auth", authorities)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     //Jwt Token -> 권한 확인
@@ -98,7 +116,7 @@ public class JwtTokenProvider {
             log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token", e);
-            // 만료 토큰 재발급 로직 시행
+            // 만료 토큰 재발급 필요
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token", e);
         } catch (IllegalArgumentException e) {
