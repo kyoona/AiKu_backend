@@ -1,14 +1,17 @@
-package konkuk.aiku.domain;
+package konkuk.aiku.controller.dto;
 
-import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Embeddable
 @Getter
-public class Location {
+@AllArgsConstructor
+public class LocationDTO {
+    @NotNull
     private Double latitude;
+    @NotNull
     private Double longitude;
+    @NotBlank
     private String locationName;
 }
