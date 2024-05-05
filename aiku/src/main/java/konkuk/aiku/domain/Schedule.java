@@ -48,14 +48,30 @@ public class Schedule extends TimeEntity{
         this.status = status;
     }
 
+    public void addUser(Users user, UserSchedule userSchedule) {
+        userSchedule.setSchedule(this);
+        userSchedule.setUser(user);
+        this.users.add(userSchedule);
+    }
+
     public void setGroup(Groups group){
         this.group = group;
         group.addSchedule(this);
     }
 
-    public void addUser(Users user, UserSchedule userSchedule) {
-        userSchedule.setSchedule(this);
-        userSchedule.setUser(user);
-        this.users.add(userSchedule);
+    public void setScheduleName(String scheduleName) {
+        this.scheduleName = scheduleName;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public void setScheduleTime(LocalDateTime scheduleTime) {
+        this.scheduleTime = scheduleTime;
+    }
+
+    public void setStatus(ScheduleStatus status) {
+        this.status = status;
     }
 }

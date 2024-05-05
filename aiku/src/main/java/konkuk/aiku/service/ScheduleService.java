@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -24,7 +27,8 @@ public class ScheduleService {
     private final UserGroupRepository userGroupRepository;
     private final UsersRepository usersRepository;
 
-    public Long scheduleAdd(String kakaoId, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
+    @Transactional
+    public Long addSchedule(String kakaoId, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
         Users user = findUserByKakaoId(kakaoId);
         Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
 
@@ -38,6 +42,26 @@ public class ScheduleService {
 
         scheduleRepository.save(schedule);
         return schedule.getId();
+    }
+
+    @Transactional
+    public void modifySchedule(String kakaoId, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
+        Users user = findUserByKakaoId(kakaoId);
+        checkUserInGroup(user.getId(), groupId).getGroup();
+
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        if(!StringUtils.hasText(scheduleServiceDTO.getScheduleName())){
+            schedule.setScheduleName(scheduleServiceDTO.getScheduleName());
+        }
+        if(scheduleServiceDTO.getLocation() != null){
+            schedule.setLocation(createLocation(scheduleServiceDTO.getLocation()));
+        }
+        if (scheduleServiceDTO.getScheduleTime() != null) {
+            schedule.setScheduleTime(scheduleServiceDTO.getScheduleTime());
+        }
+        if (scheduleServiceDTO.getStatus() != null) {
+            schedule.setStatus(scheduleServiceDTO.getStatus());
+        }
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
@@ -55,4 +79,5 @@ public class ScheduleService {
     private Location createLocation(LocationServiceDTO locationServiceDTO){
         return new Location(locationServiceDTO.getLatitude(), locationServiceDTO.getLongitude(), locationServiceDTO.getLocationName());
     }
+
 }

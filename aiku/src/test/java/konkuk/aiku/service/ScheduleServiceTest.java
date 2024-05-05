@@ -9,7 +9,6 @@ import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.LocationServiceDTO;
 import konkuk.aiku.service.dto.ScheduleServiceDTO;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -41,7 +39,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 등록")
-    public void scheduleAdd() throws Exception{
+    public void addSchedule() throws Exception{
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
@@ -67,14 +65,14 @@ class ScheduleServiceTest {
                 .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
-        Long scheduleId = scheduleService.scheduleAdd(userKaKaoId1, group.getId(), scheduleServiceDTO);
+        Long scheduleId = scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO);
 
         ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
                 .scheduleName("schedule2")
                 .location(new LocationServiceDTO(100.1, 100.1, "aiku"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
-        scheduleService.scheduleAdd(userKaKaoId1, group.getId(), scheduleServiceDTO2);
+        scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO2);
 
         //then
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
@@ -92,7 +90,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 등록-그룹에 속해 있지 않은 유저")
-    public void scheduleAddInFaultCondition() throws Exception{
+    public void addScheduleInFaultCondition() throws Exception{
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
@@ -114,6 +112,6 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
 
-        assertThatThrownBy(() -> scheduleService.scheduleAdd(userKaKaoId1, group.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
+        assertThatThrownBy(() -> scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
     }
 }

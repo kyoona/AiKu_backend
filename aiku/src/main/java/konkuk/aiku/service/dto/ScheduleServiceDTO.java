@@ -1,5 +1,6 @@
 package konkuk.aiku.service.dto;
 
+import konkuk.aiku.domain.ScheduleStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +14,5 @@ public class ScheduleServiceDTO {
     private String scheduleName;
     private LocationServiceDTO location;
     private LocalDateTime scheduleTime;
+    private ScheduleStatus status;
 }
