@@ -10,7 +10,6 @@ import java.util.List;
 @Entity
 @Getter @Setter
 public class Groups extends TimeEntity{
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "groupId")
     @Setter(value = AccessLevel.NONE)
