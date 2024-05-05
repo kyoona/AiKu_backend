@@ -31,8 +31,9 @@ class GroupServiceTest {
     @DisplayName("그룹 등록")
     void addGroup() {
         //given
-        Users user = new Users();
-        user.setUsername("user1");
+        Users user = Users.builder()
+                .username("user1")
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -55,8 +56,9 @@ class GroupServiceTest {
     @DisplayName("그룹 수정")
     void modifyGroup() throws IllegalAccessException {
         //given
-        Users user = new Users();
-        user.setUsername("user1");
+        Users user = Users.builder()
+                .username("user1")
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -86,13 +88,15 @@ class GroupServiceTest {
     @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
     void modifyGroupInFaultCondition() throws IllegalAccessException {
         //given
-        Users user = new Users();
-        user.setUsername("user1");
+        Users user = Users.builder()
+                .username("user1")
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
-        Users user2 = new Users();
-        user2.setUsername("user2");
+        Users user2 = Users.builder()
+                .username("user2")
+                .build();
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
@@ -117,8 +121,9 @@ class GroupServiceTest {
     @DisplayName("그룹 삭제")
     void deleteGroup(){
         //given
-        Users user = new Users();
-        user.setUsername("user1");
+        Users user = Users.builder()
+                .username("user1")
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -140,10 +145,10 @@ class GroupServiceTest {
     @DisplayName("그룹 조회")
     void findGroupDetailById(){
         //given
-        Users user = new Users();
-        user.setUsername("user1");
-        user.setRole(UserRole.USER);
-        user.setSetting(new Setting(false, false, false, false, false));
+        Users user = Users.builder()
+                .username("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -171,10 +176,10 @@ class GroupServiceTest {
     @DisplayName("그룹 조회-그룹에 속해 있지 않은 유저")
     void findGroupDetailByIdInFaultCondition(){
         //given
-        Users user = new Users();
-        user.setUsername("user1");
-        user.setRole(UserRole.USER);
-        user.setSetting(new Setting(false, false, false, false, false));
+        Users user = Users.builder()
+                .username("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -185,10 +190,10 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
-        Users user2 = new Users();
-        user2.setUsername("user2");
-        user2.setRole(UserRole.USER);
-        user2.setSetting(new Setting(true, true, true, true, true));
+        Users user2 = Users.builder()
+                .username("user2")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
@@ -200,10 +205,10 @@ class GroupServiceTest {
     @DisplayName("그룹 참가")
     void enterGroup(){
         //given
-        Users user = new Users();
-        user.setUsername("user1");
-        user.setRole(UserRole.USER);
-        user.setSetting(new Setting(false, false, false, false, false));
+        Users user = Users.builder()
+                .username("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -214,10 +219,10 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
-        Users user2 = new Users();
-        user2.setUsername("user2");
-        user2.setRole(UserRole.USER);
-        user2.setSetting(new Setting(true, true, true, true, true));
+        Users user2 = Users.builder()
+                .username("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId2 = usersRepository.save(user2)
                 .getId();
 
@@ -232,10 +237,10 @@ class GroupServiceTest {
     @DisplayName("그룹 퇴장")
     void exitGroup(){
         //given
-        Users user = new Users();
-        user.setUsername("user1");
-        user.setRole(UserRole.USER);
-        user.setSetting(new Setting(false, false, false, false, false));
+        Users user = Users.builder()
+                .username("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -257,10 +262,10 @@ class GroupServiceTest {
     @DisplayName("그룹 퇴장-그룹에 속해 있지 않은 유저")
     void exitGroupInFaultCondition(){
         //given
-        Users user = new Users();
-        user.setUsername("user1");
-        user.setRole(UserRole.USER);
-        user.setSetting(new Setting(false, false, false, false, false));
+        Users user = Users.builder()
+                .username("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId1 = usersRepository.save(user)
                 .getId();
 
@@ -271,10 +276,10 @@ class GroupServiceTest {
                 .build();
         Long groupId = groupService.addGroup(userId1, groupServiceDTO);
 
-        Users user2 = new Users();
-        user2.setUsername("user2");
-        user2.setRole(UserRole.USER);
-        user2.setSetting(new Setting(true, true, true, true, true));
+        Users user2 = Users.builder()
+                .username("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
         Long userId2 = usersRepository.save(user2)
                 .getId();
 

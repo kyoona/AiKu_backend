@@ -1,8 +1,7 @@
 package konkuk.aiku.controller;
 
+import konkuk.aiku.controller.dto.UserAddDTO;
 import konkuk.aiku.domain.Users;
-import konkuk.aiku.dto.UserAddDTO;
-import konkuk.aiku.service.UserLoginService;
 import konkuk.aiku.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package konkuk.aiku;
 
+import konkuk.aiku.controller.dto.UserAddDTO;
 import konkuk.aiku.domain.Users;
-import konkuk.aiku.dto.UserAddDTO;
 import konkuk.aiku.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
