@@ -1,14 +1,24 @@
 package konkuk.aiku.service;
 
 import jakarta.persistence.EntityManager;
-import konkuk.aiku.domain.Groups;
-import konkuk.aiku.domain.Users;
+import konkuk.aiku.domain.*;
+import konkuk.aiku.repository.GroupsRepository;
+import konkuk.aiku.repository.ScheduleRepository;
+import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
+import konkuk.aiku.service.dto.LocationServiceDTO;
+import konkuk.aiku.service.dto.ScheduleServiceDTO;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -18,7 +28,15 @@ class ScheduleServiceTest {
     @Autowired
     EntityManager entityManager;
     @Autowired
+    ScheduleService scheduleService;
+    @Autowired
+    ScheduleRepository scheduleRepository;
+    @Autowired
     UsersRepository usersRepository;
+    @Autowired
+    GroupsRepository groupsRepository;
+    @Autowired
+    UserGroupRepository userGroupRepository;
 
     @Test
     public void scheduleAdd() throws Exception{
@@ -30,11 +48,43 @@ class ScheduleServiceTest {
                 .build();
         usersRepository.save(user);
 
-//        Groups group =
-        
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
         //when
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.scheduleAdd(userKaKaoId1, group.getId(), scheduleServiceDTO);
+
+        ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
+                .scheduleName("schedule2")
+                .location(new LocationServiceDTO(100.1, 100.1, "aiku"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        scheduleService.scheduleAdd(userKaKaoId1, group.getId(), scheduleServiceDTO2);
 
         //then
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        assertThat(schedule.getScheduleName()).isEqualTo(scheduleServiceDTO.getScheduleName());
+        assertThat(schedule.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
+        assertThat(schedule.getLocation().getLocationName()).isEqualTo(scheduleServiceDTO.getLocation().getLocationName());
+        assertThat(schedule.getLocation().getLatitude()).isEqualTo(scheduleServiceDTO.getLocation().getLatitude());
+        assertThat(schedule.getLocation().getLongitude()).isEqualTo(scheduleServiceDTO.getLocation().getLongitude());
 
+        List<UserSchedule> userSchedules = entityManager.createQuery("select us from UserSchedule us where us.user.id = :userId", UserSchedule.class)
+                .setParameter("userId", user.getId())
+                .getResultList();
+        assertThat(userSchedules.size()).isEqualTo(2);
     }
 }
