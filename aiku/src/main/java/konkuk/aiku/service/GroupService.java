@@ -32,10 +32,11 @@ public class GroupService {
 
     @Transactional
     public Long addGroup(String kakaoId, GroupServiceDTO groupServiceDTO){
-        Groups group = new Groups();
-        group.setGroupName(groupServiceDTO.getGroupName());
-        group.setGroupImg(groupServiceDTO.getGroupImg());
-        group.setDescription(groupServiceDTO.getDescription());
+        Groups group = Groups.builder()
+                .groupName(groupServiceDTO.getGroupName())
+                .groupImg(groupServiceDTO.getGroupImg())
+                .description(groupServiceDTO.getDescription())
+                .build();
 
         groupsRepository.save(group);
 
@@ -53,16 +54,9 @@ public class GroupService {
     public void modifyGroup(String kakaoId, Long groupId, GroupServiceDTO groupServiceDTO) {
         Long userId = findUserByKakaoId(kakaoId).getId();
         Groups group = checkUserInGroup(userId, groupId).getGroup();
-
-        if(StringUtils.hasText(groupServiceDTO.getGroupName())){
-            group.setGroupName(groupServiceDTO.getGroupName());
-        }
-        if(StringUtils.hasText(groupServiceDTO.getDescription())){
-            group.setDescription(groupServiceDTO.getDescription());
-        }
-        if(groupServiceDTO != null){
-            group.setGroupImg(groupServiceDTO.getGroupImg());
-        }
+        group.setGroupName(groupServiceDTO.getGroupName());
+        group.setDescription(groupServiceDTO.getDescription());
+        group.setGroupImg(groupServiceDTO.getGroupImg());
     }
 
     @Transactional
