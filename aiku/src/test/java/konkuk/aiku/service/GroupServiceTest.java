@@ -2,6 +2,7 @@ package konkuk.aiku.service;
 
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
+import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.GroupDetailServiceDTO;
@@ -120,7 +121,7 @@ class GroupServiceTest {
                 .description("group1을 수정하였습니다.")
                 .build();
         assertThatThrownBy(()-> groupService.modifyGroup(userKaKaoId2, groupId, modifyGroupServiceDTO))
-                .isExactlyInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(NoAthorityToAccessException.class);
     }
 
     @Test
@@ -246,7 +247,7 @@ class GroupServiceTest {
         groupService.enterGroup(userKaKaoId2, groupId);
 
         //then
-        assertThat(userGroupRepository.findByUserIdAndGroupId(userId2, groupId)).isTrue();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(userId2, groupId)).isNotEmpty();
     }
 
     @Test
@@ -273,7 +274,7 @@ class GroupServiceTest {
         groupService.exitGroup(userKaKaoId1, groupId);
 
         //then
-        assertThat(userGroupRepository.findByUserIdAndGroupId(userId1, groupId)).isFalse();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(userId1, groupId)).isEmpty();
     }
 
     @Test

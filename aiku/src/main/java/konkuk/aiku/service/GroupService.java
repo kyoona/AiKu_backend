@@ -1,6 +1,7 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
@@ -51,7 +52,7 @@ public class GroupService {
     @Transactional
     public void modifyGroup(String kakaoId, Long groupId, GroupServiceDTO groupServiceDTO) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        Groups group = checkUserInGroup(userId, groupId);
+        Groups group = checkUserInGroup(userId, groupId).getGroup();
 
         if(StringUtils.hasText(groupServiceDTO.getGroupName())){
             group.setGroupName(groupServiceDTO.getGroupName());
@@ -88,7 +89,7 @@ public class GroupService {
 
     public GroupDetailServiceDTO findGroupDetailById(String kakaoId, Long groupId) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        Groups group = checkUserInGroup(userId, groupId);
+        Groups group = checkUserInGroup(userId, groupId).getGroup();
 
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
@@ -125,12 +126,12 @@ public class GroupService {
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
     }
 
-    private Groups checkUserInGroup(Long userId, Long groupId){
-        Optional<Groups> group = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
-        if(group.isEmpty()){
-            throw new RuntimeException("권한 없지롱"); //TODO
+    private UserGroup checkUserInGroup(Long userId, Long groupId){
+        Optional<UserGroup> userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
+        if(userGroup.isEmpty()){
+            throw new NoAthorityToAccessException();
         }
-        return group.get();
+        return userGroup.get();
     }
 
     private Users findUserByKakaoId(String kakaoId){
