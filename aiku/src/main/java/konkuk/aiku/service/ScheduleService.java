@@ -47,10 +47,10 @@ public class ScheduleService {
     @Transactional
     public void modifySchedule(String kakaoId, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
         Users user = findUserByKakaoId(kakaoId);
-        checkUserInGroup(user.getId(), groupId).getGroup();
+        checkUserInGroup(user.getId(), groupId);
 
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
-        if(!StringUtils.hasText(scheduleServiceDTO.getScheduleName())){
+        if(StringUtils.hasText(scheduleServiceDTO.getScheduleName())){
             schedule.setScheduleName(scheduleServiceDTO.getScheduleName());
         }
         if(scheduleServiceDTO.getLocation() != null){

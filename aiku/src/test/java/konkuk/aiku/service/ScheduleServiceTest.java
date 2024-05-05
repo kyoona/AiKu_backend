@@ -114,4 +114,53 @@ class ScheduleServiceTest {
 
         assertThatThrownBy(() -> scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
     }
+
+    @Test
+    public void modifySchedule() throws Exception{
+        //given
+        String userKaKaoId1 = "kakao1";
+        Users user = Users.builder()
+                .username("user1")
+                .kakaoId(userKaKaoId1)
+                .build();
+        usersRepository.save(user);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO);
+
+        //when
+        ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
+                .scheduleName("modify")
+                .location(null) //수정되면 안됨(값이 없는 필드는 수정 x)
+                .scheduleTime(null)
+                .build();
+        scheduleService.modifySchedule(userKaKaoId1, group.getId(), scheduleId, scheduleServiceDTO2);
+
+        //then
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        assertThat(schedule.getScheduleName()).isEqualTo(scheduleServiceDTO2.getScheduleName());
+
+        assertThat(schedule.getScheduleTime()).isNotNull();
+        assertThat(schedule.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
+
+        assertThat(schedule.getLocation()).isNotNull();
+        assertThat(schedule.getLocation().getLocationName()).isEqualTo(scheduleServiceDTO.getLocation().getLocationName());
+        assertThat(schedule.getLocation().getLatitude()).isEqualTo(scheduleServiceDTO.getLocation().getLatitude());
+        assertThat(schedule.getLocation().getLongitude()).isEqualTo(scheduleServiceDTO.getLocation().getLongitude());
+    }
 }
