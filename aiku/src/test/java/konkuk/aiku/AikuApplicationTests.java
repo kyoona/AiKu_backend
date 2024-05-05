@@ -8,6 +8,7 @@ class AikuApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }
