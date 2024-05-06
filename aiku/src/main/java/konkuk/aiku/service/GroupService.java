@@ -3,6 +3,7 @@ package konkuk.aiku.service;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
+import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
@@ -32,7 +33,7 @@ public class GroupService {
     }
 
     @Transactional
-    public Long addGroup(String kakaoId, GroupServiceDTO groupServiceDTO){
+    public Long addGroup(Users user, GroupServiceDTO groupServiceDTO){
         Groups group = Groups.builder()
                 .groupName(groupServiceDTO.getGroupName())
                 .groupImg(groupServiceDTO.getGroupImg())
@@ -40,8 +41,6 @@ public class GroupService {
                 .build();
 
         groupsRepository.save(group);
-
-        Users user = findUserByKakaoId(kakaoId);
 
         UserGroup userGroup = new UserGroup();
         userGroup.setUser(user);
@@ -52,9 +51,8 @@ public class GroupService {
     }
 
     @Transactional
-    public void modifyGroup(String kakaoId, Long groupId, GroupServiceDTO groupServiceDTO) {
-        Long userId = findUserByKakaoId(kakaoId).getId();
-        Groups group = checkUserInGroup(userId, groupId).getGroup();
+    public void modifyGroup(Users user, Long groupId, GroupServiceDTO groupServiceDTO) {
+        Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
         if(StringUtils.hasText(groupServiceDTO.getGroupName())){
             group.setGroupName(groupServiceDTO.getGroupName());
         }
@@ -67,31 +65,16 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroup(String kakaoId, Long groupId) {
-        Long userId = findUserByKakaoId(kakaoId).getId();
+    public void deleteGroup(Users user, Long groupId) {
+        Long userId = user.getId();
         checkUserInGroup(userId, groupId);
 
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
         groupsRepository.deleteById(groupId);
     }
 
-    public GroupServiceDTO findGroupById(Long id){
-        Groups group = groupsRepository.findById(id).orElse(null);
-        if(group == null) return null;
-
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
-                .id(group.getId())
-                .groupName(group.getGroupName())
-                .description(group.getDescription())
-                .groupImg(group.getGroupImg())
-                .createdAt(group.getCreatedAt())
-                .modifiedAt(group.getModifiedAt())
-                .build();
-        return groupServiceDTO;
-    }
-
-    public GroupDetailServiceDTO findGroupDetailById(String kakaoId, Long groupId) {
-        Long userId = findUserByKakaoId(kakaoId).getId();
+    public GroupDetailServiceDTO findGroupDetailById(Users user, Long groupId) {
+        Long userId = user.getId();
         Groups group = checkUserInGroup(userId, groupId).getGroup();
 
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
@@ -114,9 +97,11 @@ public class GroupService {
     }
 
     @Transactional
-    public void enterGroup(String kakaoId, Long groupId){
-        Users user = findUserByKakaoId(kakaoId);
-        Groups group = groupsRepository.findById(groupId).get();
+    public void enterGroup(Users user, Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+
+        }
 
         UserGroup userGroup = new UserGroup();
         userGroup.setUser(user);
@@ -125,10 +110,18 @@ public class GroupService {
     }
 
     @Transactional
-    public void exitGroup(String kakaoId, Long groupId){
-        Long userId = findUserByKakaoId(kakaoId).getId();
+    public void exitGroup(Users user, Long groupId){
+        Long userId = user.getId();
         checkUserInGroup(userId, groupId);
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
+    }
+
+    public Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
@@ -137,10 +130,6 @@ public class GroupService {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userGroup.get();
-    }
-
-    private Users findUserByKakaoId(String kakaoId){
-        return usersRepository.findByKakaoId(kakaoId).get();
     }
 
     private UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
