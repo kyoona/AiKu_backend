@@ -67,8 +67,8 @@ public class ScheduleController {
     @GetMapping("/{scheduleId}")
     public void scheduleDetails(@PathVariable Long groupId,
                                 @PathVariable Long scheduleId,
-                                @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
-        scheduleService.findScheduleDetailById(kakaoId, groupId, scheduleId);
+                                @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        scheduleService.findScheduleDetailById(user, groupId, scheduleId);
     }
 }

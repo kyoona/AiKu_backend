@@ -3,6 +3,7 @@ package konkuk.aiku.service;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
+import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,9 +47,12 @@ public class ScheduleService {
     //TODO
     @Transactional
     public void modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
-        checkUserInGroup(user.getId(), groupId);
+        Long userId = user.getId();
+        checkUserInGroup(userId, groupId);
+        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
 
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        Schedule schedule = userSchedule.getSchedule();
+
         if(StringUtils.hasText(scheduleServiceDTO.getScheduleName())){
             schedule.setScheduleName(scheduleServiceDTO.getScheduleName());
         }
@@ -67,15 +72,9 @@ public class ScheduleService {
         checkUserInGroup(user.getId(), groupId);
 
         scheduleRepository.deleteById(scheduleId);
-
     }
 
-    public void findScheduleDetailById(String kakaoId, Long groupId, Long scheduleId){
-        Users user = findUserByKakaoId(kakaoId);
-        checkUserInGroup(user.getId(), groupId);
-
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
-//        schedule.
+    public void findScheduleDetailById(Users user, Long groupId, Long scheduleId){
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
@@ -86,8 +85,20 @@ public class ScheduleService {
         return userGroup.get();
     }
 
-    private Users findUserByKakaoId(String kakaoId){
-        return usersRepository.findByKakaoId(kakaoId).get();
+    private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
+        UserSchedule userSchedule = scheduleRepository.findByUserIdAndScheduleId(userId, scheduleId).orElse(null);
+        if (userSchedule == null) {
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
+        return userSchedule;
+    }
+
+    private Schedule findScheduleById(Long scheduleId){
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+        if (schedule == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+        return schedule;
     }
 
     private Location createLocation(LocationServiceDTO locationServiceDTO){

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,8 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 class ScheduleServiceTest {
 
+    @Autowired
+    EntityManager em;
     @Autowired
     EntityManager entityManager;
     @Autowired
@@ -38,6 +41,7 @@ class ScheduleServiceTest {
     UserGroupRepository userGroupRepository;
 
     @Test
+    @Commit
     @DisplayName("스케줄 등록")
     public void addSchedule() throws Exception{
         //given
@@ -57,6 +61,8 @@ class ScheduleServiceTest {
         userGroup.setUser(user);
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
+        em.flush();
+        em.clear();
 
         //when
         ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
@@ -114,6 +120,8 @@ class ScheduleServiceTest {
     }
 
     @Test
+    @Commit
+    @DisplayName("스케줄 수정")
     public void modifySchedule() throws Exception{
         //given
         Users user = Users.builder()
@@ -139,6 +147,8 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+        em.flush();
+        em.clear();
 
         //when
         ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
@@ -159,5 +169,50 @@ class ScheduleServiceTest {
         assertThat(schedule.getLocation().getLocationName()).isEqualTo(scheduleServiceDTO.getLocation().getLocationName());
         assertThat(schedule.getLocation().getLatitude()).isEqualTo(scheduleServiceDTO.getLocation().getLatitude());
         assertThat(schedule.getLocation().getLongitude()).isEqualTo(scheduleServiceDTO.getLocation().getLongitude());
+    }
+
+    @Test
+    @DisplayName("스케줄 수정-스케줄에 속해 있지 않은 유저")
+    public void modifyScheduleInFaultCondition() throws Exception{
+        //given
+        Users user = Users.builder()
+                .personName("user1")
+                .kakaoId("kakao1")
+                .build();
+        usersRepository.save(user);
+
+        Users user2 = Users.builder()
+                .personName("user2")
+                .kakaoId("kakao2")
+                .build();
+        usersRepository.save(user2);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+        em.flush();
+        em.clear();
+
+        //when
+        ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
+                .scheduleName("modify")
+                .location(null)
+                .scheduleTime(null)
+                .build();
+        assertThatThrownBy(() -> scheduleService.modifySchedule(user2, group.getId(), scheduleId, scheduleServiceDTO2)).isInstanceOf(NoAthorityToAccessException.class);
     }
 }
