@@ -8,6 +8,7 @@ import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.LocationServiceDTO;
+import konkuk.aiku.service.dto.ScheduleDetailServiceDTO;
 import konkuk.aiku.service.dto.ScheduleServiceDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -251,5 +252,62 @@ class ScheduleServiceTest {
 
         //then
         assertThat(scheduleRepository.findById(scheduleId)).isEmpty();
+    }
+
+    @Test
+    public void findScheduleDetailById() {
+        //given
+        Users user = Users.builder()
+                .personName("user1")
+                .kakaoId("kakao1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
+        usersRepository.save(user);
+
+        Users user2 = Users.builder()
+                .personName("user2")
+                .kakaoId("kakao2")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
+        usersRepository.save(user2);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
+        UserGroup userGroup2 = new UserGroup();
+        userGroup2.setUser(user2);
+        userGroup2.setGroup(group);
+        userGroupRepository.save(userGroup2);
+
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+        em.flush();
+        em.clear();
+
+        //when
+        ScheduleDetailServiceDTO scheduleDetailServiceDTO = scheduleService.findScheduleDetailById(user, group.getId(), scheduleId);
+
+        //then
+        assertThat(scheduleDetailServiceDTO.getId()).isEqualTo(scheduleId);
+        assertThat(scheduleDetailServiceDTO.getScheduleName()).isEqualTo(scheduleServiceDTO.getScheduleName());
+        assertThat(scheduleDetailServiceDTO.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
+
+        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getPersonName()).isEqualTo(user.getPersonName());
+        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUserKaKaoId()).isEqualTo(user.getKakaoId());
+
+        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getPersonName()).isEqualTo(user2.getPersonName());
+        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserKaKaoId()).isEqualTo(user2.getKakaoId());
     }
 }

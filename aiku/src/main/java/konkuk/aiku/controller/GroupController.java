@@ -15,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -113,7 +111,7 @@ public class GroupController {
         UserSimpleResponseDTO responseDTO = new UserSimpleResponseDTO();
         responseDTO.setUserId(serviceDTO.getUserKaKaoId());
         responseDTO.setUserImg(serviceDTO.getUserImg());
-        responseDTO.setUsername(serviceDTO.getUsername());
+        responseDTO.setUsername(serviceDTO.getPersonName());
         return responseDTO;
     }
 }

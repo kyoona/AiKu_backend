@@ -3,18 +3,16 @@ package konkuk.aiku.service;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
-import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserGroupRepository;
-import konkuk.aiku.repository.UsersRepository;
-import konkuk.aiku.service.dto.LocationServiceDTO;
-import konkuk.aiku.service.dto.ScheduleServiceDTO;
+import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +45,6 @@ public class ScheduleService {
     @Transactional
     public void modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
         Long userId = user.getId();
-        checkUserInGroup(userId, groupId);
         UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
 
         Schedule schedule = userSchedule.getSchedule();
@@ -68,12 +65,17 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Users user, Long groupId, Long scheduleId) {
-        checkUserInGroup(user.getId(), groupId);
+        checkUserInSchedule(user.getId(), scheduleId);
 
         scheduleRepository.deleteById(scheduleId);
     }
 
-    public void findScheduleDetailById(Users user, Long groupId, Long scheduleId){
+    public ScheduleDetailServiceDTO findScheduleDetailById(Users user, Long groupId, Long scheduleId){
+        Long userId = user.getId();
+        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
+        Schedule schedule = userSchedule.getSchedule();
+        List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
+        return createScheduleDetailServiceDTO(schedule, waitUsers);
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
@@ -92,12 +94,58 @@ public class ScheduleService {
         return userSchedule;
     }
 
-    private Schedule findScheduleById(Long scheduleId){
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
-        if (schedule == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+    private ScheduleDetailServiceDTO createScheduleDetailServiceDTO(Schedule schedule, List<Users> waitUsers){
+
+        ScheduleDetailServiceDTO scheduleDetailServiceDTO = ScheduleDetailServiceDTO.builder()
+                .id(schedule.getId())
+                .scheduleName(schedule.getScheduleName())
+                .location(createLocationServiceDTO(schedule.getLocation()))
+                .scheduleTime(schedule.getScheduleTime())
+                .acceptUsers(createUserSimpleServiceDTOsByUserSchedule(schedule.getUsers()))
+                .waitUsers(createUserSimpleServiceDTOsByUsers(waitUsers))
+                .createdAt(schedule.getCreatedAt())
+                .modifiedAt(schedule.getModifiedAt())
+                .build();
+        return scheduleDetailServiceDTO;
+    }
+
+    private List<UserSimpleServiceDTO> createUserSimpleServiceDTOsByUserSchedule(List<UserSchedule> users){
+        List<UserSimpleServiceDTO> userSimpleServiceDTOs = new ArrayList<>();
+        for (UserSchedule userSchedule : users) {
+            Users user = userSchedule.getUser();
+            UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
+                    .userKaKaoId(user.getKakaoId())
+                    .personName(user.getPersonName())
+                    .phoneNumber(user.getPhoneNumber())
+                    .userImg(user.getUserImg())
+                    .setting(createSettingServiceDTO(user.getSetting()))
+                    .point(user.getPoint())
+                    .role(user.getRole())
+                    .createdAt(user.getCreatedAt())
+                    .modifiedAt(user.getModifiedAt())
+                    .build();
+            userSimpleServiceDTOs.add(userSimpleServiceDTO);
         }
-        return schedule;
+        return userSimpleServiceDTOs;
+    }
+
+    private List<UserSimpleServiceDTO> createUserSimpleServiceDTOsByUsers(List<Users> users){
+        List<UserSimpleServiceDTO> userSimpleServiceDTOs = new ArrayList<>();
+        for (Users user : users) {
+            UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
+                    .userKaKaoId(user.getKakaoId())
+                    .personName(user.getPersonName())
+                    .phoneNumber(user.getPhoneNumber())
+                    .userImg(user.getUserImg())
+                    .setting(createSettingServiceDTO(user.getSetting()))
+                    .point(user.getPoint())
+                    .role(user.getRole())
+                    .createdAt(user.getCreatedAt())
+                    .modifiedAt(user.getModifiedAt())
+                    .build();
+            userSimpleServiceDTOs.add(userSimpleServiceDTO);
+        }
+        return userSimpleServiceDTOs;
     }
 
     private Location createLocation(LocationServiceDTO locationServiceDTO){
@@ -106,5 +154,16 @@ public class ScheduleService {
 
     private LocationServiceDTO createLocationServiceDTO(Location location){
         return new LocationServiceDTO(location.getLatitude(), location.getLongitude(), location.getLocationName());
+    }
+
+    private SettingServiceDTO createSettingServiceDTO(Setting setting){
+        SettingServiceDTO settingServiceDTO = SettingServiceDTO.builder()
+                .isBettingAlarmOn(setting.isBettingAlarmOn())
+                .isPinchAlarmOn(setting.isPinchAlarmOn())
+                .isLocationInformationOn(setting.isLocationInformationOn())
+                .isScheduleAlarmOn(setting.isScheduleAlarmOn())
+                .isVoiceAuthorityOn(setting.isVoiceAuthorityOn())
+                .build();
+        return settingServiceDTO;
     }
 }

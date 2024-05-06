@@ -135,7 +135,7 @@ public class GroupService {
     private UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
         UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
                 .userKaKaoId(user.getKakaoId())
-                .username(user.getUsername())
+                .personName(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
                 .userImg(user.getUserImg())
                 .setting(createSettingServiceDTO(user))
