@@ -1,4 +1,6 @@
 package konkuk.aiku.exception;
 
-public class NoSuchEntityException extends RuntimeException{
+import java.util.NoSuchElementException;
+
+public class NoSuchEntityException extends NoSuchElementException {
 }
