@@ -5,6 +5,7 @@ import konkuk.aiku.controller.dto.EntryDTO;
 import konkuk.aiku.controller.dto.GroupDTO;
 import konkuk.aiku.controller.dto.GroupResponseDTO;
 import konkuk.aiku.controller.dto.UserSimpleResponseDTO;
+import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
 import konkuk.aiku.service.dto.GroupDetailServiceDTO;
 import konkuk.aiku.service.dto.GroupServiceDTO;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +35,8 @@ public class GroupController {
 
     @PostMapping
     public void groupAdd(@RequestBody @Valid GroupDTO groupDTO,
-                         @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
+                         @AuthenticationPrincipal UserAdaptor userAdaptor){
+        String kakaoId = userAdaptor.getPassword();
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName(groupDTO.getGroupName())
@@ -47,8 +49,8 @@ public class GroupController {
     @PatchMapping("/{groupId}")
     public void groupModify(@PathVariable Long groupId,
                             @RequestBody @Valid GroupDTO groupDTO,
-                            @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
+                            @AuthenticationPrincipal UserAdaptor userAdapter){
+        String kakaoId = userAdapter.getPassword();
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName(groupDTO.getGroupName())
@@ -60,16 +62,17 @@ public class GroupController {
 
     @DeleteMapping("/{groupId}")
     public void groupDelete(@PathVariable Long groupId,
-                            @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
+                            @AuthenticationPrincipal UserAdaptor userAdaptor){
+        String kakaoId = userAdaptor.getPassword();
         groupService.deleteGroup(kakaoId, groupId);
     }
 
     @GetMapping("/{groupId}")
     public ResponseEntity<GroupResponseDTO> groupDetails(@PathVariable Long userId,
                                                          @PathVariable Long groupId,
-                                                         @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
+                                                         @AuthenticationPrincipal UserAdaptor userAdaptor){
+        String kakaoId = userAdaptor.getPassword();
+
 
         GroupDetailServiceDTO serviceDTO = groupService.findGroupDetailById(kakaoId, groupId);
 
@@ -80,8 +83,8 @@ public class GroupController {
     @PostMapping("/{groupId}/entry")
     public void groupEntry(@PathVariable Long groupId,
                            @RequestBody EntryDTO entryDTO,
-                           @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
+                           @AuthenticationPrincipal UserAdaptor userAdaptor){
+        String kakaoId = userAdaptor.getPassword();
 
         if (entryDTO.getEnter()) {
             groupService.enterGroup(kakaoId, groupId);
