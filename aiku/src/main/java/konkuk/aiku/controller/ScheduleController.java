@@ -62,4 +62,12 @@ public class ScheduleController {
     private LocationServiceDTO createLocationServiceDTO(LocationDTO location){
         return new LocationServiceDTO(location.getLatitude(), location.getLongitude(), location.getLocationName());
     }
+
+    @GetMapping("/{scheduleId}")
+    public void scheduleDetails(@PathVariable Long groupId,
+                                @PathVariable Long scheduleId,
+                                @AuthenticationPrincipal UserDetails userDetails){
+        String kakaoId = userDetails.getPassword();
+        scheduleService.findScheduleDetailById(kakaoId, groupId, scheduleId);
+    }
 }

@@ -11,10 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -74,6 +72,14 @@ public class ScheduleService {
 
     }
 
+    public void findScheduleDetailById(String kakaoId, Long groupId, Long scheduleId){
+        Users user = findUserByKakaoId(kakaoId);
+        checkUserInGroup(user.getId(), groupId);
+
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+//        schedule.
+    }
+
     private UserGroup checkUserInGroup(Long userId, Long groupId){
         Optional<UserGroup> userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
         if(userGroup.isEmpty()){
@@ -88,5 +94,9 @@ public class ScheduleService {
 
     private Location createLocation(LocationServiceDTO locationServiceDTO){
         return new Location(locationServiceDTO.getLatitude(), locationServiceDTO.getLongitude(), locationServiceDTO.getLocationName());
+    }
+
+    private LocationServiceDTO createLocationServiceDTO(Location location){
+        return new LocationServiceDTO(location.getLatitude(), location.getLongitude(), location.getLocationName());
     }
 }
