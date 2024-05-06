@@ -43,7 +43,7 @@ class ScheduleServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
@@ -94,7 +94,7 @@ class ScheduleServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
@@ -120,7 +120,7 @@ class ScheduleServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);

@@ -33,7 +33,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
@@ -59,7 +59,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
@@ -92,14 +92,14 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
 
         String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
-                .username("user2")
+                .personName("user2")
                 .kakaoId(userKaKaoId2)
                 .build();
         Long userId2 = usersRepository.save(user2)
@@ -128,7 +128,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
@@ -153,7 +153,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
@@ -185,7 +185,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
@@ -200,7 +200,7 @@ class GroupServiceTest {
 
         String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
-                .username("user2")
+                .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId2)
                 .build();
@@ -216,7 +216,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
@@ -231,7 +231,7 @@ class GroupServiceTest {
 
         String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
-                .username("user2")
+                .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId2)
                 .build();
@@ -251,7 +251,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
@@ -277,7 +277,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
@@ -292,7 +292,7 @@ class GroupServiceTest {
 
         String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
-                .username("user2")
+                .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user2);
