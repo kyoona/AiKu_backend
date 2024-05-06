@@ -108,10 +108,11 @@ public class GroupController {
         return responseDTO;
     }
     private UserSimpleResponseDTO createUserSimpleServiceDTO(UserSimpleServiceDTO serviceDTO){
-        UserSimpleResponseDTO responseDTO = new UserSimpleResponseDTO();
-        responseDTO.setUserId(serviceDTO.getUserKaKaoId());
-        responseDTO.setUserImg(serviceDTO.getUserImg());
-        responseDTO.setUsername(serviceDTO.getPersonName());
+        UserSimpleResponseDTO responseDTO = UserSimpleResponseDTO.builder()
+                .userId(serviceDTO.getUserKaKaoId())
+                .personName(serviceDTO.getPersonName())
+                .userImg(serviceDTO.getUserImg())
+                .build();
         return responseDTO;
     }
 }
