@@ -1,6 +1,8 @@
 package konkuk.aiku.exception;
 
-import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
 
-public class NoSuchEntityException extends NoSuchElementException {
+@RequiredArgsConstructor
+public class NoSuchEntityException extends RuntimeException {
+    private final ErrorCode errorCode;
 }
