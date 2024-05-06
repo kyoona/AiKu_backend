@@ -1,6 +1,7 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
@@ -12,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,10 +32,11 @@ public class GroupService {
 
     @Transactional
     public Long addGroup(String kakaoId, GroupServiceDTO groupServiceDTO){
-        Groups group = new Groups();
-        group.setGroupName(groupServiceDTO.getGroupName());
-        group.setGroupImg(groupServiceDTO.getGroupImg());
-        group.setDescription(groupServiceDTO.getDescription());
+        Groups group = Groups.builder()
+                .groupName(groupServiceDTO.getGroupName())
+                .groupImg(groupServiceDTO.getGroupImg())
+                .description(groupServiceDTO.getDescription())
+                .build();
 
         groupsRepository.save(group);
 
@@ -50,16 +53,14 @@ public class GroupService {
     @Transactional
     public void modifyGroup(String kakaoId, Long groupId, GroupServiceDTO groupServiceDTO) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
-
-        Groups group = groupsRepository.findById(groupId).get();
+        Groups group = checkUserInGroup(userId, groupId).getGroup();
         if(StringUtils.hasText(groupServiceDTO.getGroupName())){
             group.setGroupName(groupServiceDTO.getGroupName());
         }
         if(StringUtils.hasText(groupServiceDTO.getDescription())){
             group.setDescription(groupServiceDTO.getDescription());
         }
-        if(groupServiceDTO != null){
+        if(StringUtils.hasText(groupServiceDTO.getGroupImg())){
             group.setGroupImg(groupServiceDTO.getGroupImg());
         }
     }
@@ -67,7 +68,7 @@ public class GroupService {
     @Transactional
     public void deleteGroup(String kakaoId, Long groupId) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
+        checkUserInGroup(userId, groupId);
 
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
         groupsRepository.deleteById(groupId);
@@ -82,15 +83,16 @@ public class GroupService {
                 .groupName(group.getGroupName())
                 .description(group.getDescription())
                 .groupImg(group.getGroupImg())
+                .createdAt(group.getCreatedAt())
+                .modifiedAt(group.getModifiedAt())
                 .build();
         return groupServiceDTO;
     }
 
     public GroupDetailServiceDTO findGroupDetailById(String kakaoId, Long groupId) {
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
+        Groups group = checkUserInGroup(userId, groupId).getGroup();
 
-        Groups group = groupsRepository.findById(groupId).get();
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
         List<UserSimpleServiceDTO> userSimpleServiceDTOS = new ArrayList<>();
@@ -104,6 +106,8 @@ public class GroupService {
                 .groupImg(group.getGroupImg())
                 .description(group.getDescription())
                 .users(userSimpleServiceDTOS)
+                .createdAt(group.getCreatedAt())
+                .modifiedAt(group.getModifiedAt())
                 .build();
         return groupDetailServiceDTO;
     }
@@ -122,16 +126,16 @@ public class GroupService {
     @Transactional
     public void exitGroup(String kakaoId, Long groupId){
         Long userId = findUserByKakaoId(kakaoId).getId();
-        checkNotUserInGroup(userId, groupId);
+        checkUserInGroup(userId, groupId);
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
     }
 
-    private boolean checkNotUserInGroup(Long userId, Long groupId){
-        boolean isIn = userGroupRepository.existsByUserIdAndGroupId(userId, groupId);
-        if(!isIn){
-            throw new RuntimeException("권한 없지롱"); //TODO
+    private UserGroup checkUserInGroup(Long userId, Long groupId){
+        Optional<UserGroup> userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
+        if(userGroup.isEmpty()){
+            throw new NoAthorityToAccessException();
         }
-        return !isIn;
+        return userGroup.get();
     }
 
     private Users findUserByKakaoId(String kakaoId){
@@ -147,6 +151,8 @@ public class GroupService {
                 .setting(createSettingServiceDTO(user))
                 .point(user.getPoint())
                 .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .modifiedAt(user.getModifiedAt())
                 .build();
         return userSimpleServiceDTO;
     }

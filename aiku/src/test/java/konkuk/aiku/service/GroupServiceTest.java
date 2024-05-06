@@ -2,6 +2,7 @@ package konkuk.aiku.service;
 
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
+import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.GroupDetailServiceDTO;
@@ -32,11 +33,10 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         //when
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
@@ -59,11 +59,10 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -93,14 +92,14 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
 
         String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
-                .username("user2")
+                .personName("user2")
                 .kakaoId(userKaKaoId2)
                 .build();
         Long userId2 = usersRepository.save(user2)
@@ -120,7 +119,7 @@ class GroupServiceTest {
                 .description("group1을 수정하였습니다.")
                 .build();
         assertThatThrownBy(()-> groupService.modifyGroup(userKaKaoId2, groupId, modifyGroupServiceDTO))
-                .isExactlyInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(NoAthorityToAccessException.class);
     }
 
     @Test
@@ -129,7 +128,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .kakaoId(userKaKaoId1)
                 .build();
         usersRepository.save(user);
@@ -154,12 +153,11 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -187,40 +185,7 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
-                .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId1)
-                .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
-
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
-                .groupName("group1")
-                .groupImg("url1")
-                .description("group1입니다.")
-                .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
-
-        String userKaKaoId2 = "kakao2";
-        Users user2 = Users.builder()
-                .username("user2")
-                .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId2)
-                .build();
-        Long userId2 = usersRepository.save(user2)
-                .getId();
-
-        //when
-        assertThatThrownBy(() -> groupService.findGroupDetailById(userKaKaoId2, groupId)).isInstanceOf(RuntimeException.class);
-    }
-
-    @Test
-    @DisplayName("그룹 참가")
-    void enterGroup(){
-        //given
-        String userKaKaoId1 = "kakao1";
-        Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
@@ -235,7 +200,38 @@ class GroupServiceTest {
 
         String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
-                .username("user2")
+                .personName("user2")
+                .setting(new Setting(false, false, false, false, false))
+                .kakaoId(userKaKaoId2)
+                .build();
+        usersRepository.save(user2);
+
+        //when
+        assertThatThrownBy(() -> groupService.findGroupDetailById(userKaKaoId2, groupId)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("그룹 참가")
+    void enterGroup(){
+        //given
+        String userKaKaoId1 = "kakao1";
+        Users user = Users.builder()
+                .personName("user1")
+                .setting(new Setting(false, false, false, false, false))
+                .kakaoId(userKaKaoId1)
+                .build();
+        usersRepository.save(user);
+
+        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+                .groupName("group1")
+                .groupImg("url1")
+                .description("group1입니다.")
+                .build();
+        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+
+        String userKaKaoId2 = "kakao2";
+        Users user2 = Users.builder()
+                .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId2)
                 .build();
@@ -246,7 +242,7 @@ class GroupServiceTest {
         groupService.enterGroup(userKaKaoId2, groupId);
 
         //then
-        assertThat(userGroupRepository.existsByUserIdAndGroupId(userId2, groupId)).isTrue();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(userId2, groupId)).isNotEmpty();
     }
 
     @Test
@@ -255,12 +251,11 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -273,7 +268,7 @@ class GroupServiceTest {
         groupService.exitGroup(userKaKaoId1, groupId);
 
         //then
-        assertThat(userGroupRepository.existsByUserIdAndGroupId(userId1, groupId)).isFalse();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(user.getId(), groupId)).isEmpty();
     }
 
     @Test
@@ -282,12 +277,11 @@ class GroupServiceTest {
         //given
         String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
-                .username("user1")
+                .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .kakaoId(userKaKaoId1)
                 .build();
-        Long userId1 = usersRepository.save(user)
-                .getId();
+        usersRepository.save(user);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
@@ -298,7 +292,7 @@ class GroupServiceTest {
 
         String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
-                .username("user2")
+                .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user2);

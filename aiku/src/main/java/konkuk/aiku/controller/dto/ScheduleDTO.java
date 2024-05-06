@@ -1,15 +1,22 @@
 package konkuk.aiku.controller.dto;
 
-import konkuk.aiku.domain.Location;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter @Setter
+@Getter
+@Builder
 public class ScheduleDTO {
-    private Long scheduleId;
+    @NotBlank
+    @Size(max = 15)
     private String scheduleName;
-    private Location location;
+    @Valid
+    private LocationDTO location;
+    @NotNull
     private LocalDateTime scheduleTime;
 }
