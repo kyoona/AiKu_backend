@@ -23,11 +23,14 @@ public class Users extends TimeEntity implements UserDetails {
     @Column(name = "userId")
     @Setter(value = AccessLevel.NONE)
     private Long id;
-    private String username;
+    private String personName;
     private String phoneNumber;
     private String userImg;
 
     private String kakaoId;
+
+    @Setter
+    private String password;
 
     @Embedded
     private Setting setting;
@@ -49,13 +52,13 @@ public class Users extends TimeEntity implements UserDetails {
 
     private String refreshToken;
 
-    @Override
-    public String getPassword() {
-        return kakaoId;
-    }
-
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    @Override
+    public String getUsername() {
+        return kakaoId;
     }
 
     @Override

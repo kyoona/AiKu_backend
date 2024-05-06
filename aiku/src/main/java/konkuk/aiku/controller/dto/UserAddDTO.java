@@ -46,7 +46,7 @@ public class UserAddDTO {
         );
 
         return Users.builder()
-                .username(username)
+                .personName(username)
                 .phoneNumber(phoneNumber)
                 .kakaoId(kakaoId)
                 .setting(setting)

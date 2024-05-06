@@ -4,6 +4,7 @@ import konkuk.aiku.domain.Users;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Users save(Users users) {
+        users.setPassword(passwordEncoder.encode(users.getKakaoId()));
         return usersRepository.save(users);
     }
 
