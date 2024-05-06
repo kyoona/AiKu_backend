@@ -1,8 +1,10 @@
 package konkuk.aiku.service;
 
+import konkuk.aiku.domain.Groups;
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.exception.NoAthorityToAccessException;
+import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.GroupDetailServiceDTO;
@@ -47,10 +49,10 @@ class GroupServiceTest {
         Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
 
         //then
-        GroupServiceDTO findGroupDTO = groupService.findGroupById(groupId);
-        assertThat(findGroupDTO.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
-        assertThat(findGroupDTO.getGroupImg()).isEqualTo(groupServiceDTO.getGroupImg());
-        assertThat(findGroupDTO.getDescription()).isEqualTo(groupServiceDTO.getDescription());
+        Groups findGroup = groupService.findGroupById(groupId);
+        assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
+        assertThat(findGroup.getGroupImg()).isEqualTo(groupServiceDTO.getGroupImg());
+        assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO.getDescription());
     }
 
     @Test
@@ -80,7 +82,7 @@ class GroupServiceTest {
         groupService.modifyGroup(userKaKaoId1, groupId, modifyGroupServiceDTO);
 
         //then
-        GroupServiceDTO findGroup = groupService.findGroupById(groupId);
+        Groups findGroup = groupService.findGroupById(groupId);
         assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDTO.getGroupName());
         assertThat(findGroup.getGroupImg()).isEqualTo(modifyGroupServiceDTO.getGroupImg());
         assertThat(findGroup.getDescription()).isEqualTo(modifyGroupServiceDTO.getDescription());
@@ -144,7 +146,7 @@ class GroupServiceTest {
         groupService.deleteGroup(userKaKaoId1, groupId);
 
         //then
-        assertThat(groupService.findGroupById(groupId)).isNull();
+        assertThatThrownBy(() -> groupService.findGroupById(groupId)).isInstanceOf(NoSuchEntityException.class);
     }
 
     @Test

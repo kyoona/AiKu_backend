@@ -3,6 +3,7 @@ package konkuk.aiku.service;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
+import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
@@ -75,21 +76,6 @@ public class GroupService {
         groupsRepository.deleteById(groupId);
     }
 
-    public GroupServiceDTO findGroupById(Long id){
-        Groups group = groupsRepository.findById(id).orElse(null);
-        if(group == null) return null;
-
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
-                .id(group.getId())
-                .groupName(group.getGroupName())
-                .description(group.getDescription())
-                .groupImg(group.getGroupImg())
-                .createdAt(group.getCreatedAt())
-                .modifiedAt(group.getModifiedAt())
-                .build();
-        return groupServiceDTO;
-    }
-
     public GroupDetailServiceDTO findGroupDetailById(String kakaoId, Long groupId) {
         Long userId = findUserByKakaoId(kakaoId).getId();
         Groups group = checkUserInGroup(userId, groupId).getGroup();
@@ -116,7 +102,10 @@ public class GroupService {
     @Transactional
     public void enterGroup(String kakaoId, Long groupId){
         Users user = findUserByKakaoId(kakaoId);
-        Groups group = groupsRepository.findById(groupId).get();
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+
+        }
 
         UserGroup userGroup = new UserGroup();
         userGroup.setUser(user);
@@ -129,6 +118,14 @@ public class GroupService {
         Long userId = findUserByKakaoId(kakaoId).getId();
         checkUserInGroup(userId, groupId);
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
+    }
+
+    public Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
