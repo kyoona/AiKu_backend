@@ -27,8 +27,7 @@ public class ScheduleService {
     private final UsersRepository usersRepository;
 
     @Transactional
-    public Long addSchedule(String kakaoId, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
-        Users user = findUserByKakaoId(kakaoId);
+    public Long addSchedule(Users user, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
         Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
 
         Schedule schedule = Schedule.builder()
@@ -45,8 +44,7 @@ public class ScheduleService {
 
     //TODO
     @Transactional
-    public void modifySchedule(String kakaoId, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
-        Users user = findUserByKakaoId(kakaoId);
+    public void modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
         checkUserInGroup(user.getId(), groupId);
 
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
@@ -65,8 +63,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deleteSchedule(String kakaoId, Long groupId, Long scheduleId) {
-        Users user = findUserByKakaoId(kakaoId);
+    public void deleteSchedule(Users user, Long groupId, Long scheduleId) {
         checkUserInGroup(user.getId(), groupId);
 
         scheduleRepository.deleteById(scheduleId);

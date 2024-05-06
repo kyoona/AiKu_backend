@@ -3,6 +3,8 @@ package konkuk.aiku.controller;
 import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.LocationDTO;
 import konkuk.aiku.controller.dto.ScheduleDTO;
+import konkuk.aiku.domain.Users;
+import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.ScheduleService;
 import konkuk.aiku.service.dto.LocationServiceDTO;
 import konkuk.aiku.service.dto.ScheduleServiceDTO;
@@ -23,24 +25,23 @@ public class ScheduleController {
     @PostMapping
     public void scheduleAdd(@PathVariable Long groupId,
                             @RequestBody @Valid ScheduleDTO scheduleDTO,
-                            @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
-
+                            @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
         ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
                 .scheduleName(scheduleDTO.getScheduleName())
                 .location(createLocationServiceDTO(scheduleDTO.getLocation()))
                 .scheduleTime(scheduleDTO.getScheduleTime())
                 .build();
 
-        scheduleService.addSchedule(kakaoId, groupId, scheduleServiceDTO);
+        scheduleService.addSchedule(user, groupId, scheduleServiceDTO);
     }
 
     @PatchMapping("/{scheduleId}")
     public void scheduleModify(@PathVariable Long groupId,
                                 @PathVariable Long scheduleId,
                                 @RequestBody @Valid ScheduleDTO scheduleDTO,
-                                @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
+                                @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
 
         ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
                 .scheduleName(scheduleDTO.getScheduleName())
@@ -48,15 +49,15 @@ public class ScheduleController {
                 .scheduleTime(scheduleDTO.getScheduleTime())
                 .build();
 
-        scheduleService.modifySchedule(kakaoId, groupId, scheduleId, scheduleServiceDTO);
+        scheduleService.modifySchedule(user, groupId, scheduleId, scheduleServiceDTO);
     }
 
     @DeleteMapping("/{scheduleId}")
     public void scheduleDelete(@PathVariable Long groupId,
                                @PathVariable Long scheduleId,
-                               @AuthenticationPrincipal UserDetails userDetails){
-        String kakaoId = userDetails.getPassword();
-        scheduleService.deleteSchedule(kakaoId, groupId, scheduleId);
+                               @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        scheduleService.deleteSchedule(user, groupId, scheduleId);
     }
 
     private LocationServiceDTO createLocationServiceDTO(LocationDTO location){

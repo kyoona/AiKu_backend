@@ -41,10 +41,9 @@ class ScheduleServiceTest {
     @DisplayName("스케줄 등록")
     public void addSchedule() throws Exception{
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -65,14 +64,14 @@ class ScheduleServiceTest {
                 .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
-        Long scheduleId = scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO);
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
 
         ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
                 .scheduleName("schedule2")
                 .location(new LocationServiceDTO(100.1, 100.1, "aiku"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
-        scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO2);
+        scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO2);
 
         //then
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
@@ -92,10 +91,9 @@ class ScheduleServiceTest {
     @DisplayName("스케줄 등록-그룹에 속해 있지 않은 유저")
     public void addScheduleInFaultCondition() throws Exception{
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -112,16 +110,15 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
 
-        assertThatThrownBy(() -> scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
+        assertThatThrownBy(() -> scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
     }
 
     @Test
     public void modifySchedule() throws Exception{
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -141,7 +138,7 @@ class ScheduleServiceTest {
                 .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
-        Long scheduleId = scheduleService.addSchedule(userKaKaoId1, group.getId(), scheduleServiceDTO);
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
 
         //when
         ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
@@ -149,7 +146,7 @@ class ScheduleServiceTest {
                 .location(null) //수정되면 안됨(값이 없는 필드는 수정 x)
                 .scheduleTime(null)
                 .build();
-        scheduleService.modifySchedule(userKaKaoId1, group.getId(), scheduleId, scheduleServiceDTO2);
+        scheduleService.modifySchedule(user, group.getId(), scheduleId, scheduleServiceDTO2);
 
         //then
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
