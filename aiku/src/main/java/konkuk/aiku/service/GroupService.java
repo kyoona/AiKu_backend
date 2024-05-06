@@ -132,10 +132,6 @@ public class GroupService {
         return userGroup.get();
     }
 
-    private Users findUserByKakaoId(String kakaoId){
-        return usersRepository.findByKakaoId(kakaoId).get();
-    }
-
     private UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
         UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
                 .userKaKaoId(user.getKakaoId())
