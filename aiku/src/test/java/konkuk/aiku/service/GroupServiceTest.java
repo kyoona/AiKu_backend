@@ -1,5 +1,6 @@
 package konkuk.aiku.service;
 
+import jakarta.persistence.EntityManager;
 import konkuk.aiku.domain.Groups;
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
@@ -13,15 +14,17 @@ import konkuk.aiku.service.dto.UserSimpleServiceDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
-
 
 @Transactional
 @SpringBootTest
 class GroupServiceTest {
 
+    @Autowired
+    private EntityManager em;
     @Autowired
     private GroupService groupService;
     @Autowired
@@ -30,6 +33,7 @@ class GroupServiceTest {
     private UserGroupRepository userGroupRepository;
 
     @Test
+    @Commit
     @DisplayName("그룹 등록")
     void addGroup() {
         //given
@@ -38,6 +42,8 @@ class GroupServiceTest {
                 .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
+        em.flush();
+        em.clear();
 
         //when
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
@@ -55,6 +61,7 @@ class GroupServiceTest {
     }
 
     @Test
+    @Commit
     @DisplayName("그룹 수정")
     void modifyGroup() throws IllegalAccessException {
         //given
@@ -70,6 +77,8 @@ class GroupServiceTest {
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
+        em.flush();
+        em.clear();
 
         //when
         GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
@@ -88,7 +97,7 @@ class GroupServiceTest {
 
     @Test
     @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
-    void modifyGroupInFaultCondition() throws IllegalAccessException {
+    void modifyGroupInFaultCondition() {
         //given
         Users user = Users.builder()
                 .personName("user1")
@@ -108,6 +117,8 @@ class GroupServiceTest {
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
+        em.flush();
+        em.clear();
 
         //when
         GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
@@ -116,7 +127,7 @@ class GroupServiceTest {
                 .description("group1을 수정하였습니다.")
                 .build();
         assertThatThrownBy(()-> groupService.modifyGroup(user2, groupId, modifyGroupServiceDTO))
-                .isExactlyInstanceOf(NoAthorityToAccessException.class);
+                .isInstanceOf(NoAthorityToAccessException.class);
     }
 
     @Test
@@ -135,6 +146,8 @@ class GroupServiceTest {
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
+        em.flush();
+        em.clear();
 
         //when
         groupService.deleteGroup(user, groupId);
@@ -160,6 +173,8 @@ class GroupServiceTest {
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
+        em.flush();
+        em.clear();
 
         //when
         GroupDetailServiceDTO groupDetailServiceDTO = groupService.findGroupDetailById(user, groupId);
@@ -204,6 +219,7 @@ class GroupServiceTest {
     }
 
     @Test
+    @Commit
     @DisplayName("그룹 참가")
     void enterGroup(){
         //given
@@ -227,6 +243,8 @@ class GroupServiceTest {
                 .kakaoId("kakao2")
                 .build();
         usersRepository.save(user2);
+        em.flush();
+        em.clear();
 
         //when
         groupService.enterGroup(user2, groupId);
@@ -236,6 +254,7 @@ class GroupServiceTest {
     }
 
     @Test
+    @Commit
     @DisplayName("그룹 퇴장")
     void exitGroup(){
         //given
@@ -252,6 +271,8 @@ class GroupServiceTest {
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
+        em.flush();
+        em.clear();
 
         //when
         groupService.exitGroup(user, groupId);
