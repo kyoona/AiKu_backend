@@ -33,10 +33,9 @@ class GroupServiceTest {
     @DisplayName("그룹 등록")
     void addGroup() {
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -46,7 +45,7 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         //then
         Groups findGroup = groupService.findGroupById(groupId);
@@ -59,10 +58,9 @@ class GroupServiceTest {
     @DisplayName("그룹 수정")
     void modifyGroup() throws IllegalAccessException {
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -71,7 +69,7 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         //when
         GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
@@ -79,7 +77,7 @@ class GroupServiceTest {
                 .groupImg("url2")
                 .description("group1을 수정하였습니다.")
                 .build();
-        groupService.modifyGroup(userKaKaoId1, groupId, modifyGroupServiceDTO);
+        groupService.modifyGroup(user, groupId, modifyGroupServiceDTO);
 
         //then
         Groups findGroup = groupService.findGroupById(groupId);
@@ -92,27 +90,24 @@ class GroupServiceTest {
     @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
     void modifyGroupInFaultCondition() throws IllegalAccessException {
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
-        String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
                 .personName("user2")
-                .kakaoId(userKaKaoId2)
+                .kakaoId("kakao2")
                 .build();
-        Long userId2 = usersRepository.save(user2)
-                .getId();
+        usersRepository.save(user2);
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         //when
         GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
@@ -120,7 +115,7 @@ class GroupServiceTest {
                 .groupImg("url2")
                 .description("group1을 수정하였습니다.")
                 .build();
-        assertThatThrownBy(()-> groupService.modifyGroup(userKaKaoId2, groupId, modifyGroupServiceDTO))
+        assertThatThrownBy(()-> groupService.modifyGroup(user2, groupId, modifyGroupServiceDTO))
                 .isExactlyInstanceOf(NoAthorityToAccessException.class);
     }
 
@@ -128,10 +123,9 @@ class GroupServiceTest {
     @DisplayName("그룹 삭제")
     void deleteGroup(){
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -140,10 +134,10 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         //when
-        groupService.deleteGroup(userKaKaoId1, groupId);
+        groupService.deleteGroup(user, groupId);
 
         //then
         assertThatThrownBy(() -> groupService.findGroupById(groupId)).isInstanceOf(NoSuchEntityException.class);
@@ -153,11 +147,10 @@ class GroupServiceTest {
     @DisplayName("그룹 조회")
     void findGroupDetailById(){
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -166,10 +159,10 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         //when
-        GroupDetailServiceDTO groupDetailServiceDTO = groupService.findGroupDetailById(userKaKaoId1, groupId);
+        GroupDetailServiceDTO groupDetailServiceDTO = groupService.findGroupDetailById(user, groupId);
 
         //then
         UserSimpleServiceDTO findUserDTO = groupDetailServiceDTO.getUsers().get(0);
@@ -185,11 +178,10 @@ class GroupServiceTest {
     @DisplayName("그룹 조회-그룹에 속해 있지 않은 유저")
     void findGroupDetailByIdInFaultCondition(){
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -198,29 +190,27 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
-        String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
                 .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId2)
+                .kakaoId("kakao2")
                 .build();
         usersRepository.save(user2);
 
         //when
-        assertThatThrownBy(() -> groupService.findGroupDetailById(userKaKaoId2, groupId)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> groupService.findGroupDetailById(user2, groupId)).isInstanceOf(RuntimeException.class);
     }
 
     @Test
     @DisplayName("그룹 참가")
     void enterGroup(){
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -229,33 +219,30 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
-        String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
                 .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId2)
+                .kakaoId("kakao2")
                 .build();
-        Long userId2 = usersRepository.save(user2)
-                .getId();
+        usersRepository.save(user2);
 
         //when
-        groupService.enterGroup(userKaKaoId2, groupId);
+        groupService.enterGroup(user2, groupId);
 
         //then
-        assertThat(userGroupRepository.findByUserIdAndGroupId(userId2, groupId)).isNotEmpty();
+        assertThat(userGroupRepository.findByUserIdAndGroupId(user2.getId(), groupId)).isNotEmpty();
     }
 
     @Test
     @DisplayName("그룹 퇴장")
     void exitGroup(){
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -264,10 +251,10 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         //when
-        groupService.exitGroup(userKaKaoId1, groupId);
+        groupService.exitGroup(user, groupId);
 
         //then
         assertThat(userGroupRepository.findByUserIdAndGroupId(user.getId(), groupId)).isEmpty();
@@ -277,11 +264,10 @@ class GroupServiceTest {
     @DisplayName("그룹 퇴장-그룹에 속해 있지 않은 유저")
     void exitGroupInFaultCondition(){
         //given
-        String userKaKaoId1 = "kakao1";
         Users user = Users.builder()
                 .personName("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId(userKaKaoId1)
+                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -290,9 +276,8 @@ class GroupServiceTest {
                 .groupImg("url1")
                 .description("group1입니다.")
                 .build();
-        Long groupId = groupService.addGroup(userKaKaoId1, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, groupServiceDTO);
 
-        String userKaKaoId2 = "kakao2";
         Users user2 = Users.builder()
                 .personName("user2")
                 .setting(new Setting(false, false, false, false, false))
@@ -300,6 +285,6 @@ class GroupServiceTest {
         usersRepository.save(user2);
 
         //when
-        assertThatThrownBy(() -> groupService.exitGroup(userKaKaoId2, groupId)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> groupService.exitGroup(user2, groupId)).isInstanceOf(RuntimeException.class);
     }
 }

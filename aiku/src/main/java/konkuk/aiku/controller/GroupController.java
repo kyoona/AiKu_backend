@@ -5,6 +5,7 @@ import konkuk.aiku.controller.dto.EntryDTO;
 import konkuk.aiku.controller.dto.GroupDTO;
 import konkuk.aiku.controller.dto.GroupResponseDTO;
 import konkuk.aiku.controller.dto.UserSimpleResponseDTO;
+import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
 import konkuk.aiku.service.dto.GroupDetailServiceDTO;
@@ -36,45 +37,44 @@ public class GroupController {
     @PostMapping
     public void groupAdd(@RequestBody @Valid GroupDTO groupDTO,
                          @AuthenticationPrincipal UserAdaptor userAdaptor){
-        String kakaoId = userAdaptor.getPassword();
+        Users user = userAdaptor.getUsers();
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName(groupDTO.getGroupName())
                 .description(groupDTO.getDescription())
                 .groupImg(null)
                 .build();
-        groupService.addGroup(kakaoId, groupServiceDTO);
+        groupService.addGroup(user, groupServiceDTO);
     }
 
     @PatchMapping("/{groupId}")
     public void groupModify(@PathVariable Long groupId,
                             @RequestBody @Valid GroupDTO groupDTO,
                             @AuthenticationPrincipal UserAdaptor userAdapter){
-        String kakaoId = userAdapter.getPassword();
+        Users user = userAdapter.getUsers();
 
         GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
                 .groupName(groupDTO.getGroupName())
                 .description(groupDTO.getDescription())
                 .groupImg(null)
                 .build();
-        groupService.modifyGroup(kakaoId, groupId, groupServiceDTO);
+        groupService.modifyGroup(user, groupId, groupServiceDTO);
     }
 
     @DeleteMapping("/{groupId}")
     public void groupDelete(@PathVariable Long groupId,
                             @AuthenticationPrincipal UserAdaptor userAdaptor){
-        String kakaoId = userAdaptor.getPassword();
-        groupService.deleteGroup(kakaoId, groupId);
+        Users user = userAdaptor.getUsers();
+        groupService.deleteGroup(user, groupId);
     }
 
     @GetMapping("/{groupId}")
     public ResponseEntity<GroupResponseDTO> groupDetails(@PathVariable Long userId,
                                                          @PathVariable Long groupId,
                                                          @AuthenticationPrincipal UserAdaptor userAdaptor){
-        String kakaoId = userAdaptor.getPassword();
+        Users user = userAdaptor.getUsers();
 
-
-        GroupDetailServiceDTO serviceDTO = groupService.findGroupDetailById(kakaoId, groupId);
+        GroupDetailServiceDTO serviceDTO = groupService.findGroupDetailById(user, groupId);
 
         GroupResponseDTO groupResponseDTO = createGroupResponseDTO(serviceDTO);
         return new ResponseEntity<GroupResponseDTO>(groupResponseDTO, HttpStatus.OK);
@@ -84,12 +84,12 @@ public class GroupController {
     public void groupEntry(@PathVariable Long groupId,
                            @RequestBody EntryDTO entryDTO,
                            @AuthenticationPrincipal UserAdaptor userAdaptor){
-        String kakaoId = userAdaptor.getPassword();
+        Users user = userAdaptor.getUsers();
 
         if (entryDTO.getEnter()) {
-            groupService.enterGroup(kakaoId, groupId);
+            groupService.enterGroup(user, groupId);
         } else {
-            groupService.exitGroup(kakaoId, groupId);
+            groupService.exitGroup(user, groupId);
         }
     }
 
