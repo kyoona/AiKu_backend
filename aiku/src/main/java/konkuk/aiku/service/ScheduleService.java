@@ -26,7 +26,6 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final UserGroupRepository userGroupRepository;
-    private final UsersRepository usersRepository;
 
     @Transactional
     public Long addSchedule(Users user, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
