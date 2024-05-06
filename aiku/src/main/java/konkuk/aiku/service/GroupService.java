@@ -1,6 +1,7 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UserGroupRepository;
@@ -133,7 +134,7 @@ public class GroupService {
     private UserGroup checkUserInGroup(Long userId, Long groupId){
         Optional<UserGroup> userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
         if(userGroup.isEmpty()){
-            throw new NoAthorityToAccessException();
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userGroup.get();
     }
