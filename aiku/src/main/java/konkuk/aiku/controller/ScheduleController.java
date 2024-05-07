@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static konkuk.aiku.controller.dto.SuccessResponseDTO.SuccessMessage.*;
+
 @Controller(value = "/groups/{groupId}/schedules")
 @RequiredArgsConstructor
 @Slf4j
@@ -30,7 +32,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
-    public void scheduleAdd(@PathVariable Long groupId,
+    public ResponseEntity<SuccessResponseDTO> scheduleAdd(@PathVariable Long groupId,
                             @RequestBody @Valid ScheduleDTO scheduleDTO,
                             @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
@@ -41,10 +43,11 @@ public class ScheduleController {
                 .build();
 
         scheduleService.addSchedule(user, groupId, scheduleServiceDTO);
+        return SuccessResponseDTO.getResponseEntity(ADD_SUCCESS, HttpStatus.OK);
     }
 
     @PatchMapping("/{scheduleId}")
-    public void scheduleModify(@PathVariable Long groupId,
+    public ResponseEntity<SuccessResponseDTO> scheduleModify(@PathVariable Long groupId,
                                 @PathVariable Long scheduleId,
                                 @RequestBody @Valid ScheduleDTO scheduleDTO,
                                 @AuthenticationPrincipal UserAdaptor userAdaptor){
@@ -57,14 +60,16 @@ public class ScheduleController {
                 .build();
 
         scheduleService.modifySchedule(user, groupId, scheduleId, scheduleServiceDTO);
+        return SuccessResponseDTO.getResponseEntity(MODIFY_SUCCESS, HttpStatus.OK);
     }
 
     @DeleteMapping("/{scheduleId}")
-    public void scheduleDelete(@PathVariable Long groupId,
+    public ResponseEntity<SuccessResponseDTO> scheduleDelete(@PathVariable Long groupId,
                                @PathVariable Long scheduleId,
                                @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
         scheduleService.deleteSchedule(user, groupId, scheduleId);
+        return SuccessResponseDTO.getResponseEntity(DELETE_SUCCESS, HttpStatus.OK);
     }
 
     private LocationServiceDTO createLocationServiceDTO(LocationDTO location){
