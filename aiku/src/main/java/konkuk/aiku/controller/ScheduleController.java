@@ -87,17 +87,22 @@ public class ScheduleController {
         return new ResponseEntity<>(scheduleResponseDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/{scheduleId}")
-    public void scheduleEntry(@PathVariable Long groupId,
+    @PostMapping("/{scheduleId}/enter")
+    public ResponseEntity<SuccessResponseDTO> scheduleEnter(@PathVariable Long groupId,
                               @PathVariable Long scheduleId,
-                              @RequestBody EntryDTO entryDTO,
                               @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        if(entryDTO.getEnter()){
-            scheduleService.enterSchedule(user, groupId, scheduleId);
-        }else {
-            scheduleService.exitSchedule(user, groupId, scheduleId);
-        }
+        scheduleService.enterSchedule(user, groupId, scheduleId);
+        return SuccessResponseDTO.getResponseEntity(ENTER_SUCCESS, HttpStatus.OK);
+    }
+
+    @PostMapping("/{scheduleId}/exit")
+    public ResponseEntity<SuccessResponseDTO> scheduleExit(@PathVariable Long groupId,
+                              @PathVariable Long scheduleId,
+                              @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        scheduleService.exitSchedule(user, groupId, scheduleId);
+        return SuccessResponseDTO.getResponseEntity(EXIT_SUCCESS, HttpStatus.OK);
     }
 
     @GetMapping("/{scheduleId}/result")

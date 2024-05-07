@@ -18,7 +18,9 @@ public class SuccessResponseDTO {
     public enum SuccessMessage {
         ADD_SUCCESS("등록 성공하였습니다."),
         MODIFY_SUCCESS("수정 성공하였습니다."),
-        DELETE_SUCCESS("삭제 성공하였습니다.");
+        DELETE_SUCCESS("삭제 성공하였습니다."),
+        EXIT_SUCCESS("퇴장 성공하였습니다."),
+        ENTER_SUCCESS("입장 성공하였습니다.");
 
         private String message;
 
