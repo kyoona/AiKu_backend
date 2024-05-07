@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UserSimpleServiceDTO {
     private String userKaKaoId;
-    private String username;
+    private String personName;
     private String phoneNumber;
     private String userImg;
     private SettingServiceDTO setting;

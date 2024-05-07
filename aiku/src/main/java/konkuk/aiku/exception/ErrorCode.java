@@ -8,6 +8,9 @@ import lombok.Getter;
 public enum ErrorCode {
     //4XX Client error response
     //400 Bad Request
+    ALREADY_IN_GROUP(400, "이미 챰여중인 그룹입니다."),
+    ALREADY_IN_SCHEDULE(400, "이미 챰여중인 그룹입니다"),
+
     //403 Forbidden
     NO_ATHORITY_TO_ACCESS(403, "데이터에 접근 권한이 없습니다."),
 

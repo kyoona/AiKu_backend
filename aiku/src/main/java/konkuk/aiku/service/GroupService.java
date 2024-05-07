@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static konkuk.aiku.service.dto.ServiceDTOUtils.createUserSimpleServiceDTO;
+
 @Service
 @Transactional(readOnly = true)
 @Slf4j
@@ -130,32 +132,5 @@ public class GroupService {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userGroup.get();
-    }
-
-    private UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
-        UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                .userKaKaoId(user.getKakaoId())
-                .username(user.getUsername())
-                .phoneNumber(user.getPhoneNumber())
-                .userImg(user.getUserImg())
-                .setting(createSettingServiceDTO(user))
-                .point(user.getPoint())
-                .role(user.getRole())
-                .createdAt(user.getCreatedAt())
-                .modifiedAt(user.getModifiedAt())
-                .build();
-        return userSimpleServiceDTO;
-    }
-
-    private SettingServiceDTO createSettingServiceDTO(Users user){
-        Setting setting = user.getSetting();
-        SettingServiceDTO settingServiceDTO = SettingServiceDTO.builder()
-                .isBettingAlarmOn(setting.isBettingAlarmOn())
-                .isPinchAlarmOn(setting.isPinchAlarmOn())
-                .isLocationInformationOn(setting.isLocationInformationOn())
-                .isScheduleAlarmOn(setting.isScheduleAlarmOn())
-                .isVoiceAuthorityOn(setting.isVoiceAuthorityOn())
-                .build();
-        return settingServiceDTO;
     }
 }

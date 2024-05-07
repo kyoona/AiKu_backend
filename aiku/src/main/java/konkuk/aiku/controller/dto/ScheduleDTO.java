@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ScheduleDTO {
+    Long scheduleId;
     @NotBlank
     @Size(max = 15)
     private String scheduleName;
