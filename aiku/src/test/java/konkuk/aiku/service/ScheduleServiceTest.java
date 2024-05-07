@@ -10,6 +10,7 @@ import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.LocationServiceDTO;
 import konkuk.aiku.service.dto.ScheduleDetailServiceDTO;
 import konkuk.aiku.service.dto.ScheduleServiceDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@Slf4j
 class ScheduleServiceTest {
 
     @Autowired
@@ -148,8 +150,8 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
-        em.flush();
-        em.clear();
+//        em.flush();
+//        em.clear();
 
         //when
         ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
@@ -205,8 +207,8 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
-        em.flush();
-        em.clear();
+//        em.flush();
+//        em.clear();
 
         //when
         ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
@@ -244,8 +246,8 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
-        em.flush();
-        em.clear();
+//        em.flush();
+//        em.clear();
 
         //when
         scheduleService.deleteSchedule(user, group.getId(), scheduleId);
@@ -255,6 +257,7 @@ class ScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스케줄 상세 조회")
     public void findScheduleDetailById() {
         //given
         Users user = Users.builder()
@@ -267,7 +270,7 @@ class ScheduleServiceTest {
         Users user2 = Users.builder()
                 .personName("user2")
                 .kakaoId("kakao2")
-                .setting(new Setting(false, false, false, false, false))
+                .setting(new Setting(true, true, true, true, true))
                 .build();
         usersRepository.save(user2);
 
@@ -293,8 +296,8 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
-        em.flush();
-        em.clear();
+//        em.flush();
+//        em.clear();
 
         //when
         ScheduleDetailServiceDTO scheduleDetailServiceDTO = scheduleService.findScheduleDetailById(user, group.getId(), scheduleId);

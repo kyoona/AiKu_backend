@@ -6,6 +6,7 @@ import jakarta.persistence.TypedQuery;
 import konkuk.aiku.domain.UserSchedule;
 import konkuk.aiku.domain.Users;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
 
     @PersistenceContext
@@ -32,14 +34,14 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     public List<Users> findWaitUsersInSchedule(Long groupId, List<UserSchedule> acceptUsers) {
         List<Users> users = entityManager.createQuery(
                         "SELECT ug.user FROM UserGroup ug " +
-                                "JOIN ug.user u " +
-                                "WHERE u.id NOT IN (" +
+                                "WHERE ug.user.id NOT IN (" +
                                 "    SELECT us.user.id FROM UserSchedule us WHERE us IN :userList" +
                                 ") " +
                                 "AND ug.group.id = :groupId", Users.class)
                 .setParameter("userList", acceptUsers)
-                .setParameter("groupId", 1L)
+                .setParameter("groupId", groupId)
                 .getResultList();
+
         return users;
     }
 }
