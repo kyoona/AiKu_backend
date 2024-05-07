@@ -2,7 +2,6 @@ package konkuk.aiku.service;
 
 import jakarta.persistence.EntityManager;
 import konkuk.aiku.domain.*;
-import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
@@ -47,7 +46,7 @@ class ScheduleServiceTest {
     @Test
     @Commit
     @DisplayName("스케줄 등록")
-    public void addSchedule() throws Exception{
+    public void addSchedule() {
         //given
         Users user = Users.builder()
                 .personName("user1")
@@ -99,7 +98,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 등록-그룹에 속해 있지 않은 유저")
-    public void addScheduleInFaultCondition() throws Exception{
+    public void addScheduleInFaultCondition() {
         //given
         Users user = Users.builder()
                 .personName("user1")
@@ -126,7 +125,7 @@ class ScheduleServiceTest {
     @Test
     @Commit
     @DisplayName("스케줄 수정")
-    public void modifySchedule() throws Exception{
+    public void modifySchedule() {
         //given
         Users user = Users.builder()
                 .personName("user1")
@@ -177,7 +176,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 수정-스케줄에 속해 있지 않은 유저")
-    public void modifyScheduleInFaultCondition() throws Exception{
+    public void modifyScheduleInFaultCondition() {
         //given
         Users user = Users.builder()
                 .personName("user1")
@@ -222,7 +221,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 삭제")
-    public void deleteSchedule() throws Exception{
+    public void deleteSchedule() {
         //given
         Users user = Users.builder()
                 .personName("user1")
@@ -368,7 +367,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 참가-이미 참여중인 유저")
-    public void enterScheduleAlreadyIn() {
+    public void enterScheduleNotInGroup() {
         //given
         Users user = Users.builder()
                 .personName("user1")
@@ -376,6 +375,13 @@ class ScheduleServiceTest {
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user);
+
+        Users user2 = Users.builder()
+                .personName("user2")
+                .kakaoId("kakao2")
+                .setting(new Setting(true, true, true, true, true))
+                .build();
+        usersRepository.save(user2);
 
         Groups group = Groups.builder()
                 .groupName("group1")
@@ -394,9 +400,37 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+//        em.flush();
+//        em.clear();
 
         //when
-        assertThatThrownBy(() -> scheduleService.enterSchedule(user, group.getId(), scheduleId)).isInstanceOf(AlreadyInException.class);
+        assertThatThrownBy(() -> scheduleService.enterSchedule(user2, group.getId(), scheduleId)).isInstanceOf(NoAthorityToAccessException.class);
+    }
+
+    @Test
+    @DisplayName("스케줄 참가-그룹에 속해 있지 않은 유저")
+    public void enterScheduleAlreadyIn() {
+        //given
+        Users user = Users.builder()
+                .personName("user1")
+                .kakaoId("kakao1")
+                .build();
+        usersRepository.save(user);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        //whe
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+
+        assertThatThrownBy(() -> scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
     }
 
     @Test
