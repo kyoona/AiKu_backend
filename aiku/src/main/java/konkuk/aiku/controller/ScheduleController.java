@@ -10,6 +10,7 @@ import konkuk.aiku.service.dto.LocationServiceDTO;
 import konkuk.aiku.service.dto.ScheduleDetailServiceDTO;
 import konkuk.aiku.service.dto.ScheduleServiceDTO;
 import konkuk.aiku.service.dto.UserSimpleServiceDTO;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -92,6 +93,14 @@ public class ScheduleController {
         }else {
             scheduleService.exitSchedule(user, groupId, scheduleId);
         }
+    }
+
+    @GetMapping("/{scheduleId}/result")
+    private void scheduleResult(@PathVariable Long groupId,
+                                @PathVariable Long scheduleId,
+                                @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        scheduleService.findScheduleResult(user, groupId, scheduleId);
     }
 
     private ScheduleResponseDTO createScheduleResponseDTO(ScheduleDetailServiceDTO serviceDTO){

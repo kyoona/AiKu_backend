@@ -1,6 +1,5 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.controller.dto.EntryDTO;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
@@ -15,9 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static konkuk.aiku.service.dto.ServiceDTOUtils.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -75,8 +75,8 @@ public class ScheduleService {
 
     public ScheduleDetailServiceDTO findScheduleDetailById(Users user, Long groupId, Long scheduleId){
         Long userId = user.getId();
-        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
-        Schedule schedule = userSchedule.getSchedule();
+        checkUserInGroup(userId, groupId);
+        Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
         return createScheduleDetailServiceDTO(schedule, waitUsers);
     }
@@ -97,6 +97,15 @@ public class ScheduleService {
         UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
         Schedule schedule = userSchedule.getSchedule();
         schedule.deleteUser(user, userSchedule);
+    }
+
+    public ScheduleResultServiceDTO findScheduleResult(Users user, Long groupId, Long scheduleId){
+        Long userId = user.getId();
+        checkUserInGroup(userId, groupId);
+
+        Schedule schedule = findScheduleById(scheduleId);
+        List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
+        return createScheduleResultServiceDTO(schedule, userArrivalDatas);
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
@@ -130,79 +139,5 @@ public class ScheduleService {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
         }
         return schedule;
-    }
-
-
-    private ScheduleDetailServiceDTO createScheduleDetailServiceDTO(Schedule schedule, List<Users> waitUsers){
-
-        ScheduleDetailServiceDTO scheduleDetailServiceDTO = ScheduleDetailServiceDTO.builder()
-                .id(schedule.getId())
-                .scheduleName(schedule.getScheduleName())
-                .location(createLocationServiceDTO(schedule.getLocation()))
-                .scheduleTime(schedule.getScheduleTime())
-                .acceptUsers(createUserSimpleServiceDTOsByUserSchedule(schedule.getUsers()))
-                .waitUsers(createUserSimpleServiceDTOsByUsers(waitUsers))
-                .createdAt(schedule.getCreatedAt())
-                .modifiedAt(schedule.getModifiedAt())
-                .build();
-        return scheduleDetailServiceDTO;
-    }
-
-    private List<UserSimpleServiceDTO> createUserSimpleServiceDTOsByUserSchedule(List<UserSchedule> users){
-        List<UserSimpleServiceDTO> userSimpleServiceDTOs = new ArrayList<>();
-        for (UserSchedule userSchedule : users) {
-            Users user = userSchedule.getUser();
-            UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                    .userKaKaoId(user.getKakaoId())
-                    .personName(user.getPersonName())
-                    .phoneNumber(user.getPhoneNumber())
-                    .userImg(user.getUserImg())
-                    .setting(createSettingServiceDTO(user.getSetting()))
-                    .point(user.getPoint())
-                    .role(user.getRole())
-                    .createdAt(user.getCreatedAt())
-                    .modifiedAt(user.getModifiedAt())
-                    .build();
-            userSimpleServiceDTOs.add(userSimpleServiceDTO);
-        }
-        return userSimpleServiceDTOs;
-    }
-
-    private List<UserSimpleServiceDTO> createUserSimpleServiceDTOsByUsers(List<Users> users){
-        List<UserSimpleServiceDTO> userSimpleServiceDTOs = new ArrayList<>();
-        for (Users user : users) {
-            UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                    .userKaKaoId(user.getKakaoId())
-                    .personName(user.getPersonName())
-                    .phoneNumber(user.getPhoneNumber())
-                    .userImg(user.getUserImg())
-                    .setting(createSettingServiceDTO(user.getSetting()))
-                    .point(user.getPoint())
-                    .role(user.getRole())
-                    .createdAt(user.getCreatedAt())
-                    .modifiedAt(user.getModifiedAt())
-                    .build();
-            userSimpleServiceDTOs.add(userSimpleServiceDTO);
-        }
-        return userSimpleServiceDTOs;
-    }
-
-    private Location createLocation(LocationServiceDTO locationServiceDTO){
-        return new Location(locationServiceDTO.getLatitude(), locationServiceDTO.getLongitude(), locationServiceDTO.getLocationName());
-    }
-
-    private LocationServiceDTO createLocationServiceDTO(Location location){
-        return new LocationServiceDTO(location.getLatitude(), location.getLongitude(), location.getLocationName());
-    }
-
-    private SettingServiceDTO createSettingServiceDTO(Setting setting){
-        SettingServiceDTO settingServiceDTO = SettingServiceDTO.builder()
-                .isBettingAlarmOn(setting.isBettingAlarmOn())
-                .isPinchAlarmOn(setting.isPinchAlarmOn())
-                .isLocationInformationOn(setting.isLocationInformationOn())
-                .isScheduleAlarmOn(setting.isScheduleAlarmOn())
-                .isVoiceAuthorityOn(setting.isVoiceAuthorityOn())
-                .build();
-        return settingServiceDTO;
     }
 }

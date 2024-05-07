@@ -24,7 +24,7 @@ public class UserArrivalData extends TimeEntity{
     @JoinColumn(name = "scheduleId")
     private Schedule schedule;
     private LocalDateTime arrivalTime;
-    private LocalDateTime timeDifference;
+    private int timeDifference;
 
     @Embedded
     @AttributeOverrides({
