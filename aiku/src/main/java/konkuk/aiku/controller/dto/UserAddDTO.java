@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class UserAddDTO {
-    private String username;
+    private String personName;
     private String phoneNumber;
     private String kakaoId;
     private Boolean isLocationInformationOn;
@@ -25,7 +25,7 @@ public class UserAddDTO {
         Setting setting = users.getSetting();
 
         return UserAddDTO.builder()
-                .username(users.getUsername())
+                .personName(users.getPersonName())
                 .phoneNumber(users.getPhoneNumber())
                 .kakaoId(users.getKakaoId())
                 .isLocationInformationOn(setting.isLocationInformationOn())
@@ -46,7 +46,7 @@ public class UserAddDTO {
         );
 
         return Users.builder()
-                .personName(username)
+                .personName(personName)
                 .phoneNumber(phoneNumber)
                 .kakaoId(kakaoId)
                 .setting(setting)

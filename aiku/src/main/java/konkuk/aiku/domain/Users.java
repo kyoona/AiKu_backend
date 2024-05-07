@@ -1,11 +1,13 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
+import konkuk.aiku.controller.dto.UserUpdateDTO;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +56,27 @@ public class Users extends TimeEntity implements UserDetails {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateUser(UserUpdateDTO userUpdateDTO) {
+        personName = userUpdateDTO.getPersonName();
+        Long userTitleId = userUpdateDTO.getUserTitleId();
+
+        for (UserTitle userTitle : userTitles) {
+            // 원래 사용 중이던 타이틀 사용 제거
+            if (userTitle.isUsed()) {
+                userTitle.setUsed(false);
+            }
+
+            // 새로운 타이틀 사용
+            if (userTitle.getId() == userTitleId) {
+                userTitle.setUsed(true);
+            }
+        }
+    }
+
+    public void updateSetting(Setting setting) {
+        this.setting = setting;
     }
 
     @Override
