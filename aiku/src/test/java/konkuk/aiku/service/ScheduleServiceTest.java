@@ -2,6 +2,7 @@ package konkuk.aiku.service;
 
 import jakarta.persistence.EntityManager;
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
@@ -64,8 +65,8 @@ class ScheduleServiceTest {
         userGroup.setUser(user);
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
-        em.flush();
-        em.clear();
+//        em.flush();
+//        em.clear();
 
         //when
         ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
@@ -312,5 +313,172 @@ class ScheduleServiceTest {
 
         assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getPersonName()).isEqualTo(user2.getPersonName());
         assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserKaKaoId()).isEqualTo(user2.getKakaoId());
+    }
+
+    @Test
+    @Commit
+    @DisplayName("스케줄 참가")
+    public void enterSchedule() {
+        //given
+        Users user = Users.builder()
+                .personName("user1")
+                .kakaoId("kakao1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
+        usersRepository.save(user);
+
+        Users user2 = Users.builder()
+                .personName("user2")
+                .kakaoId("kakao2")
+                .setting(new Setting(true, true, true, true, true))
+                .build();
+        usersRepository.save(user2);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
+        UserGroup userGroup2 = new UserGroup();
+        userGroup2.setUser(user2);
+        userGroup2.setGroup(group);
+        userGroupRepository.save(userGroup2);
+
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+//        em.flush();
+//        em.clear();
+
+        //when
+        scheduleService.enterSchedule(user2, group.getId(), scheduleId);
+
+        //then
+        assertThat(scheduleRepository.findByUserIdAndScheduleId(user2.getId(), scheduleId)).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("스케줄 참가-이미 참여중인 유저")
+    public void enterScheduleAlreadyIn() {
+        //given
+        Users user = Users.builder()
+                .personName("user1")
+                .kakaoId("kakao1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
+        usersRepository.save(user);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+
+        //when
+        assertThatThrownBy(() -> scheduleService.enterSchedule(user, group.getId(), scheduleId)).isInstanceOf(AlreadyInException.class);
+    }
+
+    @Test
+    @DisplayName("스케줄 퇴장")
+    public void exitSchedule() {
+        //given
+        Users user = Users.builder()
+                .personName("user1")
+                .kakaoId("kakao1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
+        usersRepository.save(user);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+
+        //when
+        scheduleService.exitSchedule(user, group.getId(), scheduleId);
+
+        //then
+        assertThat(scheduleRepository.findByUserIdAndScheduleId(user.getId(), scheduleId)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("스케줄 퇴장-참여하지 않은 유저")
+    public void exitScheduleNotIn() {
+        //given
+        Users user = Users.builder()
+                .personName("user1")
+                .kakaoId("kakao1")
+                .setting(new Setting(false, false, false, false, false))
+                .build();
+        usersRepository.save(user);
+
+        Users user2 = Users.builder()
+                .personName("user2")
+                .kakaoId("kakao2")
+                .setting(new Setting(true, true, true, true, true))
+                .build();
+        usersRepository.save(user2);
+
+        Groups group = Groups.builder()
+                .groupName("group1")
+                .description("group1입니다")
+                .build();
+        groupsRepository.save(group);
+
+        UserGroup userGroup = new UserGroup();
+        userGroup.setUser(user);
+        userGroup.setGroup(group);
+        userGroupRepository.save(userGroup);
+
+        UserGroup userGroup2 = new UserGroup();
+        userGroup2.setUser(user2);
+        userGroup2.setGroup(group);
+        userGroupRepository.save(userGroup2);
+
+        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
+//        em.flush();
+//        em.clear();
+
+        //when
+        assertThatThrownBy(() -> scheduleService.exitSchedule(user2, group.getId(), scheduleId)).isInstanceOf(NoAthorityToAccessException.class);
     }
 }

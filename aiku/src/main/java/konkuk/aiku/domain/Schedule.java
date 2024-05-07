@@ -54,6 +54,12 @@ public class Schedule extends TimeEntity{
         this.users.add(userSchedule);
     }
 
+    public void deleteUser(Users user, UserSchedule userSchedule){
+        users.remove(userSchedule);
+        userSchedule.setSchedule(null);
+        userSchedule.setUser(null);
+    }
+
     public void setGroup(Groups group){
         this.group = group;
         group.addSchedule(this);

@@ -1,8 +1,11 @@
 package konkuk.aiku.service;
 
+import konkuk.aiku.controller.dto.EntryDTO;
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
+import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.service.dto.*;
@@ -78,6 +81,24 @@ public class ScheduleService {
         return createScheduleDetailServiceDTO(schedule, waitUsers);
     }
 
+    @Transactional
+    public void enterSchedule(Users user, Long groupId, Long scheduleId){
+        Long userId = user.getId();
+        checkUserInGroup(userId, groupId);
+        Schedule schedule = findScheduleById(scheduleId);
+        checkUserAlreadyInSchedule(userId, scheduleId);
+
+        schedule.addUser(user, new UserSchedule());
+    }
+
+    @Transactional
+    public void exitSchedule(Users user, Long groupId, Long scheduleId) {
+        Long userId = user.getId();
+        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
+        Schedule schedule = userSchedule.getSchedule();
+        schedule.deleteUser(user, userSchedule);
+    }
+
     private UserGroup checkUserInGroup(Long userId, Long groupId){
         Optional<UserGroup> userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
         if(userGroup.isEmpty()){
@@ -93,6 +114,24 @@ public class ScheduleService {
         }
         return userSchedule;
     }
+
+    private boolean checkUserAlreadyInSchedule(Long userId, Long scheduleId){
+        try {
+            checkUserInSchedule(userId, scheduleId);
+            throw new AlreadyInException(ErrorCode.ALREADY_IN_SCHEDULE);
+        }catch (NoAthorityToAccessException e){
+            return true;
+        }
+    }
+
+    private Schedule findScheduleById(Long scheduleId){
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+        if(schedule == null){
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+        return schedule;
+    }
+
 
     private ScheduleDetailServiceDTO createScheduleDetailServiceDTO(Schedule schedule, List<Users> waitUsers){
 

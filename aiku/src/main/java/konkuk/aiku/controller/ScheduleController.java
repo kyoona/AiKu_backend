@@ -1,10 +1,7 @@
 package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
-import konkuk.aiku.controller.dto.LocationDTO;
-import konkuk.aiku.controller.dto.ScheduleDTO;
-import konkuk.aiku.controller.dto.ScheduleResponseDTO;
-import konkuk.aiku.controller.dto.UserSimpleResponseDTO;
+import konkuk.aiku.controller.dto.*;
 import konkuk.aiku.domain.Location;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
@@ -82,6 +79,19 @@ public class ScheduleController {
 
         ScheduleResponseDTO scheduleResponseDTO = createScheduleResponseDTO(scheduleDetailServiceDTO);
         return new ResponseEntity<>(scheduleResponseDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/{scheduleId}")
+    public void scheduleEntry(@PathVariable Long groupId,
+                              @PathVariable Long scheduleId,
+                              @RequestBody EntryDTO entryDTO,
+                              @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        if(entryDTO.getEnter()){
+            scheduleService.enterSchedule(user, groupId, scheduleId);
+        }else {
+            scheduleService.exitSchedule(user, groupId, scheduleId);
+        }
     }
 
     private ScheduleResponseDTO createScheduleResponseDTO(ScheduleDetailServiceDTO serviceDTO){
