@@ -1,10 +1,6 @@
 package konkuk.aiku.controller.dto;
 
-import konkuk.aiku.domain.Location;
-import konkuk.aiku.service.dto.GroupDetailServiceDTO;
-import konkuk.aiku.service.dto.LocationServiceDTO;
-import konkuk.aiku.service.dto.ScheduleDetailServiceDTO;
-import konkuk.aiku.service.dto.UserSimpleServiceDTO;
+import konkuk.aiku.service.dto.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +10,7 @@ public class ControllerDTOUtils {
         ScheduleResponseDTO responseDTO = ScheduleResponseDTO.builder()
                 .scheduleId(serviceDTO.getId())
                 .scheduleName(serviceDTO.getScheduleName())
-                .location(createLocation(serviceDTO.getLocation()))
+                .location(createLocationDTO(serviceDTO.getLocation()))
                 .scheduleTime(serviceDTO.getScheduleTime())
                 .acceptUsers(createUserSimpleResponseDTO(serviceDTO.getAcceptUsers()))
                 .waitUsers(createUserSimpleResponseDTO(serviceDTO.getWaitUsers()))
@@ -61,7 +57,39 @@ public class ControllerDTOUtils {
         return responseDTO;
     }
 
-    public static Location createLocation(LocationServiceDTO serviceDTO){
-        return new Location(serviceDTO.getLatitude(), serviceDTO.getLongitude(), serviceDTO.getLocationName());
+    public static LocationDTO createLocationDTO(LocationServiceDTO serviceDTO){
+        return new LocationDTO(serviceDTO.getLatitude(), serviceDTO.getLongitude(), serviceDTO.getLocationName());
+    }
+
+    public static ScheduleResultReponseDTO createScheduleResultReponseDTO(ScheduleResultServiceDTO serviceDTO){
+        ScheduleResultReponseDTO responseDTO = ScheduleResultReponseDTO.builder()
+                .schedule(createScheduleDTO(serviceDTO.getSchedule()))
+                .dataSize(serviceDTO.getDataSize())
+                .data(createUserArrivalDataDTOs(serviceDTO.getData()))
+                .build();
+        return responseDTO;
+    }
+
+    public static ScheduleDTO createScheduleDTO(ScheduleServiceDTO schedule){
+        ScheduleDTO scheduleDTO = ScheduleDTO.builder()
+                .scheduleId(schedule.getScheduleId())
+                .scheduleName(schedule.getScheduleName())
+                .location(createLocationDTO(schedule.getLocation()))
+                .scheduleTime(schedule.getScheduleTime())
+                .build();
+        return scheduleDTO;
+    }
+
+    public static List<UserArrivalDataDTO> createUserArrivalDataDTOs(List<UserArrivalDataServiceDTO> datas){
+        List<UserArrivalDataDTO> userArrivalDataDTOs = new ArrayList<>();
+        for (UserArrivalDataServiceDTO data : datas) {
+            UserArrivalDataDTO userArrivalDataDTO = UserArrivalDataDTO.builder()
+                    .userArrivalDataId(data.getUserArrivalDataId())
+                    .user(createUserSimpleServiceDTO(data.getUser()))
+                    .timeDifference(data.getTimeDifference())
+                    .build();
+            userArrivalDataDTOs.add(userArrivalDataDTO);
+        }
+        return userArrivalDataDTOs;
     }
 }

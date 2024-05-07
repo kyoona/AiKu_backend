@@ -14,7 +14,7 @@ import java.util.List;
 public class ScheduleResponseDTO {
     private Long scheduleId;
     private String scheduleName;
-    private Location location;
+    private LocationDTO location;
     private LocalDateTime scheduleTime;
     @Builder.Default private List<UserSimpleResponseDTO> acceptUsers = new ArrayList<>();
     @Builder.Default private List<UserSimpleResponseDTO> waitUsers = new ArrayList<>();

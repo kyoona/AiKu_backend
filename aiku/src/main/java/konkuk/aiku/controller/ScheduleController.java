@@ -6,10 +6,7 @@ import konkuk.aiku.domain.Location;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.ScheduleService;
-import konkuk.aiku.service.dto.LocationServiceDTO;
-import konkuk.aiku.service.dto.ScheduleDetailServiceDTO;
-import konkuk.aiku.service.dto.ScheduleServiceDTO;
-import konkuk.aiku.service.dto.UserSimpleServiceDTO;
+import konkuk.aiku.service.dto.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +16,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static konkuk.aiku.controller.dto.ControllerDTOUtils.createScheduleResponseDTO;
+import static konkuk.aiku.controller.dto.ControllerDTOUtils.createScheduleResultReponseDTO;
 import static konkuk.aiku.controller.dto.SuccessResponseDTO.SuccessMessage.*;
 
 @Controller(value = "/groups/{groupId}/schedules")
@@ -107,10 +102,12 @@ public class ScheduleController {
     }
 
     @GetMapping("/{scheduleId}/result")
-    private void scheduleResult(@PathVariable Long groupId,
+    private ResponseEntity<ScheduleResultReponseDTO> scheduleResult(@PathVariable Long groupId,
                                 @PathVariable Long scheduleId,
                                 @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        scheduleService.findScheduleResult(user, groupId, scheduleId);
+        ScheduleResultServiceDTO scheduleResultServiceDTO = scheduleService.findScheduleResult(user, groupId, scheduleId);
+        ScheduleResultReponseDTO responseDTO = createScheduleResultReponseDTO(scheduleResultServiceDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }
