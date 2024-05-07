@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static konkuk.aiku.controller.dto.ControllerDTOUtils.createScheduleResponseDTO;
 import static konkuk.aiku.controller.dto.SuccessResponseDTO.SuccessMessage.*;
 
 @Controller(value = "/groups/{groupId}/schedules")
@@ -111,35 +112,5 @@ public class ScheduleController {
                                 @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
         scheduleService.findScheduleResult(user, groupId, scheduleId);
-    }
-
-    private ScheduleResponseDTO createScheduleResponseDTO(ScheduleDetailServiceDTO serviceDTO){
-        ScheduleResponseDTO responseDTO = ScheduleResponseDTO.builder()
-                .scheduleId(serviceDTO.getId())
-                .scheduleName(serviceDTO.getScheduleName())
-                .location(createLocation(serviceDTO.getLocation()))
-                .scheduleTime(serviceDTO.getScheduleTime())
-                .acceptUsers(createUserSimpleResponseDTO(serviceDTO.getAcceptUsers()))
-                .waitUsers(createUserSimpleResponseDTO(serviceDTO.getWaitUsers()))
-                .createdAt(serviceDTO.getCreatedAt())
-                .build();
-        return responseDTO;
-    }
-
-    private List<UserSimpleResponseDTO> createUserSimpleResponseDTO(List<UserSimpleServiceDTO> serviceDTOs){
-        List<UserSimpleResponseDTO> responseDTOs = new ArrayList<>();
-        for (UserSimpleServiceDTO serviceDTO : serviceDTOs) {
-            UserSimpleResponseDTO responseDTO = UserSimpleResponseDTO.builder()
-                    .userId(serviceDTO.getUserKaKaoId())
-                    .personName(serviceDTO.getPersonName())
-                    .userImg(serviceDTO.getUserImg())
-                    .build();
-            responseDTOs.add(responseDTO);
-        }
-        return responseDTOs;
-    }
-
-    private Location createLocation(LocationServiceDTO serviceDTO){
-        return new Location(serviceDTO.getLatitude(), serviceDTO.getLongitude(), serviceDTO.getLocationName());
     }
 }

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static konkuk.aiku.controller.dto.ControllerDTOUtils.createGroupResponseDTO;
+
 @Controller
 @RequestMapping("/groups")
 @Slf4j
@@ -91,28 +93,4 @@ public class GroupController {
         }
     }
 
-    private GroupResponseDTO createGroupResponseDTO(GroupDetailServiceDTO serviceDTO) {
-        List<UserSimpleServiceDTO> userServiceDTOs = serviceDTO.getUsers();
-        List<UserSimpleResponseDTO> userSimpleResponseDTOs = new ArrayList<>();
-        for (UserSimpleServiceDTO userServiceDTO : userServiceDTOs) {
-            userSimpleResponseDTOs.add(createUserSimpleServiceDTO(userServiceDTO));
-        }
-
-        GroupResponseDTO responseDTO = GroupResponseDTO.builder()
-                .groupId(serviceDTO.getGroupId())
-                .groupName(serviceDTO.getGroupName())
-                .description(serviceDTO.getDescription())
-                .users(userSimpleResponseDTOs)
-                .build();
-
-        return responseDTO;
-    }
-    private UserSimpleResponseDTO createUserSimpleServiceDTO(UserSimpleServiceDTO serviceDTO){
-        UserSimpleResponseDTO responseDTO = UserSimpleResponseDTO.builder()
-                .userId(serviceDTO.getUserKaKaoId())
-                .personName(serviceDTO.getPersonName())
-                .userImg(serviceDTO.getUserImg())
-                .build();
-        return responseDTO;
-    }
 }
