@@ -41,9 +41,10 @@ public class GroupService {
 
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
         return group.getId();
@@ -87,9 +88,10 @@ public class GroupService {
     public void enterGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
     }
 

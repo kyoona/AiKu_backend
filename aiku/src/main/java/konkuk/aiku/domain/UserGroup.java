@@ -1,17 +1,15 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Getter @Setter
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserGroup extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userGroupId")
-    @Setter(value = AccessLevel.NONE)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,4 +19,10 @@ public class UserGroup extends TimeEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "groupId")
     private Groups group;
+
+    @Builder
+    public UserGroup(Users user, Groups group) {
+        this.user = user;
+        this.group = group;
+    }
 }
