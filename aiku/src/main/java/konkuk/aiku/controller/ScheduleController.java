@@ -16,8 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import static konkuk.aiku.controller.dto.ControllerDTOUtils.createScheduleResponseDTO;
-import static konkuk.aiku.controller.dto.ControllerDTOUtils.createScheduleResultReponseDTO;
 import static konkuk.aiku.controller.dto.SuccessResponseDTO.SuccessMessage.*;
 
 @Controller(value = "/groups/{groupId}/schedules")
@@ -77,10 +75,10 @@ public class ScheduleController {
                                           @PathVariable Long scheduleId,
                                           @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        ScheduleDetailServiceDTO scheduleDetailServiceDTO = scheduleService.findScheduleDetailById(user, groupId, scheduleId);
+        ScheduleDetailServiceDTO serviceDto = scheduleService.findScheduleDetailById(user, groupId, scheduleId);
 
-        ScheduleResponseDTO scheduleResponseDTO = createScheduleResponseDTO(scheduleDetailServiceDTO);
-        return new ResponseEntity<>(scheduleResponseDTO, HttpStatus.OK);
+        ScheduleResponseDTO responseDto = ScheduleResponseDTO.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PostMapping("/{scheduleId}/enter")
@@ -106,8 +104,8 @@ public class ScheduleController {
                                 @PathVariable Long scheduleId,
                                 @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        ScheduleResultServiceDTO scheduleResultServiceDTO = scheduleService.findScheduleResult(user, groupId, scheduleId);
-        ScheduleResultReponseDTO responseDTO = createScheduleResultReponseDTO(scheduleResultServiceDTO);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        ScheduleResultServiceDTO serviceDto = scheduleService.findScheduleResult(user, groupId, scheduleId);
+        ScheduleResultReponseDTO responseDto = ScheduleResultReponseDTO.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }
