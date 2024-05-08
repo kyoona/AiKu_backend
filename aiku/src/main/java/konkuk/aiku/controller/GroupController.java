@@ -15,13 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static konkuk.aiku.controller.dto.ControllerDTOUtils.createGroupResponseDTO;
 
 @Controller
 @RequestMapping("/groups")
@@ -93,27 +93,4 @@ public class GroupController {
         }
     }
 
-    private GroupResponseDTO createGroupResponseDTO(GroupDetailServiceDTO serviceDTO) {
-        List<UserSimpleServiceDTO> userServiceDTOs = serviceDTO.getUsers();
-        List<UserSimpleResponseDTO> userSimpleResponseDTOs = new ArrayList<>();
-        for (UserSimpleServiceDTO userServiceDTO : userServiceDTOs) {
-            userSimpleResponseDTOs.add(createUserSimpleServiceDTO(userServiceDTO));
-        }
-
-        GroupResponseDTO responseDTO = GroupResponseDTO.builder()
-                .groupId(serviceDTO.getGroupId())
-                .groupName(serviceDTO.getGroupName())
-                .description(serviceDTO.getDescription())
-                .users(userSimpleResponseDTOs)
-                .build();
-
-        return responseDTO;
-    }
-    private UserSimpleResponseDTO createUserSimpleServiceDTO(UserSimpleServiceDTO serviceDTO){
-        UserSimpleResponseDTO responseDTO = new UserSimpleResponseDTO();
-        responseDTO.setUserId(serviceDTO.getUserKaKaoId());
-        responseDTO.setUserImg(serviceDTO.getUserImg());
-        responseDTO.setUsername(serviceDTO.getUsername());
-        return responseDTO;
-    }
 }

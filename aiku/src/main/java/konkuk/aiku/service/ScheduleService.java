@@ -1,20 +1,23 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
+import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserGroupRepository;
-import konkuk.aiku.repository.UsersRepository;
-import konkuk.aiku.service.dto.LocationServiceDTO;
-import konkuk.aiku.service.dto.ScheduleServiceDTO;
+import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Optional;
+
+import static konkuk.aiku.service.dto.ServiceDTOUtils.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,11 +27,9 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final UserGroupRepository userGroupRepository;
-    private final UsersRepository usersRepository;
 
     @Transactional
-    public Long addSchedule(String kakaoId, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
-        Users user = findUserByKakaoId(kakaoId);
+    public Long addSchedule(Users user, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
         Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
 
         Schedule schedule = Schedule.builder()
@@ -45,11 +46,12 @@ public class ScheduleService {
 
     //TODO
     @Transactional
-    public void modifySchedule(String kakaoId, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
-        Users user = findUserByKakaoId(kakaoId);
-        checkUserInGroup(user.getId(), groupId);
+    public void modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
+        Long userId = user.getId();
+        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
 
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        Schedule schedule = userSchedule.getSchedule();
+
         if(StringUtils.hasText(scheduleServiceDTO.getScheduleName())){
             schedule.setScheduleName(scheduleServiceDTO.getScheduleName());
         }
@@ -65,20 +67,45 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void deleteSchedule(String kakaoId, Long groupId, Long scheduleId) {
-        Users user = findUserByKakaoId(kakaoId);
-        checkUserInGroup(user.getId(), groupId);
+    public void deleteSchedule(Users user, Long groupId, Long scheduleId) {
+        checkUserInSchedule(user.getId(), scheduleId);
 
         scheduleRepository.deleteById(scheduleId);
-
     }
 
-    public void findScheduleDetailById(String kakaoId, Long groupId, Long scheduleId){
-        Users user = findUserByKakaoId(kakaoId);
-        checkUserInGroup(user.getId(), groupId);
+    public ScheduleDetailServiceDTO findScheduleDetailById(Users user, Long groupId, Long scheduleId){
+        Long userId = user.getId();
+        checkUserInGroup(userId, groupId);
+        Schedule schedule = findScheduleById(scheduleId);
+        List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
+        return createScheduleDetailServiceDTO(schedule, waitUsers);
+    }
 
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
-//        schedule.
+    @Transactional
+    public void enterSchedule(Users user, Long groupId, Long scheduleId){
+        Long userId = user.getId();
+        checkUserInGroup(userId, groupId);
+        Schedule schedule = findScheduleById(scheduleId);
+        checkUserAlreadyInSchedule(userId, scheduleId);
+
+        schedule.addUser(user, new UserSchedule());
+    }
+
+    @Transactional
+    public void exitSchedule(Users user, Long groupId, Long scheduleId) {
+        Long userId = user.getId();
+        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
+        Schedule schedule = userSchedule.getSchedule();
+        schedule.deleteUser(user, userSchedule);
+    }
+
+    public ScheduleResultServiceDTO findScheduleResult(Users user, Long groupId, Long scheduleId){
+        Long userId = user.getId();
+        checkUserInGroup(userId, groupId);
+
+        Schedule schedule = findScheduleById(scheduleId);
+        List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
+        return createScheduleResultServiceDTO(schedule, userArrivalDatas);
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
@@ -89,15 +116,28 @@ public class ScheduleService {
         return userGroup.get();
     }
 
-    private Users findUserByKakaoId(String kakaoId){
-        return usersRepository.findByKakaoId(kakaoId).get();
+    private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
+        UserSchedule userSchedule = scheduleRepository.findByUserIdAndScheduleId(userId, scheduleId).orElse(null);
+        if (userSchedule == null) {
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
+        return userSchedule;
     }
 
-    private Location createLocation(LocationServiceDTO locationServiceDTO){
-        return new Location(locationServiceDTO.getLatitude(), locationServiceDTO.getLongitude(), locationServiceDTO.getLocationName());
+    private boolean checkUserAlreadyInSchedule(Long userId, Long scheduleId){
+        try {
+            checkUserInSchedule(userId, scheduleId);
+            throw new AlreadyInException(ErrorCode.ALREADY_IN_SCHEDULE);
+        }catch (NoAthorityToAccessException e){
+            return true;
+        }
     }
 
-    private LocationServiceDTO createLocationServiceDTO(Location location){
-        return new LocationServiceDTO(location.getLatitude(), location.getLongitude(), location.getLocationName());
+    private Schedule findScheduleById(Long scheduleId){
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+        if(schedule == null){
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+        return schedule;
     }
 }

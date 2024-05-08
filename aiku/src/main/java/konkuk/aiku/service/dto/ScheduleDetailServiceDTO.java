@@ -16,7 +16,7 @@ public class ScheduleDetailServiceDTO {
     private LocationServiceDTO location;
     private LocalDateTime scheduleTime;
     private ScheduleStatus status;
-    @Builder.Default private List<UserSimpleServiceDTO> users = new ArrayList<>();
+    @Builder.Default private List<UserSimpleServiceDTO> acceptUsers = new ArrayList<>();
     @Builder.Default private List<UserSimpleServiceDTO> waitUsers = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
