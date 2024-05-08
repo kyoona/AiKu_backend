@@ -59,9 +59,10 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 //        em.flush();
 //        em.clear();
@@ -136,9 +137,10 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -191,9 +193,10 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -229,9 +232,10 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -272,14 +276,16 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
-        UserGroup userGroup2 = new UserGroup();
-        userGroup2.setUser(user2);
-        userGroup2.setGroup(group);
+        UserGroup userGroup2 = UserGroup.builder()
+                .user(user2)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup2);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -329,14 +335,16 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
-        UserGroup userGroup2 = new UserGroup();
-        userGroup2.setUser(user2);
-        userGroup2.setGroup(group);
+        UserGroup userGroup2 = UserGroup.builder()
+                .user(user2)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup2);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -377,9 +385,10 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -436,9 +445,10 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -477,14 +487,16 @@ class ScheduleServiceTest {
                 .build();
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
-        UserGroup userGroup2 = new UserGroup();
-        userGroup2.setUser(user2);
-        userGroup2.setGroup(group);
+        UserGroup userGroup2 = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup2);
 
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
