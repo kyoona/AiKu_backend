@@ -7,9 +7,9 @@ import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
-import konkuk.aiku.service.dto.LocationServiceDTO;
-import konkuk.aiku.service.dto.ScheduleDetailServiceDTO;
-import konkuk.aiku.service.dto.ScheduleServiceDTO;
+import konkuk.aiku.service.dto.LocationServiceDto;
+import konkuk.aiku.service.dto.ScheduleDetailServiceDto;
+import konkuk.aiku.service.dto.ScheduleServiceDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,19 +67,19 @@ class ScheduleServiceTest {
 //        em.clear();
 
         //when
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
 
-        ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDto2 = ScheduleServiceDto.builder()
                 .scheduleName("schedule2")
-                .location(new LocationServiceDTO(100.1, 100.1, "aiku"))
+                .location(new LocationServiceDto(100.1, 100.1, "aiku"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
-        scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO2);
+        scheduleService.addSchedule(user, group.getId(), scheduleServiceDto2);
 
         //then
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
@@ -111,9 +111,9 @@ class ScheduleServiceTest {
         groupsRepository.save(group);
 
         //when
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
 
@@ -141,9 +141,9 @@ class ScheduleServiceTest {
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
@@ -151,16 +151,16 @@ class ScheduleServiceTest {
 //        em.clear();
 
         //when
-        ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDto2 = ScheduleServiceDto.builder()
                 .scheduleName("modify")
                 .location(null) //수정되면 안됨(값이 없는 필드는 수정 x)
                 .scheduleTime(null)
                 .build();
-        scheduleService.modifySchedule(user, group.getId(), scheduleId, scheduleServiceDTO2);
+        scheduleService.modifySchedule(user, group.getId(), scheduleId, scheduleServiceDto2);
 
         //then
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
-        assertThat(schedule.getScheduleName()).isEqualTo(scheduleServiceDTO2.getScheduleName());
+        assertThat(schedule.getScheduleName()).isEqualTo(scheduleServiceDto2.getScheduleName());
 
         assertThat(schedule.getScheduleTime()).isNotNull();
         assertThat(schedule.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
@@ -196,9 +196,9 @@ class ScheduleServiceTest {
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
@@ -206,12 +206,12 @@ class ScheduleServiceTest {
 //        em.clear();
 
         //when
-        ScheduleServiceDTO scheduleServiceDTO2 = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDto2 = ScheduleServiceDto.builder()
                 .scheduleName("modify")
                 .location(null)
                 .scheduleTime(null)
                 .build();
-        assertThatThrownBy(() -> scheduleService.modifySchedule(user2, group.getId(), scheduleId, scheduleServiceDTO2)).isInstanceOf(NoAthorityToAccessException.class);
+        assertThatThrownBy(() -> scheduleService.modifySchedule(user2, group.getId(), scheduleId, scheduleServiceDto2)).isInstanceOf(NoAthorityToAccessException.class);
     }
 
     @Test
@@ -234,9 +234,9 @@ class ScheduleServiceTest {
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
@@ -282,9 +282,9 @@ class ScheduleServiceTest {
         userGroup2.setGroup(group);
         userGroupRepository.save(userGroup2);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
@@ -292,7 +292,7 @@ class ScheduleServiceTest {
 //        em.clear();
 
         //when
-        ScheduleDetailServiceDTO scheduleDetailServiceDTO = scheduleService.findScheduleDetailById(user, group.getId(), scheduleId);
+        ScheduleDetailServiceDto scheduleDetailServiceDTO = scheduleService.findScheduleDetailById(user, group.getId(), scheduleId);
 
         //then
         assertThat(scheduleDetailServiceDTO.getId()).isEqualTo(scheduleId);
@@ -339,9 +339,9 @@ class ScheduleServiceTest {
         userGroup2.setGroup(group);
         userGroupRepository.save(userGroup2);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
@@ -382,9 +382,9 @@ class ScheduleServiceTest {
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
@@ -411,9 +411,9 @@ class ScheduleServiceTest {
         groupsRepository.save(group);
 
         //whe
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
 
@@ -441,9 +441,9 @@ class ScheduleServiceTest {
         userGroup.setGroup(group);
         userGroupRepository.save(userGroup);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);
@@ -487,9 +487,9 @@ class ScheduleServiceTest {
         userGroup2.setGroup(group);
         userGroupRepository.save(userGroup2);
 
-        ScheduleServiceDTO scheduleServiceDTO = ScheduleServiceDTO.builder()
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
-                .location(new LocationServiceDTO(127.1, 127.1, "Konkuk University"))
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(user, group.getId(), scheduleServiceDTO);

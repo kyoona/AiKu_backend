@@ -1,7 +1,7 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.controller.dto.UserAddDTO;
-import konkuk.aiku.controller.dto.UserUpdateDTO;
+import konkuk.aiku.controller.dto.UserAddDto;
+import konkuk.aiku.controller.dto.UserUpdateDto;
 import konkuk.aiku.domain.Users;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,12 +15,12 @@ class UserServiceTest {
     @Autowired
     UserService userService;
 
-    UserAddDTO userAddDTO;
+    UserAddDto userAddDTO;
     Users save;
 
     @BeforeEach
     void setUp() {
-        userAddDTO = new UserAddDTO(
+        userAddDTO = new UserAddDto(
                 "abcd", "010-0000-0000", 1L,
                 true, true, true,
                 true, true
@@ -56,7 +56,7 @@ class UserServiceTest {
 
     @Test
     void updateUser() {
-        UserUpdateDTO userUpdateDTO = new UserUpdateDTO();
+        UserUpdateDto userUpdateDTO = new UserUpdateDto();
         userUpdateDTO.setUserTitleId(null);
         userUpdateDTO.setUsername("가나다");
         userService.updateUser(save, userUpdateDTO);

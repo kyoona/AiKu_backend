@@ -32,7 +32,7 @@ public class GroupService {
     }
 
     @Transactional
-    public Long addGroup(Users user, GroupServiceDTO groupServiceDTO){
+    public Long addGroup(Users user, GroupServiceDto groupServiceDTO){
         Groups group = Groups.builder()
                 .groupName(groupServiceDTO.getGroupName())
                 .groupImg(groupServiceDTO.getGroupImg())
@@ -50,7 +50,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void modifyGroup(Users user, Long groupId, GroupServiceDTO groupServiceDTO) {
+    public void modifyGroup(Users user, Long groupId, GroupServiceDto groupServiceDTO) {
         Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
         if(StringUtils.hasText(groupServiceDTO.getGroupName())){
             group.setGroupName(groupServiceDTO.getGroupName());
@@ -72,14 +72,14 @@ public class GroupService {
         groupsRepository.deleteById(groupId);
     }
 
-    public GroupDetailServiceDTO findGroupDetailById(Users user, Long groupId) {
+    public GroupDetailServiceDto findGroupDetailById(Users user, Long groupId) {
         Long userId = user.getId();
         Groups group = checkUserInGroup(userId, groupId).getGroup();
 
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
-        List<UserSimpleServiceDTO> userSimpleServiceDTOs = UserSimpleServiceDTO.toDtoListByUserGroup(userGroups);
-        GroupDetailServiceDTO serviceDto = GroupDetailServiceDTO.toDto(group, userSimpleServiceDTOs);
+        List<UserSimpleServiceDto> userSimpleServiceDtos = UserSimpleServiceDto.toDtoListByUserGroup(userGroups);
+        GroupDetailServiceDto serviceDto = GroupDetailServiceDto.toDto(group, userSimpleServiceDtos);
         return serviceDto;
     }
 

@@ -8,9 +8,9 @@ import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
-import konkuk.aiku.service.dto.GroupDetailServiceDTO;
-import konkuk.aiku.service.dto.GroupServiceDTO;
-import konkuk.aiku.service.dto.UserSimpleServiceDTO;
+import konkuk.aiku.service.dto.GroupDetailServiceDto;
+import konkuk.aiku.service.dto.GroupServiceDto;
+import konkuk.aiku.service.dto.UserSimpleServiceDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,7 +45,7 @@ class GroupServiceTest {
         em.clear();
 
         //when
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -69,7 +69,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -79,18 +79,18 @@ class GroupServiceTest {
         em.clear();
 
         //when
-        GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
                 .groupName("group modify")
                 .groupImg("url2")
                 .description("group1을 수정하였습니다.")
                 .build();
-        groupService.modifyGroup(user, groupId, modifyGroupServiceDTO);
+        groupService.modifyGroup(user, groupId, modifyGroupServiceDto);
 
         //then
         Groups findGroup = groupService.findGroupById(groupId);
-        assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDTO.getGroupName());
-        assertThat(findGroup.getGroupImg()).isEqualTo(modifyGroupServiceDTO.getGroupImg());
-        assertThat(findGroup.getDescription()).isEqualTo(modifyGroupServiceDTO.getDescription());
+        assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDto.getGroupName());
+        assertThat(findGroup.getGroupImg()).isEqualTo(modifyGroupServiceDto.getGroupImg());
+        assertThat(findGroup.getDescription()).isEqualTo(modifyGroupServiceDto.getDescription());
     }
 
     @Test
@@ -107,7 +107,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user2);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -117,12 +117,12 @@ class GroupServiceTest {
         em.clear();
 
         //when
-        GroupServiceDTO modifyGroupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
                 .groupName("group modify")
                 .groupImg("url2")
                 .description("group1을 수정하였습니다.")
                 .build();
-        assertThatThrownBy(()-> groupService.modifyGroup(user2, groupId, modifyGroupServiceDTO))
+        assertThatThrownBy(()-> groupService.modifyGroup(user2, groupId, modifyGroupServiceDto))
                 .isInstanceOf(NoAthorityToAccessException.class);
     }
 
@@ -135,7 +135,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -162,7 +162,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -172,10 +172,10 @@ class GroupServiceTest {
         em.clear();
 
         //when
-        GroupDetailServiceDTO groupDetailServiceDTO = groupService.findGroupDetailById(user, groupId);
+        GroupDetailServiceDto groupDetailServiceDTO = groupService.findGroupDetailById(user, groupId);
 
         //then
-        UserSimpleServiceDTO findUserDTO = groupDetailServiceDTO.getUsers().get(0);
+        UserSimpleServiceDto findUserDTO = groupDetailServiceDTO.getUsers().get(0);
         assertThat(findUserDTO.getUserId()).isEqualTo(user.getId());
         assertThat(findUserDTO.getUsername()).isEqualTo(user.getUsername());
         assertThat(findUserDTO.getPoint()).isEqualTo(user.getPoint());
@@ -195,7 +195,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -223,7 +223,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -256,7 +256,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
@@ -282,7 +282,7 @@ class GroupServiceTest {
                 .build();
         usersRepository.save(user);
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .groupImg("url1")
                 .description("group1입니다.")
