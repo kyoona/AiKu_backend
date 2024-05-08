@@ -23,7 +23,7 @@ public class ControllerDTOUtils {
         List<UserSimpleResponseDTO> responseDTOs = new ArrayList<>();
         for (UserSimpleServiceDTO serviceDTO : serviceDTOs) {
             UserSimpleResponseDTO responseDTO = UserSimpleResponseDTO.builder()
-                    .userId(serviceDTO.getUserKaKaoId())
+                    .userId(serviceDTO.getUserId())
                     .username(serviceDTO.getUsername())
                     .userImg(serviceDTO.getUserImg())
                     .build();
@@ -50,7 +50,7 @@ public class ControllerDTOUtils {
     }
     public static UserSimpleResponseDTO createUserSimpleServiceDTO(UserSimpleServiceDTO serviceDTO){
         UserSimpleResponseDTO responseDTO = UserSimpleResponseDTO.builder()
-                .userId(serviceDTO.getUserKaKaoId())
+                .userId(serviceDTO.getUserId())
                 .username(serviceDTO.getUsername())
                 .userImg(serviceDTO.getUserImg())
                 .build();

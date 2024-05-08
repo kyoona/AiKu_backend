@@ -8,7 +8,7 @@ import java.util.List;
 public class ServiceDTOUtils {
     public static UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
         UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                .userKaKaoId(user.getKakaoId())
+                .userId(user.getKakaoId())
                 .username(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
                 .userImg(user.getUserImg())
@@ -91,7 +91,7 @@ public class ServiceDTOUtils {
         for (UserSchedule userSchedule : users) {
             Users user = userSchedule.getUser();
             UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                    .userKaKaoId(user.getKakaoId())
+                    .userId(user.getKakaoId())
                     .username(user.getUsername())
                     .phoneNumber(user.getPhoneNumber())
                     .userImg(user.getUserImg())
@@ -110,7 +110,7 @@ public class ServiceDTOUtils {
         List<UserSimpleServiceDTO> userSimpleServiceDTOs = new ArrayList<>();
         for (Users user : users) {
             UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                    .userKaKaoId(user.getKakaoId())
+                    .userId(user.getKakaoId())
                     .username(user.getUsername())
                     .phoneNumber(user.getPhoneNumber())
                     .userImg(user.getUserImg())

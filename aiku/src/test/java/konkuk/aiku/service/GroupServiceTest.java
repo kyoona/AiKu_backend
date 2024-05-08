@@ -181,7 +181,7 @@ class GroupServiceTest {
 
         //then
         UserSimpleServiceDTO findUserDTO = groupDetailServiceDTO.getUsers().get(0);
-        assertThat(findUserDTO.getUserKaKaoId()).isEqualTo(user.getKakaoId());
+        assertThat(findUserDTO.getUserId()).isEqualTo(user.getKakaoId());
         assertThat(findUserDTO.getUsername()).isEqualTo(user.getUsername());
 
         assertThat(groupDetailServiceDTO.getGroupId()).isEqualTo(groupId);

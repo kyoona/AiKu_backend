@@ -308,10 +308,10 @@ class ScheduleServiceTest {
         assertThat(scheduleDetailServiceDTO.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
 
         assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUsername()).isEqualTo(user.getUsername());
-        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUserKaKaoId()).isEqualTo(user.getKakaoId());
+        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUserId()).isEqualTo(user.getKakaoId());
 
         assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUsername()).isEqualTo(user2.getUsername());
-        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserKaKaoId()).isEqualTo(user2.getKakaoId());
+        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserId()).isEqualTo(user2.getKakaoId());
     }
 
     @Test
