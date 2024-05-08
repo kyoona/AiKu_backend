@@ -18,7 +18,7 @@ public class LoginController {
 
     @PostMapping("/sign-in")
     public JwtToken signIn(@RequestBody UserSignInDTO userSignInDTO) {
-        String kakaoId = userSignInDTO.getKakaoId();
+        Long kakaoId = userSignInDTO.getKakaoId();
         JwtToken jwtToken = userLoginService.signIn(kakaoId);
 
         return jwtToken;
@@ -28,7 +28,7 @@ public class LoginController {
     public AccessTokenDTO refreshToken(@RequestBody UserSignInDTO userSignInDTO, @CookieValue("refreshToken") String refreshToken) {
         // Cookie -> RefreshToken 받아서
         // DB상의 Refresh 토큰과 동일 && 만료되지 않았는지 확인 -> 재발급
-        String kakaoId = userSignInDTO.getKakaoId();
+        Long kakaoId = userSignInDTO.getKakaoId();
         String accessToken = userLoginService.refresh(kakaoId, refreshToken);
 
         return new AccessTokenDTO(kakaoId, accessToken);

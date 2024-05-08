@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 public class AccessTokenDTO {
-    private String kakaoId;
+    private Long kakaoId;
     private String accessToken;
 }
