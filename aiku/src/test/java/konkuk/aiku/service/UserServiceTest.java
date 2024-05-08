@@ -1,55 +1,67 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.controller.dto.UserAddDTO;
+import konkuk.aiku.controller.dto.UserUpdateDTO;
 import konkuk.aiku.domain.Users;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest
+@DataJpaTest
 class UserServiceTest {
 
     @Autowired
     UserService userService;
 
+    UserAddDTO userAddDTO;
+    Users save;
+
     @BeforeEach
     void setUp() {
-    }
-
-    @Test
-    void save() {
-        UserAddDTO userAddDTO = new UserAddDTO(
+        userAddDTO = new UserAddDTO(
                 "abcd", "010-0000-0000", 1L,
                 true, true, true,
                 true, true
         );
-        Users entity = userAddDTO.toEntity();
 
-        Users save = userService.save(entity);
-
-        Users byKakaoId = userService.findByKakaoId(1L);
-
-        Assertions.assertThat(save).isEqualTo(byKakaoId);
     }
 
     @Test
-    void findById() {
+    void save() {
+        Users entity = userAddDTO.toEntity();
+        save = userService.save(entity);
+
+        Assertions.assertThat(save.getKakaoId()).isEqualTo(entity.getKakaoId());
     }
 
     @Test
     void findByKakaoId() {
+        Users entity = userAddDTO.toEntity();
+        save = userService.save(entity);
+        Users byKakaoId = userService.findByKakaoId(1L);
+
+        Assertions.assertThat(userAddDTO.getKakaoId()).isEqualTo(byKakaoId.getKakaoId());
     }
 
     @Test
     void logout() {
+        userService.logout(save.getKakaoId());
+
+        Users findUser = userService.findByKakaoId(save.getKakaoId());
+
+        Assertions.assertThat(findUser.getRefreshToken()).isNull();
     }
 
     @Test
     void updateUser() {
+        UserUpdateDTO userUpdateDTO = new UserUpdateDTO();
+        userUpdateDTO.setUserTitleId(null);
+        userUpdateDTO.setUsername("가나다");
+        userService.updateUser(save, userUpdateDTO);
+
+
     }
 
     @Test

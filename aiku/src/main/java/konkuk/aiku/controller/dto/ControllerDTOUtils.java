@@ -24,7 +24,7 @@ public class ControllerDTOUtils {
         for (UserSimpleServiceDTO serviceDTO : serviceDTOs) {
             UserSimpleResponseDTO responseDTO = UserSimpleResponseDTO.builder()
                     .userId(serviceDTO.getUserKaKaoId())
-                    .personName(serviceDTO.getPersonName())
+                    .username(serviceDTO.getUsername())
                     .userImg(serviceDTO.getUserImg())
                     .build();
             responseDTOs.add(responseDTO);
@@ -51,7 +51,7 @@ public class ControllerDTOUtils {
     public static UserSimpleResponseDTO createUserSimpleServiceDTO(UserSimpleServiceDTO serviceDTO){
         UserSimpleResponseDTO responseDTO = UserSimpleResponseDTO.builder()
                 .userId(serviceDTO.getUserKaKaoId())
-                .personName(serviceDTO.getPersonName())
+                .username(serviceDTO.getUsername())
                 .userImg(serviceDTO.getUserImg())
                 .build();
         return responseDTO;

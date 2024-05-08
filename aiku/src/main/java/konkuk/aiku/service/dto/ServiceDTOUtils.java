@@ -9,7 +9,7 @@ public class ServiceDTOUtils {
     public static UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
         UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
                 .userKaKaoId(user.getKakaoId())
-                .personName(user.getUsername())
+                .username(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
                 .userImg(user.getUserImg())
                 .setting(createSettingServiceDTO(user))
@@ -92,7 +92,7 @@ public class ServiceDTOUtils {
             Users user = userSchedule.getUser();
             UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
                     .userKaKaoId(user.getKakaoId())
-                    .personName(user.getPersonName())
+                    .username(user.getUsername())
                     .phoneNumber(user.getPhoneNumber())
                     .userImg(user.getUserImg())
                     .setting(createSettingServiceDTO(user.getSetting()))
@@ -111,7 +111,7 @@ public class ServiceDTOUtils {
         for (Users user : users) {
             UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
                     .userKaKaoId(user.getKakaoId())
-                    .personName(user.getPersonName())
+                    .username(user.getUsername())
                     .phoneNumber(user.getPhoneNumber())
                     .userImg(user.getUserImg())
                     .setting(createSettingServiceDTO(user.getSetting()))
