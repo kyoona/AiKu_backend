@@ -11,7 +11,7 @@ import java.util.List;
 @Getter @Setter
 @Builder
 public class UserResponseDTO {
-    private Long kakaoId;
+    private Long userId;
     private String username;
     private String userImg;
     private String phoneNumber;
@@ -27,7 +27,7 @@ public class UserResponseDTO {
         TitleResponseDTO titleDto = TitleResponseDTO.toDto(userTitle);
 
         return UserResponseDTO.builder()
-                .kakaoId(users.getKakaoId())
+                .userId(users.getId())
                 .username(users.getUsername())
                 .userImg(users.getUserImg())
                 .phoneNumber(users.getPhoneNumber())

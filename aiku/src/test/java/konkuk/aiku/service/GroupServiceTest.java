@@ -38,8 +38,7 @@ class GroupServiceTest {
     void addGroup() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
         em.flush();
@@ -66,8 +65,7 @@ class GroupServiceTest {
     void modifyGroup() throws IllegalAccessException {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
@@ -100,14 +98,12 @@ class GroupServiceTest {
     void modifyGroupInFaultCondition() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
         Users user2 = Users.builder()
-                .personName("user2")
-                .kakaoId("kakao2")
+                .username("user2")
                 .build();
         usersRepository.save(user2);
 
@@ -135,8 +131,7 @@ class GroupServiceTest {
     void deleteGroup(){
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
@@ -161,9 +156,9 @@ class GroupServiceTest {
     void findGroupDetailById(){
         //given
         Users user = Users.builder()
-                .personName("user1")
+                .username("user1")
+                .point(1000)
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -181,8 +176,9 @@ class GroupServiceTest {
 
         //then
         UserSimpleServiceDTO findUserDTO = groupDetailServiceDTO.getUsers().get(0);
-        assertThat(findUserDTO.getUserKaKaoId()).isEqualTo(user.getKakaoId());
+        assertThat(findUserDTO.getUserId()).isEqualTo(user.getId());
         assertThat(findUserDTO.getUsername()).isEqualTo(user.getUsername());
+        assertThat(findUserDTO.getPoint()).isEqualTo(user.getPoint());
 
         assertThat(groupDetailServiceDTO.getGroupId()).isEqualTo(groupId);
         assertThat(groupDetailServiceDTO.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
@@ -194,9 +190,8 @@ class GroupServiceTest {
     void findGroupDetailByIdInFaultCondition(){
         //given
         Users user = Users.builder()
-                .personName("user1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -208,9 +203,8 @@ class GroupServiceTest {
         Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         Users user2 = Users.builder()
-                .personName("user2")
+                .username("user2")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId("kakao2")
                 .build();
         usersRepository.save(user2);
 
@@ -224,9 +218,8 @@ class GroupServiceTest {
     void enterGroup(){
         //given
         Users user = Users.builder()
-                .personName("user1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -238,9 +231,8 @@ class GroupServiceTest {
         Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         Users user2 = Users.builder()
-                .personName("user2")
+                .username("user2")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId("kakao2")
                 .build();
         usersRepository.save(user2);
         em.flush();
@@ -259,9 +251,8 @@ class GroupServiceTest {
     void exitGroup(){
         //given
         Users user = Users.builder()
-                .personName("user1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -286,9 +277,8 @@ class GroupServiceTest {
     void exitGroupInFaultCondition(){
         //given
         Users user = Users.builder()
-                .personName("user1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
-                .kakaoId("kakao1")
                 .build();
         usersRepository.save(user);
 
@@ -300,7 +290,7 @@ class GroupServiceTest {
         Long groupId = groupService.addGroup(user, groupServiceDTO);
 
         Users user2 = Users.builder()
-                .personName("user2")
+                .username("user2")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user2);

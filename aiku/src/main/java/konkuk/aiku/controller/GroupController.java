@@ -4,24 +4,17 @@ import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.EntryDTO;
 import konkuk.aiku.controller.dto.GroupDTO;
 import konkuk.aiku.controller.dto.GroupResponseDTO;
-import konkuk.aiku.controller.dto.UserSimpleResponseDTO;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
 import konkuk.aiku.service.dto.GroupDetailServiceDTO;
 import konkuk.aiku.service.dto.GroupServiceDTO;
-import konkuk.aiku.service.dto.UserSimpleServiceDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static konkuk.aiku.controller.dto.ControllerDTOUtils.createGroupResponseDTO;
 
 @Controller
 @RequestMapping("/groups")
@@ -76,8 +69,8 @@ public class GroupController {
 
         GroupDetailServiceDTO serviceDTO = groupService.findGroupDetailById(user, groupId);
 
-        GroupResponseDTO groupResponseDTO = createGroupResponseDTO(serviceDTO);
-        return new ResponseEntity<GroupResponseDTO>(groupResponseDTO, HttpStatus.OK);
+        GroupResponseDTO responseDto = GroupResponseDTO.toDto(serviceDTO);
+        return new ResponseEntity<GroupResponseDTO>(responseDto, HttpStatus.OK);
     }
 
     @PostMapping("/{groupId}/entry")

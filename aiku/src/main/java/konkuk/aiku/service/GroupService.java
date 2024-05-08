@@ -13,11 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static konkuk.aiku.service.dto.ServiceDTOUtils.createUserSimpleServiceDTO;
 
 @Service
 @Transactional(readOnly = true)
@@ -81,29 +78,14 @@ public class GroupService {
 
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
-        List<UserSimpleServiceDTO> userSimpleServiceDTOS = new ArrayList<>();
-        for (UserGroup userGroup : userGroups) {
-            userSimpleServiceDTOS.add(createUserSimpleServiceDTO(userGroup.getUser()));
-        }
-
-        GroupDetailServiceDTO groupDetailServiceDTO = GroupDetailServiceDTO.builder()
-                .groupId(group.getId())
-                .groupName(group.getGroupName())
-                .groupImg(group.getGroupImg())
-                .description(group.getDescription())
-                .users(userSimpleServiceDTOS)
-                .createdAt(group.getCreatedAt())
-                .modifiedAt(group.getModifiedAt())
-                .build();
-        return groupDetailServiceDTO;
+        List<UserSimpleServiceDTO> userSimpleServiceDTOs = UserSimpleServiceDTO.toDtoListByUserGroup(userGroups);
+        GroupDetailServiceDTO serviceDto = GroupDetailServiceDTO.toDto(group, userSimpleServiceDTOs);
+        return serviceDto;
     }
 
     @Transactional
     public void enterGroup(Users user, Long groupId){
-        Groups group = groupsRepository.findById(groupId).orElse(null);
-        if (group == null) {
-
-        }
+        Groups group = findGroupById(groupId);
 
         UserGroup userGroup = new UserGroup();
         userGroup.setUser(user);

@@ -78,7 +78,7 @@ public class ScheduleService {
         checkUserInGroup(userId, groupId);
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
-        return createScheduleDetailServiceDTO(schedule, waitUsers);
+        return ScheduleDetailServiceDTO.toDto(schedule, waitUsers);
     }
 
     @Transactional
@@ -105,7 +105,7 @@ public class ScheduleService {
 
         Schedule schedule = findScheduleById(scheduleId);
         List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
-        return createScheduleResultServiceDTO(schedule, userArrivalDatas);
+        return ScheduleResultServiceDTO.toDto(schedule, userArrivalDatas);
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
