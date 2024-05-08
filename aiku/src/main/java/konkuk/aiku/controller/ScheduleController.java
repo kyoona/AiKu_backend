@@ -2,12 +2,10 @@ package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.*;
-import konkuk.aiku.domain.Location;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.ScheduleService;
 import konkuk.aiku.service.dto.*;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,8 @@
 package konkuk.aiku.service.dto;
 
+import konkuk.aiku.domain.Schedule;
 import konkuk.aiku.domain.ScheduleStatus;
+import konkuk.aiku.domain.Users;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,4 +22,19 @@ public class ScheduleDetailServiceDTO {
     @Builder.Default private List<UserSimpleServiceDTO> waitUsers = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+
+    public static ScheduleDetailServiceDTO toDto(Schedule schedule, List<Users> waitUsers){
+
+        ScheduleDetailServiceDTO scheduleDetailServiceDTO = ScheduleDetailServiceDTO.builder()
+                .id(schedule.getId())
+                .scheduleName(schedule.getScheduleName())
+                .location(LocationServiceDTO.toDto(schedule.getLocation()))
+                .scheduleTime(schedule.getScheduleTime())
+                .acceptUsers(UserSimpleServiceDTO.toDtosByUserSchedule(schedule.getUsers()))
+                .waitUsers(UserSimpleServiceDTO.toDtosByUser(waitUsers))
+                .createdAt(schedule.getCreatedAt())
+                .modifiedAt(schedule.getModifiedAt())
+                .build();
+        return scheduleDetailServiceDTO;
+    }
 }

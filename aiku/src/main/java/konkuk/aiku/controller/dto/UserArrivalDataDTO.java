@@ -1,6 +1,7 @@
 package konkuk.aiku.controller.dto;
 
 import konkuk.aiku.service.dto.UserArrivalDataServiceDTO;
+import konkuk.aiku.service.dto.UserSimpleServiceDTO;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -25,7 +26,7 @@ public class UserArrivalDataDTO {
     public static UserArrivalDataDTO toDto(UserArrivalDataServiceDTO serviceDto){
         UserArrivalDataDTO dto = UserArrivalDataDTO.builder()
                 .userArrivalDataId(serviceDto.getUserArrivalDataId())
-                .user(createUserSimpleServiceDTO(serviceDto.getUser()))
+                .user(UserSimpleResponseDTO.toDto(serviceDto.getUser()))
                 .timeDifference(serviceDto.getTimeDifference())
                 .build();
         return dto;
