@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class UserResponseDTO {
     private Long kakaoId;
-    private String personName;
+    private String username;
     private String userImg;
     private String phoneNumber;
     private int point;
@@ -28,7 +28,7 @@ public class UserResponseDTO {
 
         return UserResponseDTO.builder()
                 .kakaoId(users.getKakaoId())
-                .personName(users.getPersonName())
+                .username(users.getUsername())
                 .userImg(users.getUserImg())
                 .phoneNumber(users.getPhoneNumber())
                 .point(users.getPoint())

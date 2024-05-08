@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 public class UserSimpleResponseDTO {
     private String userId;
-    private String personName;
+    private String username;
     private String userImg;
 }

@@ -11,7 +11,7 @@ public class UserAdaptor extends User {
     private Users users;
 
     public UserAdaptor(Users users) {
-        super(users.getUsername(), users.getPassword(), users.getAuthorities());
+        super(String.valueOf(users.getKakaoId()), users.getPassword(), users.getAuthorities());
         this.users = users;
     }
 }
