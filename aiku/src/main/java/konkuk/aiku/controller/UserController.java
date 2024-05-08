@@ -78,7 +78,7 @@ public class UserController {
     @PostMapping("/logout")
     public void logout(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         String kakaoId = userAdaptor.getUsername();
-        userService.logout(kakaoId);
+        userService.logout(Long.valueOf(kakaoId));
     }
 
 }

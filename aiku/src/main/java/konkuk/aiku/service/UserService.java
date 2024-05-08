@@ -32,12 +32,12 @@ public class UserService {
     }
 
     @Transactional
-    public Users findByKakaoId(String kakaoId) {
+    public Users findByKakaoId(Long kakaoId) {
         return usersRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
     }
 
     @Transactional
-    public void logout(String kakaoId) {
+    public void logout(Long kakaoId) {
         Users user = findByKakaoId(kakaoId);
         user.setRefreshToken(null);
     }

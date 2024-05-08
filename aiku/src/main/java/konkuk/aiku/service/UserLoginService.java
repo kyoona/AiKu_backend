@@ -28,7 +28,7 @@ public class UserLoginService {
 
     // username + password로 인증용 토큰 생성 -> 일단 카카오 아이디로만 설정
     @Transactional
-    public JwtToken signIn(String kakaoId) {
+    public JwtToken signIn(Long kakaoId) {
 
         UsernamePasswordAuthenticationToken authenticationFilter
                 = new UsernamePasswordAuthenticationToken(kakaoId, kakaoId);
@@ -53,7 +53,7 @@ public class UserLoginService {
 
     // username + password로 인증용 토큰 생성 -> 일단 카카오 아이디로만 설정
     @Transactional
-    public String refresh(String kakaoId, String refreshToken) {
+    public String refresh(Long kakaoId, String refreshToken) {
 
         String refreshDBToken = usersRepository.findByKakaoId(kakaoId)
                 .map(user -> user.getRefreshToken())

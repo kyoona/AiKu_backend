@@ -5,5 +5,5 @@ import lombok.Setter;
 
 @Getter @Setter
 public class UserSignInDTO {
-    private String kakaoId;
+    private Long kakaoId;
 }
