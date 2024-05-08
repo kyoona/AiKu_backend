@@ -49,8 +49,7 @@ class ScheduleServiceTest {
     public void addSchedule() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
@@ -101,8 +100,7 @@ class ScheduleServiceTest {
     public void addScheduleInFaultCondition() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
@@ -128,8 +126,7 @@ class ScheduleServiceTest {
     public void modifySchedule() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
@@ -179,14 +176,12 @@ class ScheduleServiceTest {
     public void modifyScheduleInFaultCondition() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
         Users user2 = Users.builder()
-                .personName("user2")
-                .kakaoId("kakao2")
+                .username("user2")
                 .build();
         usersRepository.save(user2);
 
@@ -224,8 +219,7 @@ class ScheduleServiceTest {
     public void deleteSchedule() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
@@ -261,15 +255,13 @@ class ScheduleServiceTest {
     public void findScheduleDetailById() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user);
 
         Users user2 = Users.builder()
-                .personName("user2")
-                .kakaoId("kakao2")
+                .username("user2")
                 .setting(new Setting(true, true, true, true, true))
                 .build();
         usersRepository.save(user2);
@@ -308,10 +300,10 @@ class ScheduleServiceTest {
         assertThat(scheduleDetailServiceDTO.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
 
         assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUsername()).isEqualTo(user.getUsername());
-        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUserId()).isEqualTo(user.getKakaoId());
+        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUserId()).isEqualTo(user.getId());
 
         assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUsername()).isEqualTo(user2.getUsername());
-        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserId()).isEqualTo(user2.getKakaoId());
+        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserId()).isEqualTo(user2.getId());
     }
 
     @Test
@@ -320,15 +312,13 @@ class ScheduleServiceTest {
     public void enterSchedule() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user);
 
         Users user2 = Users.builder()
-                .personName("user2")
-                .kakaoId("kakao2")
+                .username("user2")
                 .setting(new Setting(true, true, true, true, true))
                 .build();
         usersRepository.save(user2);
@@ -370,15 +360,13 @@ class ScheduleServiceTest {
     public void enterScheduleNotInGroup() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user);
 
         Users user2 = Users.builder()
-                .personName("user2")
-                .kakaoId("kakao2")
+                .username("user2")
                 .setting(new Setting(true, true, true, true, true))
                 .build();
         usersRepository.save(user2);
@@ -412,8 +400,7 @@ class ScheduleServiceTest {
     public void enterScheduleAlreadyIn() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .build();
         usersRepository.save(user);
 
@@ -438,8 +425,7 @@ class ScheduleServiceTest {
     public void exitSchedule() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user);
@@ -474,15 +460,13 @@ class ScheduleServiceTest {
     public void exitScheduleNotIn() {
         //given
         Users user = Users.builder()
-                .personName("user1")
-                .kakaoId("kakao1")
+                .username("user1")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(user);
 
         Users user2 = Users.builder()
-                .personName("user2")
-                .kakaoId("kakao2")
+                .username("user2")
                 .setting(new Setting(true, true, true, true, true))
                 .build();
         usersRepository.save(user2);

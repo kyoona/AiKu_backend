@@ -8,7 +8,7 @@ import java.util.List;
 public class ServiceDTOUtils {
     public static UserSimpleServiceDTO createUserSimpleServiceDTO(Users user){
         UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                .userId(user.getKakaoId())
+                .userId(user.getId())
                 .username(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
                 .userImg(user.getUserImg())
@@ -90,18 +90,7 @@ public class ServiceDTOUtils {
         List<UserSimpleServiceDTO> userSimpleServiceDTOs = new ArrayList<>();
         for (UserSchedule userSchedule : users) {
             Users user = userSchedule.getUser();
-            UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                    .userId(user.getKakaoId())
-                    .username(user.getUsername())
-                    .phoneNumber(user.getPhoneNumber())
-                    .userImg(user.getUserImg())
-                    .setting(createSettingServiceDTO(user.getSetting()))
-                    .point(user.getPoint())
-                    .role(user.getRole())
-                    .createdAt(user.getCreatedAt())
-                    .modifiedAt(user.getModifiedAt())
-                    .build();
-            userSimpleServiceDTOs.add(userSimpleServiceDTO);
+            userSimpleServiceDTOs.add(createUserSimpleServiceDTO(user));
         }
         return userSimpleServiceDTOs;
     }
@@ -109,18 +98,7 @@ public class ServiceDTOUtils {
     public static List<UserSimpleServiceDTO> createUserSimpleServiceDTOsByUsers(List<Users> users){
         List<UserSimpleServiceDTO> userSimpleServiceDTOs = new ArrayList<>();
         for (Users user : users) {
-            UserSimpleServiceDTO userSimpleServiceDTO = UserSimpleServiceDTO.builder()
-                    .userId(user.getKakaoId())
-                    .username(user.getUsername())
-                    .phoneNumber(user.getPhoneNumber())
-                    .userImg(user.getUserImg())
-                    .setting(createSettingServiceDTO(user.getSetting()))
-                    .point(user.getPoint())
-                    .role(user.getRole())
-                    .createdAt(user.getCreatedAt())
-                    .modifiedAt(user.getModifiedAt())
-                    .build();
-            userSimpleServiceDTOs.add(userSimpleServiceDTO);
+            userSimpleServiceDTOs.add(createUserSimpleServiceDTO(user));
         }
         return userSimpleServiceDTOs;
     }

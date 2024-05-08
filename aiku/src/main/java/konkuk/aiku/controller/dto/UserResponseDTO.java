@@ -27,7 +27,7 @@ public class UserResponseDTO {
         TitleResponseDTO titleDto = TitleResponseDTO.toDto(userTitle);
 
         return UserResponseDTO.builder()
-                .userId(users.getKakaoId())
+                .userId(users.getId())
                 .username(users.getUsername())
                 .userImg(users.getUserImg())
                 .phoneNumber(users.getPhoneNumber())
