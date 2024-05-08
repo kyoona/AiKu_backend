@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class UserSimpleServiceDTO {
-    private String userKaKaoId;
+    private Long userKaKaoId;
     private String username;
     private String phoneNumber;
     private String userImg;

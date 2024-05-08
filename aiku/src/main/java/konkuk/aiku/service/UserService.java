@@ -22,7 +22,7 @@ public class UserService {
 
     @Transactional
     public Users save(Users users) {
-        users.setPassword(passwordEncoder.encode(users.getKakaoId()));
+        users.setPassword(passwordEncoder.encode(users.getKakaoId().toString()));
         return usersRepository.save(users);
     }
 

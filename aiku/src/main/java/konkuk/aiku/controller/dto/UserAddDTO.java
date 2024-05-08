@@ -14,7 +14,7 @@ import lombok.Setter;
 public class UserAddDTO {
     private String personName;
     private String phoneNumber;
-    private String kakaoId;
+    private Long kakaoId;
     private Boolean isLocationInformationOn;
     private Boolean isVoiceAuthorityOn;
     private Boolean isBettingAlarmOn;

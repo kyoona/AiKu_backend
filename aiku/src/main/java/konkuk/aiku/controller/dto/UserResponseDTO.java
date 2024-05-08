@@ -11,7 +11,7 @@ import java.util.List;
 @Getter @Setter
 @Builder
 public class UserResponseDTO {
-    private String kakaoId;
+    private Long kakaoId;
     private String personName;
     private String userImg;
     private String phoneNumber;

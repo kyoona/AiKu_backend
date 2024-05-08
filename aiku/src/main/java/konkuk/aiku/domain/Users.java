@@ -29,7 +29,7 @@ public class Users extends TimeEntity implements UserDetails {
     private String phoneNumber;
     private String userImg;
 
-    private String kakaoId;
+    private Long kakaoId;
 
     @Setter
     private String password;
@@ -81,7 +81,7 @@ public class Users extends TimeEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return kakaoId;
+        return kakaoId.toString();
     }
 
     @Override
