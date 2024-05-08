@@ -1,8 +1,8 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.controller.dto.SettingAlarmDTO;
-import konkuk.aiku.controller.dto.SettingAuthorityDTO;
-import konkuk.aiku.controller.dto.UserUpdateDTO;
+import konkuk.aiku.controller.dto.SettingAlarmDto;
+import konkuk.aiku.controller.dto.SettingAuthorityDto;
+import konkuk.aiku.controller.dto.UserUpdateDto;
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.repository.UsersRepository;
@@ -43,7 +43,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Users users, UserUpdateDTO userUpdateDTO) {
+    public void updateUser(Users users, UserUpdateDto userUpdateDTO) {
         users.updateUser(userUpdateDTO);
     }
 
@@ -53,12 +53,12 @@ public class UserService {
     }
 
     @Transactional
-    public void setAlarm(Users users, SettingAlarmDTO settingAlarmDTO) {
+    public void setAlarm(Users users, SettingAlarmDto settingAlarmDTO) {
         Setting setting = settingAlarmDTO.toSetting(users.getSetting());
         users.updateSetting(setting);
     }
 
-    public void setAuthority(Users users, SettingAuthorityDTO settingAuthorityDTO) {
+    public void setAuthority(Users users, SettingAuthorityDto settingAuthorityDTO) {
         Setting setting = settingAuthorityDTO.toSetting(users.getSetting());
         users.updateSetting(setting);
     }

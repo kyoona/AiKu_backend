@@ -1,14 +1,14 @@
 package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
-import konkuk.aiku.controller.dto.EntryDTO;
-import konkuk.aiku.controller.dto.GroupDTO;
-import konkuk.aiku.controller.dto.GroupResponseDTO;
+import konkuk.aiku.controller.dto.EntryDto;
+import konkuk.aiku.controller.dto.GroupDto;
+import konkuk.aiku.controller.dto.GroupResponseDto;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
-import konkuk.aiku.service.dto.GroupDetailServiceDTO;
-import konkuk.aiku.service.dto.GroupServiceDTO;
+import konkuk.aiku.service.dto.GroupDetailServiceDto;
+import konkuk.aiku.service.dto.GroupServiceDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +28,11 @@ public class GroupController {
     }
 
     @PostMapping
-    public void groupAdd(@RequestBody @Valid GroupDTO groupDTO,
+    public void groupAdd(@RequestBody @Valid GroupDto groupDTO,
                          @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName(groupDTO.getGroupName())
                 .description(groupDTO.getDescription())
                 .groupImg(null)
@@ -42,11 +42,11 @@ public class GroupController {
 
     @PatchMapping("/{groupId}")
     public void groupModify(@PathVariable Long groupId,
-                            @RequestBody @Valid GroupDTO groupDTO,
+                            @RequestBody @Valid GroupDto groupDTO,
                             @AuthenticationPrincipal UserAdaptor userAdapter){
         Users user = userAdapter.getUsers();
 
-        GroupServiceDTO groupServiceDTO = GroupServiceDTO.builder()
+        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName(groupDTO.getGroupName())
                 .description(groupDTO.getDescription())
                 .groupImg(null)
@@ -62,20 +62,20 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}")
-    public ResponseEntity<GroupResponseDTO> groupDetails(@PathVariable Long userId,
+    public ResponseEntity<GroupResponseDto> groupDetails(@PathVariable Long userId,
                                                          @PathVariable Long groupId,
                                                          @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        GroupDetailServiceDTO serviceDTO = groupService.findGroupDetailById(user, groupId);
+        GroupDetailServiceDto serviceDTO = groupService.findGroupDetailById(user, groupId);
 
-        GroupResponseDTO responseDto = GroupResponseDTO.toDto(serviceDTO);
-        return new ResponseEntity<GroupResponseDTO>(responseDto, HttpStatus.OK);
+        GroupResponseDto responseDto = GroupResponseDto.toDto(serviceDTO);
+        return new ResponseEntity<GroupResponseDto>(responseDto, HttpStatus.OK);
     }
 
     @PostMapping("/{groupId}/entry")
     public void groupEntry(@PathVariable Long groupId,
-                           @RequestBody EntryDTO entryDTO,
+                           @RequestBody EntryDto entryDTO,
                            @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 

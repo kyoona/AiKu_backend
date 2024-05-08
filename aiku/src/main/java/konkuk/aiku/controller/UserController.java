@@ -19,19 +19,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserAddDTO save(@RequestBody UserAddDTO userAddDTO) {
+    public UserAddDto save(@RequestBody UserAddDto userAddDTO) {
         Users user = userService.save(userAddDTO.toEntity());
-        return UserAddDTO.toDto(user);
+        return UserAddDto.toDto(user);
     }
 
     @GetMapping
-    public UserResponseDTO getUsers(@AuthenticationPrincipal UserAdaptor userAdaptor) {
+    public UserResponseDto getUsers(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
-        return UserResponseDTO.toDto(users);
+        return UserResponseDto.toDto(users);
     }
 
     @PatchMapping
-    public void getUsers(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody UserUpdateDTO userUpdateDTO) {
+    public void getUsers(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody UserUpdateDto userUpdateDTO) {
         Users users = userAdaptor.getUsers();
         userService.updateUser(users, userUpdateDTO);
     }
@@ -43,29 +43,29 @@ public class UserController {
     }
 
     @PatchMapping("/setting/alarm")
-    public void setAlarm(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody SettingAlarmDTO settingAlarmDTO) {
+    public void setAlarm(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody SettingAlarmDto settingAlarmDTO) {
         Users users = userAdaptor.getUsers();
         userService.setAlarm(users, settingAlarmDTO);
     }
 
     @GetMapping("/setting/alarm")
-    public SettingAlarmDTO getAlarm(@AuthenticationPrincipal UserAdaptor userAdaptor) {
+    public SettingAlarmDto getAlarm(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
         Setting alarm = userService.getAlarm(users);
-        return SettingAlarmDTO.toDto(alarm);
+        return SettingAlarmDto.toDto(alarm);
     }
 
     @PatchMapping("/setting/authority")
-    public void setAuthority(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody SettingAuthorityDTO settingAuthorityDTO) {
+    public void setAuthority(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody SettingAuthorityDto settingAuthorityDTO) {
         Users users = userAdaptor.getUsers();
         userService.setAuthority(users, settingAuthorityDTO);
     }
 
     @GetMapping("/setting/authority")
-    public SettingAuthorityDTO getAuthority(@AuthenticationPrincipal UserAdaptor userAdaptor) {
+    public SettingAuthorityDto getAuthority(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
         Setting alarm = userService.getAuthority(users);
-        return SettingAuthorityDTO.toDto(alarm);
+        return SettingAuthorityDto.toDto(alarm);
     }
 
     @PostMapping("/image")

@@ -1,7 +1,7 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
-import konkuk.aiku.controller.dto.UserUpdateDTO;
+import konkuk.aiku.controller.dto.UserUpdateDto;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -49,7 +49,7 @@ public class Users extends TimeEntity {
         this.refreshToken = refreshToken;
     }
 
-    public void updateUser(UserUpdateDTO userUpdateDTO) {
+    public void updateUser(UserUpdateDto userUpdateDTO) {
         username = userUpdateDTO.getUsername();
         Long userTitleId = userUpdateDTO.getUserTitleId();
 

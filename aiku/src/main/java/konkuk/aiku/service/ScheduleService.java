@@ -17,7 +17,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Optional;
 
-import static konkuk.aiku.service.dto.ServiceDTOUtils.*;
+import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,7 +29,7 @@ public class ScheduleService {
     private final UserGroupRepository userGroupRepository;
 
     @Transactional
-    public Long addSchedule(Users user, Long groupId, ScheduleServiceDTO scheduleServiceDTO){
+    public Long addSchedule(Users user, Long groupId, ScheduleServiceDto scheduleServiceDTO){
         Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
 
         Schedule schedule = Schedule.builder()
@@ -46,7 +46,7 @@ public class ScheduleService {
 
     //TODO
     @Transactional
-    public void modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDTO scheduleServiceDTO) {
+    public void modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDto scheduleServiceDTO) {
         Long userId = user.getId();
         UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
 
@@ -73,12 +73,12 @@ public class ScheduleService {
         scheduleRepository.deleteById(scheduleId);
     }
 
-    public ScheduleDetailServiceDTO findScheduleDetailById(Users user, Long groupId, Long scheduleId){
+    public ScheduleDetailServiceDto findScheduleDetailById(Users user, Long groupId, Long scheduleId){
         Long userId = user.getId();
         checkUserInGroup(userId, groupId);
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
-        return ScheduleDetailServiceDTO.toDto(schedule, waitUsers);
+        return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
     }
 
     @Transactional
@@ -99,13 +99,13 @@ public class ScheduleService {
         schedule.deleteUser(user, userSchedule);
     }
 
-    public ScheduleResultServiceDTO findScheduleResult(Users user, Long groupId, Long scheduleId){
+    public ScheduleResultServiceDto findScheduleResult(Users user, Long groupId, Long scheduleId){
         Long userId = user.getId();
         checkUserInGroup(userId, groupId);
 
         Schedule schedule = findScheduleById(scheduleId);
         List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
-        return ScheduleResultServiceDTO.toDto(schedule, userArrivalDatas);
+        return ScheduleResultServiceDto.toDto(schedule, userArrivalDatas);
     }
 
     private UserGroup checkUserInGroup(Long userId, Long groupId){
