@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,6 +44,9 @@ public class Users extends TimeEntity {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    private String fcmToken;
+    private LocalDateTime fcmTokenCreateAt;
+
     private String refreshToken;
 
     public void setRefreshToken(String refreshToken) {
@@ -70,4 +74,8 @@ public class Users extends TimeEntity {
         this.setting = setting;
     }
 
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+        this.fcmTokenCreateAt = LocalDateTime.now();
+    }
 }
