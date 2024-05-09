@@ -67,8 +67,7 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}")
-    public ResponseEntity<GroupResponseDto> groupDetails(@PathVariable Long userId,
-                                                         @PathVariable Long groupId,
+    public ResponseEntity<GroupResponseDto> groupDetails(@PathVariable Long groupId,
                                                          @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
