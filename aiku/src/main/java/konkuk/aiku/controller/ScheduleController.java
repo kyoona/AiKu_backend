@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
 
-@Controller(value = "/groups/{groupId}/schedules")
+@Controller
+@RequestMapping("/groups/{groupId}/schedules")
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduleController {
