@@ -1,14 +1,16 @@
 package konkuk.aiku.controller.dto;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+@Getter
 public class SuccessResponseDto {
     private final boolean success = true;
-    private SuccessMessage message;
+    private String message;
 
-    public SuccessResponseDto(SuccessMessage message) {
-        this.message = message;
+    public SuccessResponseDto(SuccessMessage successMessage) {
+        this.message = successMessage.message;
     }
 
     public static ResponseEntity<SuccessResponseDto> getResponseEntity(SuccessMessage message, HttpStatus status){
