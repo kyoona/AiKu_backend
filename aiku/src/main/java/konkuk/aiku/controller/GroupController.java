@@ -39,8 +39,8 @@ public class GroupController {
                 .description(groupDTO.getDescription())
                 .groupImg(null)
                 .build();
-        groupService.addGroup(user, groupServiceDTO);
-        return SuccessResponseDto.getResponseEntity(ADD_SUCCESS, HttpStatus.OK);
+        Long addId = groupService.addGroup(user, groupServiceDTO);
+        return SuccessResponseDto.getResponseEntity(addId, ADD_SUCCESS, HttpStatus.OK);
     }
 
     @PatchMapping("/{groupId}")
@@ -54,16 +54,16 @@ public class GroupController {
                 .description(groupDTO.getDescription())
                 .groupImg(null)
                 .build();
-        groupService.modifyGroup(user, groupId, groupServiceDTO);
-        return SuccessResponseDto.getResponseEntity(MODIFY_SUCCESS, HttpStatus.OK);
+        Long modifyId = groupService.modifyGroup(user, groupId, groupServiceDTO);
+        return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 
     @DeleteMapping("/{groupId}")
     public ResponseEntity<SuccessResponseDto> groupDelete(@PathVariable Long groupId,
                                                           @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        groupService.deleteGroup(user, groupId);
-        return SuccessResponseDto.getResponseEntity(DELETE_SUCCESS, HttpStatus.OK);
+        Long deleteId = groupService.deleteGroup(user, groupId);
+        return SuccessResponseDto.getResponseEntity(deleteId, DELETE_SUCCESS, HttpStatus.OK);
     }
 
     @GetMapping("/{groupId}")
@@ -81,16 +81,16 @@ public class GroupController {
     public ResponseEntity<SuccessResponseDto> groupEnter(@PathVariable Long groupId,
                                                          @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        groupService.enterGroup(user, groupId);
-        return SuccessResponseDto.getResponseEntity(ENTER_SUCCESS, HttpStatus.OK);
+        Long enterId = groupService.enterGroup(user, groupId);
+        return SuccessResponseDto.getResponseEntity(enterId, ENTER_SUCCESS, HttpStatus.OK);
     }
 
     @PostMapping("/{groupId}/exit")
     public ResponseEntity<SuccessResponseDto> groupExit(@PathVariable Long groupId,
                                                         @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        groupService.exitGroup(user, groupId);
-        return SuccessResponseDto.getResponseEntity(EXIT_SUCCESS, HttpStatus.OK);
+        Long exitId = groupService.exitGroup(user, groupId);
+        return SuccessResponseDto.getResponseEntity(exitId, EXIT_SUCCESS, HttpStatus.OK);
     }
 
 }

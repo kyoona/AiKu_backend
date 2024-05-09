@@ -29,7 +29,6 @@ public class SecurityConfig {
                 // 권한 설정 시작
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/alarm").permitAll() // 테스트용 임시 허용.
                                 .requestMatchers("/users").permitAll() // 모든 사용자 허용
                                 .requestMatchers("/login/sign-in").permitAll() // 모든 사용자 허용
                                 .requestMatchers("/login/refresh").permitAll() // 모든 사용자 허용
