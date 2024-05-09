@@ -34,8 +34,8 @@ public class ScheduleController {
                 .scheduleTime(scheduleDTO.getScheduleTime())
                 .build();
 
-        scheduleService.addSchedule(user, groupId, scheduleServiceDTO);
-        return SuccessResponseDto.getResponseEntity(ADD_SUCCESS, HttpStatus.OK);
+        Long addId = scheduleService.addSchedule(user, groupId, scheduleServiceDTO);
+        return SuccessResponseDto.getResponseEntity(addId, ADD_SUCCESS, HttpStatus.OK);
     }
 
     @PatchMapping("/{scheduleId}")
@@ -51,8 +51,8 @@ public class ScheduleController {
                 .scheduleTime(scheduleDTO.getScheduleTime())
                 .build();
 
-        scheduleService.modifySchedule(user, groupId, scheduleId, scheduleServiceDTO);
-        return SuccessResponseDto.getResponseEntity(MODIFY_SUCCESS, HttpStatus.OK);
+        Long modifyId = scheduleService.modifySchedule(user, groupId, scheduleId, scheduleServiceDTO);
+        return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 
     @DeleteMapping("/{scheduleId}")
@@ -60,8 +60,8 @@ public class ScheduleController {
                                                              @PathVariable Long scheduleId,
                                                              @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        scheduleService.deleteSchedule(user, groupId, scheduleId);
-        return SuccessResponseDto.getResponseEntity(DELETE_SUCCESS, HttpStatus.OK);
+        Long deleteId = scheduleService.deleteSchedule(user, groupId, scheduleId);
+        return SuccessResponseDto.getResponseEntity(deleteId, DELETE_SUCCESS, HttpStatus.OK);
     }
 
     private LocationServiceDto createLocationServiceDTO(LocationDto location){
@@ -84,8 +84,8 @@ public class ScheduleController {
                                                             @PathVariable Long scheduleId,
                                                             @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        scheduleService.enterSchedule(user, groupId, scheduleId);
-        return SuccessResponseDto.getResponseEntity(ENTER_SUCCESS, HttpStatus.OK);
+        Long enterId = scheduleService.enterSchedule(user, groupId, scheduleId);
+        return SuccessResponseDto.getResponseEntity(enterId, ENTER_SUCCESS, HttpStatus.OK);
     }
 
     @PostMapping("/{scheduleId}/exit")
@@ -93,8 +93,8 @@ public class ScheduleController {
                                                            @PathVariable Long scheduleId,
                                                            @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        scheduleService.exitSchedule(user, groupId, scheduleId);
-        return SuccessResponseDto.getResponseEntity(EXIT_SUCCESS, HttpStatus.OK);
+        Long exitId = scheduleService.exitSchedule(user, groupId, scheduleId);
+        return SuccessResponseDto.getResponseEntity(exitId, EXIT_SUCCESS, HttpStatus.OK);
     }
 
     @GetMapping("/{scheduleId}/result")
