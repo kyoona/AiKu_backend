@@ -29,7 +29,7 @@ public class AlarmController {
                                                         @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
         alarmService.saveToken(user, fcmToken);
-        return SuccessResponseDto.getResponseEntity(ADD_SUCCESS, HttpStatus.OK);
+        return SuccessResponseDto.getResponseEntity(user.getId(), ADD_SUCCESS, HttpStatus.OK);
     }
 
     @PatchMapping("/token")
@@ -37,6 +37,6 @@ public class AlarmController {
                                                         @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
         alarmService.updateToken(user, fcmToken);
-        return SuccessResponseDto.getResponseEntity(MODIFY_SUCCESS, HttpStatus.OK);
+        return SuccessResponseDto.getResponseEntity(user.getId(), MODIFY_SUCCESS, HttpStatus.OK);
     }
 }
