@@ -32,9 +32,11 @@ public class AlarmController {
         return SuccessResponseDto.getResponseEntity(ADD_SUCCESS, HttpStatus.OK);
     }
 
-    @GetMapping()
-    @ResponseBody
-    public String testAPI(){
-        return "ok";
+    @PatchMapping("/token")
+    public ResponseEntity<SuccessResponseDto> tokenUpdate(@RequestBody @Valid FcmToken fcmToken,
+                                                        @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        alarmService.updateToken(user, fcmToken);
+        return SuccessResponseDto.getResponseEntity(MODIFY_SUCCESS, HttpStatus.OK);
     }
 }

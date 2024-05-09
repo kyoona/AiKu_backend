@@ -32,6 +32,9 @@ public class AlarmService {
     @Transactional
     public void updateToken(Users user, FcmToken fcmToken){
         String token = fcmToken.getToken();
+        if (user.getFcmToken() == null) {
+            throw new TokenException(ErrorCode.NO_GENERATED_TOKEN);
+        }
         fcmTokenProvider.validateFcmToken(token);
         user.setFcmToken(token);
     }
