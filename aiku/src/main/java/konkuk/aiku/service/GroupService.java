@@ -41,16 +41,17 @@ public class GroupService {
 
         groupsRepository.save(group);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
 
         return group.getId();
     }
 
     @Transactional
-    public void modifyGroup(Users user, Long groupId, GroupServiceDto groupServiceDTO) {
+    public Long modifyGroup(Users user, Long groupId, GroupServiceDto groupServiceDTO) {
         Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
         if(StringUtils.hasText(groupServiceDTO.getGroupName())){
             group.setGroupName(groupServiceDTO.getGroupName());
@@ -61,15 +62,17 @@ public class GroupService {
         if(StringUtils.hasText(groupServiceDTO.getGroupImg())){
             group.setGroupImg(groupServiceDTO.getGroupImg());
         }
+        return group.getId();
     }
 
     @Transactional
-    public void deleteGroup(Users user, Long groupId) {
+    public Long deleteGroup(Users user, Long groupId) {
         Long userId = user.getId();
         checkUserInGroup(userId, groupId);
 
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
         groupsRepository.deleteById(groupId);
+        return groupId;
     }
 
     public GroupDetailServiceDto findGroupDetailById(Users user, Long groupId) {
@@ -84,20 +87,23 @@ public class GroupService {
     }
 
     @Transactional
-    public void enterGroup(Users user, Long groupId){
+    public Long enterGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);
 
-        UserGroup userGroup = new UserGroup();
-        userGroup.setUser(user);
-        userGroup.setGroup(group);
+        UserGroup userGroup = UserGroup.builder()
+                .user(user)
+                .group(group)
+                .build();
         userGroupRepository.save(userGroup);
+        return groupId;
     }
 
     @Transactional
-    public void exitGroup(Users user, Long groupId){
+    public Long exitGroup(Users user, Long groupId){
         Long userId = user.getId();
         checkUserInGroup(userId, groupId);
         userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
+        return groupId;
     }
 
     public Groups findGroupById(Long groupId){

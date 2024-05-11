@@ -46,7 +46,7 @@ public class ScheduleService {
 
     //TODO
     @Transactional
-    public void modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDto scheduleServiceDTO) {
+    public Long modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDto scheduleServiceDTO) {
         Long userId = user.getId();
         UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
 
@@ -64,13 +64,16 @@ public class ScheduleService {
         if (scheduleServiceDTO.getStatus() != null) {
             schedule.setStatus(scheduleServiceDTO.getStatus());
         }
+
+        return schedule.getId();
     }
 
     @Transactional
-    public void deleteSchedule(Users user, Long groupId, Long scheduleId) {
+    public Long deleteSchedule(Users user, Long groupId, Long scheduleId) {
         checkUserInSchedule(user.getId(), scheduleId);
 
         scheduleRepository.deleteById(scheduleId);
+        return scheduleId;
     }
 
     public ScheduleDetailServiceDto findScheduleDetailById(Users user, Long groupId, Long scheduleId){
@@ -82,21 +85,23 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void enterSchedule(Users user, Long groupId, Long scheduleId){
+    public Long enterSchedule(Users user, Long groupId, Long scheduleId){
         Long userId = user.getId();
         checkUserInGroup(userId, groupId);
         Schedule schedule = findScheduleById(scheduleId);
         checkUserAlreadyInSchedule(userId, scheduleId);
 
         schedule.addUser(user, new UserSchedule());
+        return schedule.getId();
     }
 
     @Transactional
-    public void exitSchedule(Users user, Long groupId, Long scheduleId) {
+    public Long exitSchedule(Users user, Long groupId, Long scheduleId) {
         Long userId = user.getId();
         UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
         Schedule schedule = userSchedule.getSchedule();
         schedule.deleteUser(user, userSchedule);
+        return schedule.getId();
     }
 
     public ScheduleResultServiceDto findScheduleResult(Users user, Long groupId, Long scheduleId){
