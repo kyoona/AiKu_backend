@@ -36,6 +36,7 @@ class GroupServiceTest {
     private Users userB;
     private Users userC;
 
+    GroupServiceDto groupServiceDTO;
 
     @BeforeEach
     void beforeEach(){
@@ -65,38 +66,32 @@ class GroupServiceTest {
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(userC);
-    }
 
-    @Test
-    @Commit
-    @DisplayName("그룹 등록")
-    void addGroup() {
-        //when
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
+        groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
                 .description("group1입니다.")
                 .build();
+    }
+
+    @Test
+    @DisplayName("그룹 등록")
+    void addGroup() {
+        //when
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
 
         //then
         Groups findGroup = groupService.findGroupById(groupId);
         assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
         assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO.getDescription());
+
+        assertThat(userGroupRepository.findByUserIdAndGroupId(userA.getId(), groupId)).isNotEmpty();
     }
 
     @Test
-    @Commit
     @DisplayName("그룹 수정")
     void modifyGroup() throws IllegalAccessException {
         //given
-
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
-        em.flush();
-        em.clear();
 
         //when
         GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
@@ -115,13 +110,7 @@ class GroupServiceTest {
     @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
     void modifyGroupInFaultCondition() {
         //given
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
-        em.flush();
-        em.clear();
 
         //when
         GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
@@ -136,13 +125,7 @@ class GroupServiceTest {
     @DisplayName("그룹 삭제")
     void deleteGroup(){
         //given
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
-        em.flush();
-        em.clear();
 
         //when
         groupService.deleteGroup(userA, groupId);
@@ -155,22 +138,17 @@ class GroupServiceTest {
     @DisplayName("그룹 조회")
     void findGroupDetailById(){
         //given
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
-        em.flush();
-        em.clear();
+        groupService.enterGroup(userB, groupId);
 
         //when
         GroupDetailServiceDto groupDetailServiceDTO = groupService.findGroupDetailById(userA, groupId);
 
         //then
-        UserSimpleServiceDto findUserDTO = groupDetailServiceDTO.getUsers().get(0);
-        assertThat(findUserDTO.getUserId()).isEqualTo(userA.getId());
-        assertThat(findUserDTO.getUsername()).isEqualTo(userA.getUsername());
-        assertThat(findUserDTO.getPoint()).isEqualTo(userA.getPoint());
+        assertThat(groupDetailServiceDTO.getUsers().size()).isEqualTo(2);
+        assertThat(groupDetailServiceDTO.getUsers()).filteredOn( user ->
+            (user.getUserId() == userA.getId()) || (user.getUserId() == userB.getId())
+        ).size().isEqualTo(2);
 
         assertThat(groupDetailServiceDTO.getGroupId()).isEqualTo(groupId);
         assertThat(groupDetailServiceDTO.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
@@ -181,10 +159,6 @@ class GroupServiceTest {
     @DisplayName("그룹 조회-그룹에 속해 있지 않은 유저")
     void findGroupDetailByIdInFaultCondition(){
         //given
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
 
         //when
@@ -192,17 +166,10 @@ class GroupServiceTest {
     }
 
     @Test
-    @Commit
     @DisplayName("그룹 참가")
     void enterGroup(){
         //given
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
-        em.flush();
-        em.clear();
 
         //when
         groupService.enterGroup(userB, groupId);
@@ -212,17 +179,10 @@ class GroupServiceTest {
     }
 
     @Test
-    @Commit
     @DisplayName("그룹 퇴장")
     void exitGroup(){
         //given
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
-        em.flush();
-        em.clear();
 
         //when
         groupService.exitGroup(userA, groupId);
@@ -235,10 +195,6 @@ class GroupServiceTest {
     @DisplayName("그룹 퇴장-그룹에 속해 있지 않은 유저")
     void exitGroupInFaultCondition(){
         //given
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
 
         //when
