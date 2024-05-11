@@ -4,7 +4,7 @@ import konkuk.aiku.domain.UserGroup;
 
 import java.util.Optional;
 
-public interface UserGroupRepositoryCustom {
+public interface GroupsRepositoryCustom {
     Optional<UserGroup> findByUserIdAndGroupId(Long userId, Long groupId);
-    void deleteByUserIdAndGroupId(Long userId, Long groupId);
+    void deleteUserGroup(UserGroup userGroup);
 }

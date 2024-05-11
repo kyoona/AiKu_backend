@@ -5,16 +5,13 @@ import konkuk.aiku.domain.Groups;
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.exception.NoAthorityToAccessException;
-import konkuk.aiku.exception.NoSuchEntityException;
-import konkuk.aiku.repository.UserGroupRepository;
+import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.GroupDetailServiceDto;
 import konkuk.aiku.service.dto.GroupServiceDto;
-import konkuk.aiku.service.dto.UserSimpleServiceDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -26,11 +23,11 @@ class GroupServiceTest {
     @Autowired
     private EntityManager em;
     @Autowired
+    private GroupsRepository groupsRepository;
+    @Autowired
     private GroupService groupService;
     @Autowired
     private UsersRepository usersRepository;
-    @Autowired
-    private UserGroupRepository userGroupRepository;
 
     private Users userA;
     private Users userB;
@@ -80,16 +77,17 @@ class GroupServiceTest {
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
 
         //then
-        Groups findGroup = groupService.findGroupById(groupId);
+        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
+        assertThat(findGroup).isNotNull();
         assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
         assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO.getDescription());
 
-        assertThat(userGroupRepository.findByUserIdAndGroupId(userA.getId(), groupId)).isNotEmpty();
+        assertThat( groupsRepository.findByUserIdAndGroupId(userA.getId(), groupId)).isNotEmpty();
     }
 
     @Test
     @DisplayName("그룹 수정")
-    void modifyGroup() throws IllegalAccessException {
+    void modifyGroup() {
         //given
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
 
@@ -101,7 +99,7 @@ class GroupServiceTest {
         groupService.modifyGroup(userA, groupId, modifyGroupServiceDto);
 
         //then
-        Groups findGroup = groupService.findGroupById(groupId);
+        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
         assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDto.getGroupName());
         assertThat(findGroup.getDescription()).isEqualTo(modifyGroupServiceDto.getDescription());
     }
@@ -131,7 +129,7 @@ class GroupServiceTest {
         groupService.deleteGroup(userA, groupId);
 
         //then
-        assertThatThrownBy(() -> groupService.findGroupById(groupId)).isInstanceOf(NoSuchEntityException.class);
+        assertThat(groupsRepository.findById(groupId)).isEmpty();
     }
 
     @Test
@@ -150,9 +148,10 @@ class GroupServiceTest {
             (user.getUserId() == userA.getId()) || (user.getUserId() == userB.getId())
         ).size().isEqualTo(2);
 
-        assertThat(groupDetailServiceDTO.getGroupId()).isEqualTo(groupId);
-        assertThat(groupDetailServiceDTO.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
-        assertThat(groupDetailServiceDTO.getDescription()).isEqualTo(groupServiceDTO.getDescription());
+        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
+        assertThat(groupDetailServiceDTO.getGroupId()).isEqualTo(findGroup.getId());
+        assertThat(groupDetailServiceDTO.getGroupName()).isEqualTo(findGroup.getGroupName());
+        assertThat(groupDetailServiceDTO.getDescription()).isEqualTo(findGroup.getDescription());
     }
 
     @Test
@@ -175,7 +174,7 @@ class GroupServiceTest {
         groupService.enterGroup(userB, groupId);
 
         //then
-        assertThat(userGroupRepository.findByUserIdAndGroupId(userB.getId(), groupId)).isNotEmpty();
+        assertThat(groupsRepository.findByUserIdAndGroupId(userA.getId(), groupId)).isNotEmpty();
     }
 
     @Test
@@ -188,7 +187,7 @@ class GroupServiceTest {
         groupService.exitGroup(userA, groupId);
 
         //then
-        assertThat(userGroupRepository.findByUserIdAndGroupId(userA.getId(), groupId)).isEmpty();
+        assertThat(groupsRepository.findByUserIdAndGroupId(userA.getId(), groupId)).isEmpty();
     }
 
     @Test

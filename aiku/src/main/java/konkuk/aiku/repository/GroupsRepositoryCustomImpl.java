@@ -12,8 +12,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class UserGroupRepositoryCustomImpl implements UserGroupRepositoryCustom{
-
+public class GroupsRepositoryCustomImpl implements GroupsRepositoryCustom{
     @PersistenceContext
     private final EntityManager entityManager;
 
@@ -27,11 +26,7 @@ public class UserGroupRepositoryCustomImpl implements UserGroupRepositoryCustom{
     }
 
     @Override
-    public void deleteByUserIdAndGroupId(Long userId, Long groupId) {
-        String jpql = "DELETE FROM UserGroup ug WHERE ug.user.id = :userId AND ug.group.id = :groupId";
-        Query query = entityManager.createQuery(jpql)
-                .setParameter("userId", userId)
-                .setParameter("groupId", groupId);
-        query.executeUpdate();
+    public void deleteUserGroup(UserGroup userGroup) {
+        entityManager.remove(userGroup);
     }
 }

@@ -6,7 +6,6 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.ScheduleRepository;
-import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
