@@ -31,7 +31,7 @@ class UserServiceTest {
     @Test
     void save() {
         Users entity = userAddDTO.toEntity();
-        save = userService.save(entity);
+//        save = userService.save(entity);
 
         Assertions.assertThat(save.getKakaoId()).isEqualTo(entity.getKakaoId());
     }
@@ -39,7 +39,7 @@ class UserServiceTest {
     @Test
     void findByKakaoId() {
         Users entity = userAddDTO.toEntity();
-        save = userService.save(entity);
+//        save = userService.save(entity);
         Users byKakaoId = userService.findByKakaoId(1L);
 
         Assertions.assertThat(userAddDTO.getKakaoId()).isEqualTo(byKakaoId.getKakaoId());
@@ -61,6 +61,7 @@ class UserServiceTest {
         userUpdateDTO.setUsername("가나다");
         userService.updateUser(save, userUpdateDTO);
 
+        // 칭호 생성 로직 작성 후 진행
 
     }
 

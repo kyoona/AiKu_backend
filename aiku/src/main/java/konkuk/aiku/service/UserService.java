@@ -4,7 +4,12 @@ import konkuk.aiku.controller.dto.SettingAlarmDto;
 import konkuk.aiku.controller.dto.SettingAuthorityDto;
 import konkuk.aiku.controller.dto.UserUpdateDto;
 import konkuk.aiku.domain.Setting;
+import konkuk.aiku.domain.UserTitle;
 import konkuk.aiku.domain.Users;
+import konkuk.aiku.exception.ErrorCode;
+import konkuk.aiku.exception.NoSuchEntityException;
+import konkuk.aiku.repository.TitleRepository;
+import konkuk.aiku.repository.UserTitleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UsersRepository usersRepository;
+    private final UserTitleRepository userTitleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Users save(Users users) {
+    public Long save(Users users) {
         users.setPassword(passwordEncoder.encode(users.getKakaoId().toString()));
-        return usersRepository.save(users);
+        return usersRepository.save(users).getId();
     }
 
     @Transactional
@@ -43,24 +49,33 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Users users, UserUpdateDto userUpdateDTO) {
-        users.updateUser(userUpdateDTO);
+    public Long updateUser(Users users, UserUpdateDto userUpdateDTO) {
+        users.setUsername(userUpdateDTO.getUsername());
+        UserTitle userTitle = userTitleRepository.findByUserTitleId(userUpdateDTO.getUserTitleId())
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_TITLE));
+        users.setMainTitle(userTitle);
+
+        return users.getId();
     }
 
     @Transactional
-    public void deleteUsers(Users users) {
+    public Long deleteUsers(Users users) {
+        Long userId = users.getId();
         usersRepository.delete(users);
+        return userId;
     }
 
     @Transactional
-    public void setAlarm(Users users, SettingAlarmDto settingAlarmDTO) {
+    public Long setAlarm(Users users, SettingAlarmDto settingAlarmDTO) {
         Setting setting = settingAlarmDTO.toSetting(users.getSetting());
         users.updateSetting(setting);
+        return users.getId();
     }
 
-    public void setAuthority(Users users, SettingAuthorityDto settingAuthorityDTO) {
+    public Long setAuthority(Users users, SettingAuthorityDto settingAuthorityDTO) {
         Setting setting = settingAuthorityDTO.toSetting(users.getSetting());
         users.updateSetting(setting);
+        return users.getId();
     }
 
     public Setting getAlarm(Users users) {
