@@ -15,7 +15,6 @@ public class Groups extends TimeEntity{
     private Long id;
 
     private String groupName;
-    private String groupImg;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<Schedule> schedules = new ArrayList<>();
@@ -23,9 +22,8 @@ public class Groups extends TimeEntity{
     private String description;
 
     @Builder
-    public Groups(String groupName, String groupImg, String description) {
+    public Groups(String groupName, String description) {
         this.groupName = groupName;
-        this.groupImg = groupImg;
         this.description = description;
     }
 
@@ -41,7 +39,4 @@ public class Groups extends TimeEntity{
         this.description = description;
     }
 
-    public void setGroupImg(String groupImg) {
-        this.groupImg = groupImg;
-    }
 }

@@ -31,7 +31,6 @@ public class GroupService {
     public Long addGroup(Users user, GroupServiceDto groupServiceDTO){
         Groups group = Groups.builder()
                 .groupName(groupServiceDTO.getGroupName())
-                .groupImg(groupServiceDTO.getGroupImg())
                 .description(groupServiceDTO.getDescription())
                 .build();
 
@@ -49,15 +48,8 @@ public class GroupService {
     @Transactional
     public Long modifyGroup(Users user, Long groupId, GroupServiceDto groupServiceDTO) {
         Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
-        if(StringUtils.hasText(groupServiceDTO.getGroupName())){
-            group.setGroupName(groupServiceDTO.getGroupName());
-        }
-        if(StringUtils.hasText(groupServiceDTO.getDescription())){
-            group.setDescription(groupServiceDTO.getDescription());
-        }
-        if(StringUtils.hasText(groupServiceDTO.getGroupImg())){
-            group.setGroupImg(groupServiceDTO.getGroupImg());
-        }
+        group.setGroupName(groupServiceDTO.getGroupName());
+        group.setDescription(groupServiceDTO.getDescription());
         return group.getId();
     }
 

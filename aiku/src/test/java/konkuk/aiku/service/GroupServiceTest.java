@@ -47,7 +47,6 @@ class GroupServiceTest {
         //when
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -55,7 +54,6 @@ class GroupServiceTest {
         //then
         Groups findGroup = groupService.findGroupById(groupId);
         assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
-        assertThat(findGroup.getGroupImg()).isEqualTo(groupServiceDTO.getGroupImg());
         assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO.getDescription());
     }
 
@@ -71,7 +69,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -81,7 +78,6 @@ class GroupServiceTest {
         //when
         GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
                 .groupName("group modify")
-                .groupImg("url2")
                 .description("group1을 수정하였습니다.")
                 .build();
         groupService.modifyGroup(user, groupId, modifyGroupServiceDto);
@@ -89,7 +85,6 @@ class GroupServiceTest {
         //then
         Groups findGroup = groupService.findGroupById(groupId);
         assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDto.getGroupName());
-        assertThat(findGroup.getGroupImg()).isEqualTo(modifyGroupServiceDto.getGroupImg());
         assertThat(findGroup.getDescription()).isEqualTo(modifyGroupServiceDto.getDescription());
     }
 
@@ -109,7 +104,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -119,7 +113,6 @@ class GroupServiceTest {
         //when
         GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
                 .groupName("group modify")
-                .groupImg("url2")
                 .description("group1을 수정하였습니다.")
                 .build();
         assertThatThrownBy(()-> groupService.modifyGroup(user2, groupId, modifyGroupServiceDto))
@@ -137,7 +130,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -164,7 +156,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -197,7 +188,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -225,7 +215,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -258,7 +247,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);
@@ -284,7 +272,6 @@ class GroupServiceTest {
 
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName("group1")
-                .groupImg("url1")
                 .description("group1입니다.")
                 .build();
         Long groupId = groupService.addGroup(user, groupServiceDTO);

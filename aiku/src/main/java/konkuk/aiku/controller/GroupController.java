@@ -35,7 +35,6 @@ public class GroupController {
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName(groupDTO.getGroupName())
                 .description(groupDTO.getDescription())
-                .groupImg(null)
                 .build();
         Long addId = groupService.addGroup(user, groupServiceDTO);
         return SuccessResponseDto.getResponseEntity(addId, ADD_SUCCESS, HttpStatus.OK);
@@ -50,7 +49,6 @@ public class GroupController {
         GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
                 .groupName(groupDTO.getGroupName())
                 .description(groupDTO.getDescription())
-                .groupImg(null)
                 .build();
         Long modifyId = groupService.modifyGroup(user, groupId, groupServiceDTO);
         return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
