@@ -86,7 +86,7 @@ public class GroupService {
     }
 
     private UserGroup checkUserInGroup(Users user, Groups groups){
-        UserGroup userGroup = groupsRepository.findByUserIdAndGroupId(user.getId(), groups.getId()).orElse(null);
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
         if(userGroup == null){
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
