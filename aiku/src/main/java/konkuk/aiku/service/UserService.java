@@ -21,9 +21,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Users save(Users users) {
+    public Long save(Users users) {
         users.setPassword(passwordEncoder.encode(users.getKakaoId().toString()));
-        return usersRepository.save(users);
+        return usersRepository.save(users).getId();
     }
 
     @Transactional
@@ -43,24 +43,29 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Users users, UserUpdateDto userUpdateDTO) {
+    public Long updateUser(Users users, UserUpdateDto userUpdateDTO) {
         users.updateUser(userUpdateDTO);
+        return users.getId();
     }
 
     @Transactional
-    public void deleteUsers(Users users) {
+    public Long deleteUsers(Users users) {
+        Long userId = users.getId();
         usersRepository.delete(users);
+        return userId;
     }
 
     @Transactional
-    public void setAlarm(Users users, SettingAlarmDto settingAlarmDTO) {
+    public Long setAlarm(Users users, SettingAlarmDto settingAlarmDTO) {
         Setting setting = settingAlarmDTO.toSetting(users.getSetting());
         users.updateSetting(setting);
+        return users.getId();
     }
 
-    public void setAuthority(Users users, SettingAuthorityDto settingAuthorityDTO) {
+    public Long setAuthority(Users users, SettingAuthorityDto settingAuthorityDTO) {
         Setting setting = settingAuthorityDTO.toSetting(users.getSetting());
         users.updateSetting(setting);
+        return users.getId();
     }
 
     public Setting getAlarm(Users users) {
