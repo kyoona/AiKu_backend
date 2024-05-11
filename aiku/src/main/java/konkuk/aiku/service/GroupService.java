@@ -8,6 +8,7 @@ import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,18 +19,13 @@ import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 @Slf4j
 public class GroupService {
 
     private final GroupsRepository groupsRepository;
     private final UsersRepository usersRepository;
     private final UserGroupRepository userGroupRepository;
-
-    public GroupService(GroupsRepository groupsRepository, UsersRepository usersRepository, UserGroupRepository userGroupRepository) {
-        this.groupsRepository = groupsRepository;
-        this.usersRepository = usersRepository;
-        this.userGroupRepository = userGroupRepository;
-    }
 
     @Transactional
     public Long addGroup(Users user, GroupServiceDto groupServiceDTO){
