@@ -1,12 +1,11 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Title extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,6 +14,18 @@ public class Title extends TimeEntity{
     private Long id;
 
     private String titleName;
-    private String Description;
+    private String description;
     private String titleImg;
+
+    @Builder
+    public Title(String titleName, String description, String titleImg) {
+        this.titleName = titleName;
+        this.description = description;
+        this.titleImg = titleImg;
+    }
+
+    public void updateTitle(String titleName, String description) {
+        this.titleName = titleName;
+        this.description = description;
+    }
 }
