@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PatchMapping
-    public void getUsers(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody UserUpdateDto userUpdateDTO) {
+    public void updateUsers(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody UserUpdateDto userUpdateDTO) {
         Users users = userAdaptor.getUsers();
         userService.updateUser(users, userUpdateDTO);
     }

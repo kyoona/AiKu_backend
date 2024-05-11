@@ -61,6 +61,7 @@ class UserServiceTest {
         userUpdateDTO.setUsername("가나다");
         userService.updateUser(save, userUpdateDTO);
 
+        // 칭호 생성 로직 작성 후 진행
 
     }
 
