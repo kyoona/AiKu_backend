@@ -4,7 +4,12 @@ import konkuk.aiku.controller.dto.SettingAlarmDto;
 import konkuk.aiku.controller.dto.SettingAuthorityDto;
 import konkuk.aiku.controller.dto.UserUpdateDto;
 import konkuk.aiku.domain.Setting;
+import konkuk.aiku.domain.UserTitle;
 import konkuk.aiku.domain.Users;
+import konkuk.aiku.exception.ErrorCode;
+import konkuk.aiku.exception.NoSuchEntityException;
+import konkuk.aiku.repository.TitleRepository;
+import konkuk.aiku.repository.UserTitleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UsersRepository usersRepository;
+    private final UserTitleRepository userTitleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -44,7 +50,11 @@ public class UserService {
 
     @Transactional
     public Long updateUser(Users users, UserUpdateDto userUpdateDTO) {
-        users.updateUser(userUpdateDTO);
+        users.setUsername(userUpdateDTO.getUsername());
+        UserTitle userTitle = userTitleRepository.findByUserTitleId(userUpdateDTO.getUserTitleId())
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_TITLE));
+        users.setMainTitle(userTitle);
+
         return users.getId();
     }
 

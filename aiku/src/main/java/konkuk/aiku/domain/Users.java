@@ -21,7 +21,10 @@ public class Users extends TimeEntity {
     @Column(name = "userId")
     @Setter(value = AccessLevel.NONE)
     private Long id;
+
+    @Setter
     private String username;
+
     private String phoneNumber;
     private String userImg;
 
@@ -35,6 +38,11 @@ public class Users extends TimeEntity {
 
     @OneToMany(mappedBy = "user")
     private List<UserTitle> userTitles;
+
+    @OneToOne
+    @Setter
+    private UserTitle mainTitle; // 기본으로 설정한 타이틀
+
     private int point;
 
     @Enumerated(value = EnumType.STRING)
@@ -51,23 +59,6 @@ public class Users extends TimeEntity {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
-    }
-
-    public void updateUser(UserUpdateDto userUpdateDTO) {
-        username = userUpdateDTO.getUsername();
-        Long userTitleId = userUpdateDTO.getUserTitleId();
-
-        for (UserTitle userTitle : userTitles) {
-            // 원래 사용 중이던 타이틀 사용 제거
-            if (userTitle.isUsed()) {
-                userTitle.setUsed(false);
-            }
-
-            // 새로운 타이틀 사용
-            if (userTitle.getId() == userTitleId) {
-                userTitle.setUsed(true);
-            }
-        }
     }
 
     public void updateSetting(Setting setting) {
