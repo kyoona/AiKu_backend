@@ -15,33 +15,39 @@ public class Groups extends TimeEntity{
     private Long id;
 
     private String groupName;
-    private String groupImg;
+
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<UserGroup> userGroups = new ArrayList<>();
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<Schedule> schedules = new ArrayList<>();
 
     private String description;
 
-    @Builder
-    public Groups(String groupName, String groupImg, String description) {
+    private Groups(String groupName, String description) {
         this.groupName = groupName;
-        this.groupImg = groupImg;
         this.description = description;
+    }
+
+    //==생성 메서드==
+    public static Groups createGroups(Users user, String groupName, String description){
+        Groups group = new Groups(groupName, description);
+        group.addUser(user);
+        return group;
+    }
+
+    //==편의 메서드==
+    public void modifyGroup(String groupName, String description){
+        this.groupName = groupName;
+        this.description = description;
+    }
+
+    public void addUser(Users user){
+        UserGroup userGroup = new UserGroup(user, this);
+        this.userGroups.add(userGroup);
     }
 
     public void addSchedule(Schedule schedule){
         schedules.add(schedule);
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setGroupImg(String groupImg) {
-        this.groupImg = groupImg;
     }
 }

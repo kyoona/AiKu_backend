@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 public class GroupServiceDto {
     private Long id;
     private String groupName;
-    private String groupImg;
     private String description;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

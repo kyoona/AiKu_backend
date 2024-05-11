@@ -23,7 +23,6 @@ public class GroupDetailServiceDto {
         GroupDetailServiceDto groupDetailServiceDTO = GroupDetailServiceDto.builder()
                 .groupId(group.getId())
                 .groupName(group.getGroupName())
-                .groupImg(group.getGroupImg())
                 .description(group.getDescription())
                 .users(userSimpleServiceDtos)
                 .createdAt(group.getCreatedAt())

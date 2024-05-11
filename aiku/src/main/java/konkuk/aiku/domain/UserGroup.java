@@ -20,8 +20,7 @@ public class UserGroup extends TimeEntity{
     @JoinColumn(name = "groupId")
     private Groups group;
 
-    @Builder
-    public UserGroup(Users user, Groups group) {
+    protected UserGroup(Users user, Groups group) {
         this.user = user;
         this.group = group;
     }

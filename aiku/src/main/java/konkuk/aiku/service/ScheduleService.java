@@ -5,8 +5,8 @@ import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
+import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
-import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
 
@@ -26,11 +25,12 @@ import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
-    private final UserGroupRepository userGroupRepository;
+    private final GroupsRepository groupsRepository;
 
     @Transactional
     public Long addSchedule(Users user, Long groupId, ScheduleServiceDto scheduleServiceDTO){
-        Groups group = checkUserInGroup(user.getId(), groupId).getGroup();
+        Groups group = findGroupById(groupId);
+        checkUserInGroup(user, group);
 
         Schedule schedule = Schedule.builder()
                 .scheduleName(scheduleServiceDTO.getScheduleName())
@@ -77,8 +77,10 @@ public class ScheduleService {
     }
 
     public ScheduleDetailServiceDto findScheduleDetailById(Users user, Long groupId, Long scheduleId){
-        Long userId = user.getId();
-        checkUserInGroup(userId, groupId);
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
         return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
@@ -86,10 +88,11 @@ public class ScheduleService {
 
     @Transactional
     public Long enterSchedule(Users user, Long groupId, Long scheduleId){
-        Long userId = user.getId();
-        checkUserInGroup(userId, groupId);
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
         Schedule schedule = findScheduleById(scheduleId);
-        checkUserAlreadyInSchedule(userId, scheduleId);
+        checkUserAlreadyInSchedule(user.getId(), scheduleId);
 
         schedule.addUser(user, new UserSchedule());
         return schedule.getId();
@@ -104,21 +107,30 @@ public class ScheduleService {
         return schedule.getId();
     }
 
+    private Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
+    }
+
     public ScheduleResultServiceDto findScheduleResult(Users user, Long groupId, Long scheduleId){
-        Long userId = user.getId();
-        checkUserInGroup(userId, groupId);
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
 
         Schedule schedule = findScheduleById(scheduleId);
         List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
         return ScheduleResultServiceDto.toDto(schedule, userArrivalDatas);
     }
 
-    private UserGroup checkUserInGroup(Long userId, Long groupId){
-        Optional<UserGroup> userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
-        if(userGroup.isEmpty()){
+    private UserGroup checkUserInGroup(Users user, Groups groups){
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
+        if(userGroup == null){
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
-        return userGroup.get();
+        return userGroup;
     }
 
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
