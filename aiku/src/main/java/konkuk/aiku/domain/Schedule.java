@@ -86,7 +86,6 @@ public class Schedule extends TimeEntity{
 
     public void addUserArrivalData(Users user, LocalDateTime arriavalTime){
         UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arriavalTime);
-        log.info("도착 {}", userArrivalData.getTimeDifference());
         userArrivalDatas.add(userArrivalData);
     }
 }

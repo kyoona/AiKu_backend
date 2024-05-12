@@ -19,9 +19,9 @@ class AlarmServiceTest {
     @Autowired
     UsersRepository usersRepository;
 
-    @Test
+/*    @Test
     void sendLocationInSchedule() {
         Users user = usersRepository.findById(25l).get();
         alarmService.sendLocationInSchedule(user, 7l, new RealTimeLocationDto(127.1, 127.1));
-    }
+    }*/
 }

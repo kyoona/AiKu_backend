@@ -11,18 +11,19 @@ import konkuk.aiku.firebase.FcmToken;
 import konkuk.aiku.firebase.FcmTokenProvider;
 import konkuk.aiku.firebase.MessageSender;
 import konkuk.aiku.repository.ScheduleRepository;
-import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class AlarmService {
-    private final UsersRepository usersRepository;
     private final ScheduleRepository scheduleRepository;
     private final FcmTokenProvider fcmTokenProvider;
     private final MessageSender messageSender;
@@ -52,7 +53,7 @@ public class AlarmService {
     public void sendLocationInSchedule(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
         Schedule schedule = findBySchedule(scheduleId);
 
-/*        checkIsScheduleRun(schedule);
+        checkIsScheduleRun(schedule);
         checkUserInSchedule(user.getId(), scheduleId);
 
         List<String> receiverToken = new ArrayList<>();
@@ -63,8 +64,9 @@ public class AlarmService {
             }
         }
 
-        messageSender.sendRealTimeLocation(user, locationDto.getLatitude(), locationDto.getLongitude(), receiverToken);*/
+        messageSender.sendRealTimeLocation(user, locationDto.getLatitude(), locationDto.getLongitude(), receiverToken);
 
+        //유저가 도착했을 시 이벤트 발행
         checkUserArrival(user, schedule, locationDto);
     }
 
