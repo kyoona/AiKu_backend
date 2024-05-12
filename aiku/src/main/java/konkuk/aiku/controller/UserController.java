@@ -87,11 +87,19 @@ public class UserController {
     }
 
     @GetMapping("/items")
-    public ResponseEntity<List<ItemResponseDto>> getUserItems(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestParam String itemCategory) {
+    public ResponseEntity<List<ItemResponseDto>> getUserItems(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestParam String itemType) {
         Users users = userAdaptor.getUsers();
-        List<ItemResponseDto> itemList = userService.getUserItems(users, itemCategory);
+        List<ItemResponseDto> itemList = userService.getUserItems(users, itemType);
 
         return new ResponseEntity<>(itemList, HttpStatus.OK);
+    }
+
+    @GetMapping("/titles")
+    public ResponseEntity<List<TitleResponseDto>> getUserTitles(@AuthenticationPrincipal UserAdaptor userAdaptor) {
+        Users users = userAdaptor.getUsers();
+        List<TitleResponseDto> titleList = userService.getUserTitle(users.getId());
+
+        return new ResponseEntity<>(titleList, HttpStatus.OK);
     }
 
     @PostMapping("/logout")

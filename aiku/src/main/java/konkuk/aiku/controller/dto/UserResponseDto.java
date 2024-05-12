@@ -19,12 +19,7 @@ public class UserResponseDto {
     private TitleResponseDto title;
 
     public static UserResponseDto toDto(Users users) {
-        List<UserTitle> userTitles = users.getUserTitles();
-
-        UserTitle userTitle = userTitles.stream().filter(title -> title.isUsed()).findAny()
-                .orElseThrow(() -> new RuntimeException("타이틀이 존재하지 않습니다."));
-
-        TitleResponseDto titleDto = TitleResponseDto.toDto(userTitle);
+        TitleResponseDto titleDto = TitleResponseDto.toDto(users.getMainTitle());
 
         return UserResponseDto.builder()
                 .userId(users.getId())

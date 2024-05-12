@@ -1,9 +1,6 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.controller.dto.ItemResponseDto;
-import konkuk.aiku.controller.dto.SettingAlarmDto;
-import konkuk.aiku.controller.dto.SettingAuthorityDto;
-import konkuk.aiku.controller.dto.UserUpdateDto;
+import konkuk.aiku.controller.dto.*;
 import konkuk.aiku.domain.ItemCategory;
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.UserTitle;
@@ -107,6 +104,12 @@ public class UserService {
         return userItems.stream()
                 .map(UserItem::getItem)
                 .map(ItemResponseDto::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TitleResponseDto> getUserTitle(Long userId) {
+        return userTitleRepository.findByUserId(userId).stream()
+                .map(TitleResponseDto::toDto)
                 .collect(Collectors.toList());
     }
 }
