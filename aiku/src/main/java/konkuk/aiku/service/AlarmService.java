@@ -63,7 +63,7 @@ public class AlarmService {
             }
         }
 
-        messageSender.sendRealTimeLocation(user.getId(), locationDto.getLatitude(), locationDto.getLongitude(), receiverToken);
+        messageSender.sendRealTimeLocation(user, locationDto.getLatitude(), locationDto.getLongitude(), receiverToken);
     }
 
     private Schedule findBySchedule(Long scheduleId){
