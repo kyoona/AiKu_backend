@@ -2,6 +2,7 @@ package konkuk.aiku.service;
 
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.domain.*;
+import konkuk.aiku.event.ScheduleEventPublisher;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.exception.TokenException;
@@ -16,9 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -28,6 +26,8 @@ public class AlarmService {
     private final ScheduleRepository scheduleRepository;
     private final FcmTokenProvider fcmTokenProvider;
     private final MessageSender messageSender;
+
+    private final ScheduleEventPublisher scheduleEventPublisher;
 
     @Transactional
     public void saveToken(Users user, FcmToken fcmToken){
@@ -52,7 +52,7 @@ public class AlarmService {
     public void sendLocationInSchedule(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
         Schedule schedule = findBySchedule(scheduleId);
 
-        checkIsScheduleRun(schedule);
+/*        checkIsScheduleRun(schedule);
         checkUserInSchedule(user.getId(), scheduleId);
 
         List<String> receiverToken = new ArrayList<>();
@@ -63,7 +63,16 @@ public class AlarmService {
             }
         }
 
-        messageSender.sendRealTimeLocation(user, locationDto.getLatitude(), locationDto.getLongitude(), receiverToken);
+        messageSender.sendRealTimeLocation(user, locationDto.getLatitude(), locationDto.getLongitude(), receiverToken);*/
+
+        checkUserArrival(user, schedule, locationDto);
+    }
+
+    private void checkUserArrival(Users user, Schedule schedule, RealTimeLocationDto locationDto){
+        Double distance = locationDto.distance(schedule.getLocation().getLatitude(), schedule.getLocation().getLongitude());
+        if(distance < 0.001){
+            scheduleEventPublisher.userArriveInSchedule(user, schedule);
+        }
     }
 
     private Schedule findBySchedule(Long scheduleId){
@@ -75,7 +84,7 @@ public class AlarmService {
     }
 
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
-        UserSchedule userSchedule = scheduleRepository.findByUserIdAndScheduleId(userId, scheduleId).orElse(null);
+        UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId).orElse(null);
         if (userSchedule == null) {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }

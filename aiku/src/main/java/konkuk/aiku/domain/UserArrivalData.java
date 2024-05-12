@@ -3,11 +3,14 @@ package konkuk.aiku.domain;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter @Setter
 public class UserArrivalData extends TimeEntity{
 
@@ -41,4 +44,22 @@ public class UserArrivalData extends TimeEntity{
             @AttributeOverride(name = "locationName", column = @Column(name = "endLocationName"))
     })
     private Location endLocation;
+
+    private UserArrivalData(Users user, Schedule schedule, LocalDateTime arrivalTime) {
+        this.user = user;
+        this.schedule = schedule;
+        this.arrivalTime = arrivalTime;
+    }
+
+    //==생성 메서드==
+    public static UserArrivalData createUserArrivalData(Users user, Schedule schedule, LocalDateTime arrivalTime){
+        UserArrivalData userArrivalData = new UserArrivalData(user, schedule, arrivalTime);
+        userArrivalData.setTimeDifference(schedule.getScheduleTime());
+        return userArrivalData;
+    }
+
+    //==편의 메서드==
+    private void setTimeDifference(LocalDateTime scheduleTime){
+        timeDifference = (int) Duration.between(scheduleTime, arrivalTime).toMinutes();
+    }
 }

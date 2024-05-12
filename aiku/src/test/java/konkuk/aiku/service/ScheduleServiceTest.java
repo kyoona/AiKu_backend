@@ -233,7 +233,7 @@ class ScheduleServiceTest {
         scheduleService.enterSchedule(userA2, groupA.getId(), scheduleId);
 
         //then
-        assertThat(scheduleRepository.findByUserIdAndScheduleId(userA2.getId(), scheduleId)).isNotEmpty();
+        assertThat(scheduleRepository.findUserScheduleByUserIdAndScheduleId(userA2.getId(), scheduleId)).isNotEmpty();
     }
 
     @Test
@@ -280,7 +280,7 @@ class ScheduleServiceTest {
         scheduleService.exitSchedule(userA1, groupA.getId(), scheduleId);
 
         //then
-        assertThat(scheduleRepository.findByUserIdAndScheduleId(userA1.getId(), scheduleId)).isEmpty();
+        assertThat(scheduleRepository.findUserScheduleByUserIdAndScheduleId(userA1.getId(), scheduleId)).isEmpty();
     }
 
     @Test

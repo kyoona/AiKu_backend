@@ -2,6 +2,7 @@ package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Slf4j
 public class Schedule extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +30,7 @@ public class Schedule extends TimeEntity{
     @Enumerated
     private ScheduleStatus status;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<UserSchedule> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule")
@@ -37,7 +39,7 @@ public class Schedule extends TimeEntity{
     @OneToMany(mappedBy = "schedule")
     private List<Betting> racings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<UserArrivalData> userArrivalDatas = new ArrayList<>();
 
     @Builder
@@ -46,18 +48,6 @@ public class Schedule extends TimeEntity{
         this.location = location;
         this.scheduleTime = scheduleTime;
         this.status = status;
-    }
-
-    public void addUser(Users user, UserSchedule userSchedule) {
-        userSchedule.setSchedule(this);
-        userSchedule.setUser(user);
-        this.users.add(userSchedule);
-    }
-
-    public void deleteUser(Users user, UserSchedule userSchedule){
-        users.remove(userSchedule);
-        userSchedule.setSchedule(null);
-        userSchedule.setUser(null);
     }
 
     public void setGroup(Groups group){
@@ -79,5 +69,24 @@ public class Schedule extends TimeEntity{
 
     public void setStatus(ScheduleStatus status) {
         this.status = status;
+    }
+
+    //==편의 메서드==
+    public void addUser(Users user, UserSchedule userSchedule) {
+        userSchedule.setSchedule(this);
+        userSchedule.setUser(user);
+        this.users.add(userSchedule);
+    }
+
+    public void deleteUser(Users user, UserSchedule userSchedule){
+        users.remove(userSchedule);
+        userSchedule.setSchedule(null);
+        userSchedule.setUser(null);
+    }
+
+    public void addUserArrivalData(Users user, LocalDateTime arriavalTime){
+        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arriavalTime);
+        log.info("도착 {}", userArrivalData.getTimeDifference());
+        userArrivalDatas.add(userArrivalData);
     }
 }
