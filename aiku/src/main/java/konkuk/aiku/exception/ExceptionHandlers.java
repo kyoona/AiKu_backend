@@ -12,6 +12,7 @@ public class ExceptionHandlers  {
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ErrorDTO> handleExampleException(Exception ex){
+        ex.printStackTrace();
         return new ResponseEntity<>(new ErrorDTO(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

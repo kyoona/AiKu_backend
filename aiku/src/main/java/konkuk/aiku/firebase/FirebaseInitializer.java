@@ -21,7 +21,7 @@ public class FirebaseInitializer {
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            FirebaseApp app = FirebaseApp.initializeApp(options, "aiku");
+            FirebaseApp app = FirebaseApp.initializeApp(options);
             log.info("FirebaseInitializer app={}", app.getName());
         } catch (IOException e) {
             throw new RuntimeException("FirebaseInitializer 오류", e);

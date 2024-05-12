@@ -17,6 +17,8 @@ public enum ErrorCode {
 
     //403 Forbidden
     NO_ATHORITY_TO_ACCESS(403, "데이터에 접근 권한이 없습니다."),
+    SCHEDULE_TO_WAIT(403, "아직 열리지 않은 스케줄입니다."),
+    SCHEDULE_TO_TERM(403, "종료된 스케줄입니다."),
 
     //404 NOT FOUND
     NO_SUCH_ENTITY(404, "존재하지 않는 데이터입니다."),
@@ -27,7 +29,8 @@ public enum ErrorCode {
     NO_SUCH_TITLE(404, "존재하지 않는 칭호입니다."),
 
     //5XX Server error response
-    INTERNAL_SERVER_ERROR(500, "서버 내부 오류");
+    INTERNAL_SERVER_ERROR(500, "서버 내부 오류"),
+    FAIL_TO_SEND_LOCATION(500, "Firebase Messeging 실패, 실시간 위치 정보");
 
     private int code;
     private String message;

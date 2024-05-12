@@ -56,6 +56,7 @@ class ScheduleServiceTest {
                 .phoneNumber("010-1111-1111")
                 .userImg("http://userA1.img")
                 .point(1000)
+                .fcmToken("fcm")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(userA1);
@@ -65,6 +66,7 @@ class ScheduleServiceTest {
                 .phoneNumber("010-1111-2222")
                 .userImg("http://userA2.img")
                 .point(2000)
+                .fcmToken("fcm")
                 .setting(new Setting(true, true, true, true, true))
                 .build();
         usersRepository.save(userA2);
@@ -74,6 +76,7 @@ class ScheduleServiceTest {
                 .phoneNumber("010-3333-3333")
                 .userImg("http://userB.img")
                 .point(3000)
+                .fcmToken("fcm")
                 .setting(new Setting(false, false, false, false, false))
                 .build();
         usersRepository.save(userB);
