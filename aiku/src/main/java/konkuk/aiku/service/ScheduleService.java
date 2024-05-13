@@ -112,20 +112,13 @@ public class ScheduleService {
     @Transactional
     public boolean arriveUser(Users user, Long scheduleId, LocalDateTime arriveTime){
         if(checkUserAlreadyArrive(user, scheduleId)) return false;
+
         Schedule schedule = findScheduleById(scheduleId);
-        log.info("스케줄 {}", schedule.getId());
         schedule.addUserArrivalData(user, arriveTime);
         return true;
     }
 
-    //==편의 메서드==
-    private Groups findGroupById(Long groupId){
-        Groups group = groupsRepository.findById(groupId).orElse(null);
-        if (group == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
-        }
-        return group;
-    }
+    //==검증 메서드==
 
     private UserGroup checkUserInGroup(Users user, Groups groups){
         UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
@@ -159,6 +152,15 @@ public class ScheduleService {
             return false;
         }
         return true;
+    }
+
+    //==레파지토리 조회 메서드==
+    private Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 
     private Schedule findScheduleById(Long scheduleId){
