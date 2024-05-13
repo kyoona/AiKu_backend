@@ -13,6 +13,7 @@ import konkuk.aiku.firebase.FcmToken;
 import konkuk.aiku.firebase.FcmTokenProvider;
 import konkuk.aiku.firebase.MessageSender;
 import konkuk.aiku.firebase.dto.RealTimeLocationMessage;
+import konkuk.aiku.firebase.dto.SendingEmojiMessage;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +79,7 @@ public class AlarmService {
         checkUserArrival(user, schedule, locationDto);
     }
 
-    public void sendEmojiToUser(Users user, Long scheduleId, @Valid EmojiMessageDto emojiMessageDto){
+    public void sendEmojiToUser(Users user, Long scheduleId, EmojiMessageDto emojiMessageDto){
         Schedule schedule = findScheduleById(scheduleId);
         Users receiver = findUserById(emojiMessageDto.getReceiverId());
 
@@ -86,7 +87,10 @@ public class AlarmService {
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
-        
+        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, receiver, emojiMessageDto.getEmojiId())
+                .toStringMap();
+
+        messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
     }
 
     //==유저 검증 메서드==

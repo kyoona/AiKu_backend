@@ -32,7 +32,7 @@ public enum ErrorCode {
     //5XX Server error response
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류"),
     FAIL_TO_CONVERT_MESSAGE(500, "Message를 Firebase Data로 변환 실패했습니다."),
-    FAIL_TO_SEND_LOCATION(500, "Firebase Messeging 실패, 실시간 위치 정보");
+    FAIL_TO_SEND_MESSAGE(500, "Firebase 메세지 전송 실패");
 
     private int code;
     private String message;
