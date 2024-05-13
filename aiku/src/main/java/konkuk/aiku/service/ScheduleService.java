@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
 

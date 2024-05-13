@@ -3,14 +3,13 @@ package konkuk.aiku.firebase.dto;
 import konkuk.aiku.domain.Users;
 import lombok.Getter;
 
-@Getter
 public class RealTimeLocationMessage extends Message{
-    private String title;
-    private Long userId;
-    private String userName;
-    private String userImg;
-    private Double latitude;
-    private Double longitude;
+    protected String title;
+    protected Long userId;
+    protected String userName;
+    protected String userImg;
+    protected Double latitude;
+    protected Double longitude;
 
     protected RealTimeLocationMessage(Long userId, String userName, String userImg, Double latitude, Double longitude) {
         this.title = MessageTitle.USER_REAL_TIME_LOCATION.getTitle();

@@ -5,18 +5,18 @@ import lombok.AccessLevel;
 import lombok.Builder;
 
 public class SendingEmojiMessage extends Message{
-    private String title;
+    protected String title;
 
-    private Long senderId;
-    private String senderName;
-    private String senderImg;
+    protected Long senderId;
+    protected String senderName;
+    protected String senderImg;
 
-    private Long receiverId;
-    private String receiverName;
-    private String receiverImg;
+    protected Long receiverId;
+    protected String receiverName;
+    protected String receiverImg;
 
-    private Long emojiId;
-    private Long emojiImg;
+    protected Long emojiId;
+    protected Long emojiImg;
 
     @Builder(access = AccessLevel.PROTECTED)
     protected SendingEmojiMessage(Long senderId, String senderName, String senderImg, Long receiverId, String receiverName, String receiverImg, Long emojiId, Long emojiImg) {

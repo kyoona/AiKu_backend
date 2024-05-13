@@ -8,16 +8,16 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 public class UserArrivalMessage extends Message{
-    private String title;
+    protected String title;
 
-    private Long userId;
-    private String userName;
-    private String userImg;
+    protected Long userId;
+    protected String userName;
+    protected String userImg;
 
-    private Long scheduleId;
-    private String scheduleName;
+    protected Long scheduleId;
+    protected String scheduleName;
 
-    private LocalDateTime arrivalTime;
+    protected LocalDateTime arrivalTime;
 
 
     @Builder(access = AccessLevel.PRIVATE)
