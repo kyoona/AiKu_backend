@@ -11,4 +11,7 @@ public class BettingResult {
     @Column(name = "bettingResultId")
     @Setter(value = AccessLevel.NONE)
     private Long id;
+
+    @Enumerated(value = EnumType.STRING)
+    private ResultType resultType; // WIN, LOSE
 }

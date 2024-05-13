@@ -20,6 +20,7 @@ public enum ErrorCode {
 
     //404 NOT FOUND
     NO_SUCH_ENTITY(404, "존재하지 않는 데이터입니다."),
+    NO_SUCH_USERS(404, "존재하지 않는 사용자입니다."),
     NO_SUCH_SCHEDULE(404, "존재하지 않는 스케줄입니다."),
     NO_SUCH_GROUP(404, "존재하지 않는 그룹입니다."),
     NO_SUCH_ORDER(404, "존재하지 않는 주문입니다."),

@@ -1,12 +1,11 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Betting extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +27,21 @@ public class Betting extends TimeEntity{
 
     private int point;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private BettingResult result;
+    @Enumerated(value = EnumType.STRING)
+    private ResultType resultType; // WIN, LOSE
+
+//    @OneToOne(fetch = FetchType.LAZY)
+//    private BettingResult result;
 
     @Enumerated
     private BettingType bettingType;
+
+    @Builder
+    public Betting(Users bettor, Users targetUser, Schedule schedule, int point, BettingType bettingType) {
+        this.bettor = bettor;
+        this.targetUser = targetUser;
+        this.schedule = schedule;
+        this.point = point;
+        this.bettingType = bettingType;
+    }
 }

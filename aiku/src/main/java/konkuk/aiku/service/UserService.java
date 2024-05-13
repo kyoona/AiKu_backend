@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class UserService {
 
@@ -39,7 +39,7 @@ public class UserService {
 
     @Transactional
     public Users findById(Long id) {
-        return usersRepository.findById(id).orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+        return usersRepository.findById(id).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_ENTITY));
     }
 
     @Transactional
@@ -48,8 +48,8 @@ public class UserService {
     }
 
     @Transactional
-    public Long logout(Long kakaoId) {
-        Users user = findByKakaoId(kakaoId);
+    public Long logout(Long userId) {
+        Users user = findById(userId);
         user.setRefreshToken(null);
         return user.getId();
     }
