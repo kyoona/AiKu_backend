@@ -11,6 +11,7 @@ import konkuk.aiku.service.dto.LocationServiceDto;
 import konkuk.aiku.service.dto.ScheduleDetailServiceDto;
 import konkuk.aiku.service.dto.ScheduleServiceDto;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -85,6 +86,14 @@ class ScheduleServiceTest {
         groupsRepository.save(groupA);
 
         groupService.enterGroup(userA2, groupA.getId());
+    }
+
+    @AfterEach
+    void afterEach(){
+        groupService.exitGroup(userA1, groupA.getId());
+        groupService.exitGroup(userA2, groupA.getId());
+        groupsRepository.deleteAll();
+        usersRepository.deleteAll();
     }
 
     @Test
