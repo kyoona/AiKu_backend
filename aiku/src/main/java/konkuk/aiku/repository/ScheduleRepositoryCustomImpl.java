@@ -3,6 +3,7 @@ package konkuk.aiku.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import konkuk.aiku.domain.UserArrivalData;
 import konkuk.aiku.domain.UserSchedule;
 import konkuk.aiku.domain.Users;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     private final EntityManager entityManager;
 
     @Override
-    public Optional<UserSchedule> findByUserIdAndScheduleId(Long userId, Long scheduleId) {
+    public Optional<UserSchedule> findUserScheduleByUserIdAndScheduleId(Long userId, Long scheduleId) {
         String jpql = "SELECT us FROM UserSchedule us " +
                 "WHERE us.user.id = :userId AND us.schedule.id = :scheduleId";
         TypedQuery<UserSchedule> query = entityManager.createQuery(jpql, UserSchedule.class)
@@ -43,5 +44,15 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
                 .getResultList();
 
         return users;
+    }
+
+    @Override
+    public Optional<UserArrivalData> findUserArrivalDataByUserIdAndScheduleId(Long userId, Long scheduleId) {
+        String jpql = "SELECT uad FROM UserArrivalData uad " +
+                "WHERE uad.user.id = :userId AND uad.schedule.id = :scheduleId";
+        TypedQuery<UserArrivalData> query = entityManager.createQuery(jpql, UserArrivalData.class)
+                .setParameter("userId", userId)
+                .setParameter("scheduleId", scheduleId);
+        return query.getResultList().stream().findFirst();
     }
 }

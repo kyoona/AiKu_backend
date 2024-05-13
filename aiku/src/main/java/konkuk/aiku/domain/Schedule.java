@@ -2,6 +2,7 @@ package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Slf4j
 public class Schedule extends TimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +30,7 @@ public class Schedule extends TimeEntity{
     @Enumerated
     private ScheduleStatus status;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<UserSchedule> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule")
@@ -37,17 +39,26 @@ public class Schedule extends TimeEntity{
     @OneToMany(mappedBy = "schedule")
     private List<Betting> racings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<UserArrivalData> userArrivalDatas = new ArrayList<>();
 
     @Builder
-    public Schedule(String scheduleName, Location location, LocalDateTime scheduleTime, ScheduleStatus status) {
+    public Schedule(Long id, String scheduleName, Location location, LocalDateTime scheduleTime, ScheduleStatus status) {
+        this.id = id;
         this.scheduleName = scheduleName;
         this.location = location;
         this.scheduleTime = scheduleTime;
         this.status = status;
     }
 
+    //==수정 메서드==
+    public void updateSchedule(String scheduleName, Location location, LocalDateTime scheduleTime){
+        this.scheduleName = scheduleName;
+        this.location = location;
+        this.scheduleTime = scheduleTime;
+    }
+
+    //==편의 메서드==
     public void addUser(Users user, UserSchedule userSchedule) {
         userSchedule.setSchedule(this);
         userSchedule.setUser(user);
@@ -60,24 +71,13 @@ public class Schedule extends TimeEntity{
         userSchedule.setUser(null);
     }
 
-    public void setGroup(Groups group){
+    public void addUserArrivalData(Users user, LocalDateTime arriavalTime){
+        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arriavalTime);
+        userArrivalDatas.add(userArrivalData);
+    }
+
+    //==Setter==
+    protected void setGroup(Groups group) {
         this.group = group;
-        group.addSchedule(this);
-    }
-
-    public void setScheduleName(String scheduleName) {
-        this.scheduleName = scheduleName;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public void setScheduleTime(LocalDateTime scheduleTime) {
-        this.scheduleTime = scheduleTime;
-    }
-
-    public void setStatus(ScheduleStatus status) {
-        this.status = status;
     }
 }

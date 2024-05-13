@@ -9,6 +9,7 @@ import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
 import konkuk.aiku.service.dto.GroupDetailServiceDto;
 import konkuk.aiku.service.dto.GroupServiceDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,25 +21,19 @@ import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
 
 @Controller
 @RequestMapping("/groups")
+@RequiredArgsConstructor
 @Slf4j
 public class GroupController {
 
     private final GroupService groupService;
-
-    public GroupController(GroupService groupService) {
-        this.groupService = groupService;
-    }
 
     @PostMapping
     public ResponseEntity<SuccessResponseDto> groupAdd(@RequestBody @Valid GroupDto groupDTO,
                                                        @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName(groupDTO.getGroupName())
-                .description(groupDTO.getDescription())
-                .groupImg(null)
-                .build();
+        GroupServiceDto groupServiceDTO = groupDTO.toServiceDto();
+
         Long addId = groupService.addGroup(user, groupServiceDTO);
         return SuccessResponseDto.getResponseEntity(addId, ADD_SUCCESS, HttpStatus.OK);
     }
@@ -49,11 +44,8 @@ public class GroupController {
                                                           @AuthenticationPrincipal UserAdaptor userAdapter){
         Users user = userAdapter.getUsers();
 
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName(groupDTO.getGroupName())
-                .description(groupDTO.getDescription())
-                .groupImg(null)
-                .build();
+        GroupServiceDto groupServiceDTO = groupDTO.toServiceDto();
+
         Long modifyId = groupService.modifyGroup(user, groupId, groupServiceDTO);
         return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
     }
