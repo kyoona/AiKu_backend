@@ -37,7 +37,7 @@ public class Groups extends TimeEntity{
     }
 
     //==편의 메서드==
-    public void modifyGroup(String groupName, String description){
+    public void updateGroup(String groupName, String description){
         this.groupName = groupName;
         this.description = description;
     }
@@ -48,6 +48,7 @@ public class Groups extends TimeEntity{
     }
 
     public void addSchedule(Schedule schedule){
+        schedule.setGroup(this);
         schedules.add(schedule);
     }
 }

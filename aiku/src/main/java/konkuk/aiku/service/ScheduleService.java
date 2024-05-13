@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +37,8 @@ public class ScheduleService {
                 .location(createLocation(scheduleServiceDTO.getLocation()))
                 .scheduleTime(scheduleServiceDTO.getScheduleTime())
                 .build();
-        schedule.setGroup(group);
+
+        group.addSchedule(schedule);
         schedule.addUser(user, new UserSchedule());
 
         scheduleRepository.save(schedule);
@@ -53,18 +53,8 @@ public class ScheduleService {
 
         Schedule schedule = userSchedule.getSchedule();
 
-        if(StringUtils.hasText(scheduleServiceDTO.getScheduleName())){
-            schedule.setScheduleName(scheduleServiceDTO.getScheduleName());
-        }
-        if(scheduleServiceDTO.getLocation() != null){
-            schedule.setLocation(createLocation(scheduleServiceDTO.getLocation()));
-        }
-        if (scheduleServiceDTO.getScheduleTime() != null) {
-            schedule.setScheduleTime(scheduleServiceDTO.getScheduleTime());
-        }
-        if (scheduleServiceDTO.getStatus() != null) {
-            schedule.setStatus(scheduleServiceDTO.getStatus());
-        }
+        Location location = createLocation(scheduleServiceDTO.getLocation());
+        schedule.updateSchedule(scheduleServiceDTO.getScheduleName(), location, scheduleServiceDTO.getScheduleTime());
 
         return schedule.getId();
     }
@@ -122,20 +112,13 @@ public class ScheduleService {
     @Transactional
     public boolean arriveUser(Users user, Long scheduleId, LocalDateTime arriveTime){
         if(checkUserAlreadyArrive(user, scheduleId)) return false;
+
         Schedule schedule = findScheduleById(scheduleId);
-        log.info("스케줄 {}", schedule.getId());
         schedule.addUserArrivalData(user, arriveTime);
         return true;
     }
 
-    //==편의 메서드==
-    private Groups findGroupById(Long groupId){
-        Groups group = groupsRepository.findById(groupId).orElse(null);
-        if (group == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
-        }
-        return group;
-    }
+    //==검증 메서드==
 
     private UserGroup checkUserInGroup(Users user, Groups groups){
         UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
@@ -169,6 +152,15 @@ public class ScheduleService {
             return false;
         }
         return true;
+    }
+
+    //==레파지토리 조회 메서드==
+    private Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 
     private Schedule findScheduleById(Long scheduleId){
