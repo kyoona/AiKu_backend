@@ -43,32 +43,19 @@ public class Schedule extends TimeEntity{
     private List<UserArrivalData> userArrivalDatas = new ArrayList<>();
 
     @Builder
-    public Schedule(String scheduleName, Location location, LocalDateTime scheduleTime, ScheduleStatus status) {
+    public Schedule(Long id, String scheduleName, Location location, LocalDateTime scheduleTime, ScheduleStatus status) {
+        this.id = id;
         this.scheduleName = scheduleName;
         this.location = location;
         this.scheduleTime = scheduleTime;
         this.status = status;
     }
 
-    public void setGroup(Groups group){
-        this.group = group;
-        group.addSchedule(this);
-    }
-
-    public void setScheduleName(String scheduleName) {
+    //==수정 메서드==
+    public void updateSchedule(String scheduleName, Location location, LocalDateTime scheduleTime){
         this.scheduleName = scheduleName;
-    }
-
-    public void setLocation(Location location) {
         this.location = location;
-    }
-
-    public void setScheduleTime(LocalDateTime scheduleTime) {
         this.scheduleTime = scheduleTime;
-    }
-
-    public void setStatus(ScheduleStatus status) {
-        this.status = status;
     }
 
     //==편의 메서드==
@@ -87,5 +74,10 @@ public class Schedule extends TimeEntity{
     public void addUserArrivalData(Users user, LocalDateTime arriavalTime){
         UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arriavalTime);
         userArrivalDatas.add(userArrivalData);
+    }
+
+    //==Setter==
+    protected void setGroup(Groups group) {
+        this.group = group;
     }
 }

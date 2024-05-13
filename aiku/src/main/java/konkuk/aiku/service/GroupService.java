@@ -35,7 +35,7 @@ public class GroupService {
 
         checkUserInGroup(user, group);
 
-        group.modifyGroup(groupDto.getGroupName(), groupDto.getDescription());
+        group.updateGroup(groupDto.getGroupName(), groupDto.getDescription());
         return group.getId();
     }
 

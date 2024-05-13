@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +37,8 @@ public class ScheduleService {
                 .location(createLocation(scheduleServiceDTO.getLocation()))
                 .scheduleTime(scheduleServiceDTO.getScheduleTime())
                 .build();
-        schedule.setGroup(group);
+
+        group.addSchedule(schedule);
         schedule.addUser(user, new UserSchedule());
 
         scheduleRepository.save(schedule);
@@ -53,18 +53,8 @@ public class ScheduleService {
 
         Schedule schedule = userSchedule.getSchedule();
 
-        if(StringUtils.hasText(scheduleServiceDTO.getScheduleName())){
-            schedule.setScheduleName(scheduleServiceDTO.getScheduleName());
-        }
-        if(scheduleServiceDTO.getLocation() != null){
-            schedule.setLocation(createLocation(scheduleServiceDTO.getLocation()));
-        }
-        if (scheduleServiceDTO.getScheduleTime() != null) {
-            schedule.setScheduleTime(scheduleServiceDTO.getScheduleTime());
-        }
-        if (scheduleServiceDTO.getStatus() != null) {
-            schedule.setStatus(scheduleServiceDTO.getStatus());
-        }
+        Location location = createLocation(scheduleServiceDTO.getLocation());
+        schedule.updateSchedule(scheduleServiceDTO.getScheduleName(), location, scheduleServiceDTO.getScheduleTime());
 
         return schedule.getId();
     }

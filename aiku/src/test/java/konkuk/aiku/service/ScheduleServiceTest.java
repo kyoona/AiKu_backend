@@ -135,8 +135,8 @@ class ScheduleServiceTest {
         //when
         ScheduleServiceDto scheduleServiceDto2 = ScheduleServiceDto.builder()
                 .scheduleName("modify")
-                .location(null) //수정되면 안됨(값이 없는 필드는 수정 x)
-                .scheduleTime(null)
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
                 .build();
         scheduleService.modifySchedule(userA1, groupA.getId(), scheduleId, scheduleServiceDto2);
 
@@ -145,12 +145,12 @@ class ScheduleServiceTest {
         assertThat(schedule.getScheduleName()).isEqualTo(scheduleServiceDto2.getScheduleName());
 
         assertThat(schedule.getScheduleTime()).isNotNull();
-        assertThat(schedule.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
+        assertThat(schedule.getScheduleTime()).isEqualTo(scheduleServiceDto2.getScheduleTime());
 
         assertThat(schedule.getLocation()).isNotNull();
-        assertThat(schedule.getLocation().getLocationName()).isEqualTo(scheduleServiceDTO.getLocation().getLocationName());
-        assertThat(schedule.getLocation().getLatitude()).isEqualTo(scheduleServiceDTO.getLocation().getLatitude());
-        assertThat(schedule.getLocation().getLongitude()).isEqualTo(scheduleServiceDTO.getLocation().getLongitude());
+        assertThat(schedule.getLocation().getLocationName()).isEqualTo(scheduleServiceDto2.getLocation().getLocationName());
+        assertThat(schedule.getLocation().getLatitude()).isEqualTo(scheduleServiceDto2.getLocation().getLatitude());
+        assertThat(schedule.getLocation().getLongitude()).isEqualTo(scheduleServiceDto2.getLocation().getLongitude());
     }
 
     @Test
