@@ -73,6 +73,11 @@ class GroupServiceTest {
                 .build();
     }
 
+    @AfterEach
+    void afterEach(){
+        usersRepository.deleteAll();
+    }
+
     @Test
     @DisplayName("그룹 등록")
     void addGroup() {
