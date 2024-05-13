@@ -1,5 +1,6 @@
 package konkuk.aiku.service.dto;
 
+import konkuk.aiku.controller.dto.GroupDto;
 import lombok.Builder;
 import lombok.Getter;
 
