@@ -32,10 +32,8 @@ public class GroupController {
                                                        @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName(groupDTO.getGroupName())
-                .description(groupDTO.getDescription())
-                .build();
+        GroupServiceDto groupServiceDTO = groupDTO.toServiceDto();
+
         Long addId = groupService.addGroup(user, groupServiceDTO);
         return SuccessResponseDto.getResponseEntity(addId, ADD_SUCCESS, HttpStatus.OK);
     }
@@ -46,10 +44,8 @@ public class GroupController {
                                                           @AuthenticationPrincipal UserAdaptor userAdapter){
         Users user = userAdapter.getUsers();
 
-        GroupServiceDto groupServiceDTO = GroupServiceDto.builder()
-                .groupName(groupDTO.getGroupName())
-                .description(groupDTO.getDescription())
-                .build();
+        GroupServiceDto groupServiceDTO = groupDTO.toServiceDto();
+
         Long modifyId = groupService.modifyGroup(user, groupId, groupServiceDTO);
         return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
     }
