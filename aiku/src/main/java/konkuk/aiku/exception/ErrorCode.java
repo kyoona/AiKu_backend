@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     //404 NOT FOUND
     NO_SUCH_ENTITY(404, "존재하지 않는 데이터입니다."),
+    NO_SUCH_USER(404, "존재하지 않는 유저입니다."),
     NO_SUCH_SCHEDULE(404, "존재하지 않는 스케줄입니다."),
     NO_SUCH_GROUP(404, "존재하지 않는 그룹입니다."),
     NO_SUCH_ORDER(404, "존재하지 않는 주문입니다."),
@@ -30,6 +31,7 @@ public enum ErrorCode {
 
     //5XX Server error response
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류"),
+    FAIL_TO_CONVERT_MESSAGE(500, "Message를 Firebase Data로 변환 실패했습니다."),
     FAIL_TO_SEND_LOCATION(500, "Firebase Messeging 실패, 실시간 위치 정보");
 
     private int code;

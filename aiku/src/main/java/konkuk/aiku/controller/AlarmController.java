@@ -1,6 +1,7 @@
 package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
+import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.controller.dto.SuccessResponseDto;
 import konkuk.aiku.domain.Users;
@@ -49,5 +50,13 @@ public class AlarmController {
         realTimeLocationDto.setId(user.getId());
 
         alarmService.sendLocationInSchedule(user, scheduleId, realTimeLocationDto);
+    }
+
+    @PostMapping("/schedules/{scheduleId}/emoji")
+    public void emojiSend(@PathVariable Long scheduleId,
+                          @RequestBody @Valid EmojiMessageDto emojiMessageDto,
+                          @AuthenticationPrincipal UserAdaptor userAdaptor) {
+        Users user = userAdaptor.getUsers();
+        alarmService.sendEmojiToUser(user, scheduleId, emojiMessageDto);
     }
 }

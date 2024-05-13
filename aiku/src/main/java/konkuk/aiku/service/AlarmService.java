@@ -1,5 +1,7 @@
 package konkuk.aiku.service;
 
+import jakarta.validation.Valid;
+import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.event.ScheduleEventPublisher;
@@ -10,7 +12,9 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.firebase.FcmToken;
 import konkuk.aiku.firebase.FcmTokenProvider;
 import konkuk.aiku.firebase.MessageSender;
+import konkuk.aiku.firebase.dto.RealTimeLocationMessage;
 import konkuk.aiku.repository.ScheduleRepository;
+import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,6 +30,7 @@ import java.util.List;
 @Slf4j
 public class AlarmService {
     private final ScheduleRepository scheduleRepository;
+    private final UsersRepository usersRepository;
     private final FcmTokenProvider fcmTokenProvider;
     private final MessageSender messageSender;
 
@@ -51,10 +57,10 @@ public class AlarmService {
     }
 
     public void sendLocationInSchedule(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
-        Schedule schedule = findBySchedule(scheduleId);
+        Schedule schedule = findScheduleById(scheduleId);
 
-        checkIsScheduleRun(schedule);
         checkUserInSchedule(user.getId(), scheduleId);
+        checkIsScheduleRun(schedule);
 
         List<String> receiverToken = new ArrayList<>();
         for (UserSchedule userSchedule : schedule.getUsers()) {
@@ -64,25 +70,31 @@ public class AlarmService {
             }
         }
 
-        messageSender.sendRealTimeLocation(user, locationDto.getLatitude(), locationDto.getLongitude(), receiverToken);
+        Map<String, String> messageDataMap = RealTimeLocationMessage.createMessage(user, locationDto.getLatitude(), locationDto.getLongitude())
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, receiverToken);
 
         //유저가 도착했을 시 이벤트 발행
         checkUserArrival(user, schedule, locationDto);
     }
 
+    public void sendEmojiToUser(Users user, Long scheduleId, @Valid EmojiMessageDto emojiMessageDto){
+        Schedule schedule = findScheduleById(scheduleId);
+        Users receiver = findUserById(emojiMessageDto.getReceiverId());
+
+        checkUserInSchedule(user.getId(), scheduleId);
+        checkUserInSchedule(receiver.getId(), scheduleId);
+        checkIsScheduleRun(schedule);
+
+        
+    }
+
+    //==유저 검증 메서드==
     private void checkUserArrival(Users user, Schedule schedule, RealTimeLocationDto locationDto){
         Double distance = locationDto.distance(schedule.getLocation().getLatitude(), schedule.getLocation().getLongitude());
         if(distance < 0.001){
             scheduleEventPublisher.userArriveInSchedule(user, schedule);
         }
-    }
-
-    private Schedule findBySchedule(Long scheduleId){
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
-        if (schedule == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
-        }
-        return schedule;
     }
 
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
@@ -99,5 +111,22 @@ public class AlarmService {
         } else if (schedule.getStatus() == ScheduleStatus.TERM) {
             throw new NoAthorityToAccessException(ErrorCode.SCHEDULE_TO_TERM);
         }
+    }
+
+    //==레파지토리 조회 메서드==
+    private Schedule findScheduleById(Long scheduleId){
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+        if (schedule == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+        return schedule;
+    }
+
+    private Users findUserById(Long userId){
+        Users user = usersRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_USER);
+        }
+        return user;
     }
 }
