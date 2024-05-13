@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
@@ -107,14 +108,6 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    private Groups findGroupById(Long groupId){
-        Groups group = groupsRepository.findById(groupId).orElse(null);
-        if (group == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
-        }
-        return group;
-    }
-
     public ScheduleResultServiceDto findScheduleResult(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupById(groupId);
 
@@ -123,6 +116,25 @@ public class ScheduleService {
         Schedule schedule = findScheduleById(scheduleId);
         List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
         return ScheduleResultServiceDto.toDto(schedule, userArrivalDatas);
+    }
+
+    //==유저 도착 이벤트==
+    @Transactional
+    public boolean arriveUser(Users user, Long scheduleId, LocalDateTime arriveTime){
+        if(checkUserAlreadyArrive(user, scheduleId)) return false;
+        Schedule schedule = findScheduleById(scheduleId);
+        log.info("스케줄 {}", schedule.getId());
+        schedule.addUserArrivalData(user, arriveTime);
+        return true;
+    }
+
+    //==편의 메서드==
+    private Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 
     private UserGroup checkUserInGroup(Users user, Groups groups){
@@ -134,7 +146,7 @@ public class ScheduleService {
     }
 
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
-        UserSchedule userSchedule = scheduleRepository.findByUserIdAndScheduleId(userId, scheduleId).orElse(null);
+        UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId).orElse(null);
         if (userSchedule == null) {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
@@ -148,6 +160,15 @@ public class ScheduleService {
         }catch (NoAthorityToAccessException e){
             return true;
         }
+    }
+
+    private boolean checkUserAlreadyArrive(Users user, Long scheduleId){
+        UserArrivalData userArrivalData = scheduleRepository
+                .findUserArrivalDataByUserIdAndScheduleId(user.getId(), scheduleId).orElse(null);
+        if (userArrivalData == null) {
+            return false;
+        }
+        return true;
     }
 
     private Schedule findScheduleById(Long scheduleId){

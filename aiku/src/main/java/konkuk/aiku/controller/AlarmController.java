@@ -1,6 +1,8 @@
 package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
+import konkuk.aiku.controller.dto.EmojiMessageDto;
+import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.controller.dto.SuccessResponseDto;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.firebase.FcmToken;
@@ -38,5 +40,23 @@ public class AlarmController {
         Users user = userAdaptor.getUsers();
         alarmService.updateToken(user, fcmToken);
         return SuccessResponseDto.getResponseEntity(user.getId(), MODIFY_SUCCESS, HttpStatus.OK);
+    }
+
+    @PostMapping("/schedules/{scheduleId}/location")
+    public void realTimeLocation(@PathVariable Long scheduleId,
+                                 @RequestBody @Valid RealTimeLocationDto realTimeLocationDto,
+                                 @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        realTimeLocationDto.setId(user.getId());
+
+        alarmService.sendLocationInSchedule(user, scheduleId, realTimeLocationDto);
+    }
+
+    @PostMapping("/schedules/{scheduleId}/emoji")
+    public void emojiSend(@PathVariable Long scheduleId,
+                          @RequestBody @Valid EmojiMessageDto emojiMessageDto,
+                          @AuthenticationPrincipal UserAdaptor userAdaptor) {
+        Users user = userAdaptor.getUsers();
+        alarmService.sendEmojiToUser(user, scheduleId, emojiMessageDto);
     }
 }
