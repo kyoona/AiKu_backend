@@ -8,7 +8,6 @@ import konkuk.aiku.firebase.dto.UserArrivalMessage;
 import konkuk.aiku.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -29,7 +28,7 @@ public class ScheduleEventHandler {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void userArriveInSchedule(ScheduleUserArrivalEvent event) {
+    public void userArriveInSchedule(UserArriveInScheduleEvent event) {
         Users user = event.getUser();
         Schedule schedule = event.getSchedule();
 
@@ -40,6 +39,11 @@ public class ScheduleEventHandler {
                     .toStringMap();
             messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
         }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void scheduleAlarmEvent(ScheduleAlarmEvent event){
+
     }
 
     //==편의 메서드==
