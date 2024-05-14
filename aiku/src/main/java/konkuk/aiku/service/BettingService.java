@@ -12,7 +12,6 @@ import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.ScheduleRepository;
-import konkuk.aiku.repository.UserGroupRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ public class BettingService {
 
 
     private Optional<UserSchedule> findUserInSchedule(Long userId, Long scheduleId) {
-        return scheduleRepository.findByUserIdAndScheduleId(userId, scheduleId);
+        return scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId);
     }
 
     private Betting findBettingById(Long bettingId) {
@@ -68,14 +67,18 @@ public class BettingService {
         return betting.getId();
     }
 
-    public BettingResponseDto findBetting(Long scheduleId, Long bettingId) {
-        // Schedule 검증이 필요?
+    public BettingResponseDto findBetting(Long bettingId) {
         Betting betting = findBettingById(bettingId);
 
         return BettingResponseDto.toDto(betting);
     }
 
-    public Long updateBetting(Long scheduleId, Long bettingId, BettingModifyDto bettingModifyDto) {
+    public Long updateBetting(Users users, Long scheduleId, Long bettingId, BettingModifyDto bettingModifyDto) {
+        Optional<UserSchedule> userInSchedule = findUserInSchedule(users.getId(), scheduleId);
+
+        if (userInSchedule.isEmpty()) {
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
         // Schedule 검증
         Betting betting = findBettingById(bettingId);
         Users target = findUserById(bettingModifyDto.getTargetUserId());
@@ -86,14 +89,20 @@ public class BettingService {
         return betting.getId();
     }
 
-    public Long deleteBetting(Long bettingId) {
+    public Long deleteBetting(Users users, Long scheduleId, Long bettingId) {
+        Optional<UserSchedule> userInSchedule = findUserInSchedule(users.getId(), scheduleId);
+
+        if (userInSchedule.isEmpty()) {
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
+        // Schedule 검증
         bettingRepository.deleteById(bettingId);
 
         return bettingId;
     }
 
-    public List<BettingResponseDto> getBettingsByType(String bettingType) {
-        List<Betting> bettings = bettingRepository.findBettingsByBettingType(BettingType.valueOf(bettingType));
+    public List<BettingResponseDto> getBettingsByType(Long scheduleId, String bettingType) {
+        List<Betting> bettings = bettingRepository.findBettingsByScheduleIdAndBettingType(scheduleId, BettingType.valueOf(bettingType));
 
         return bettings.stream()
                 .map(BettingResponseDto::toDto)

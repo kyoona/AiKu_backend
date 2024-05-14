@@ -1,7 +1,6 @@
 package konkuk.aiku.controller.dto;
 
 import konkuk.aiku.domain.Betting;
-import konkuk.aiku.domain.BettingResult;
 import konkuk.aiku.domain.BettingType;
 import konkuk.aiku.domain.ResultType;
 import konkuk.aiku.service.dto.UserSimpleServiceDto;

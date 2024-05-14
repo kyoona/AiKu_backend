@@ -30,11 +30,8 @@ public class Betting extends TimeEntity{
     @Enumerated(value = EnumType.STRING)
     private ResultType resultType; // WIN, LOSE
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    private BettingResult result;
-
     @Enumerated
-    private BettingType bettingType;
+    private BettingType bettingType; // RACING, BETTING
 
     @Builder
     public Betting(Users bettor, Users targetUser, Schedule schedule, int point, BettingType bettingType) {
