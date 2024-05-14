@@ -7,6 +7,7 @@ import konkuk.aiku.controller.dto.SuccessResponseDto;
 import konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.BettingService;
+import konkuk.aiku.service.dto.BettingServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +29,9 @@ public class BettingController {
             @AuthenticationPrincipal UserAdaptor userAdaptor,
             @PathVariable Long scheduleId, @RequestBody BettingAddDto bettingAddDto
     ) {
+        BettingServiceDto bettingServiceDto = bettingAddDto.toServiceDto();
 
-        Long bettingId = bettingService.addBetting(userAdaptor.getUsers(), scheduleId, bettingAddDto);
+        Long bettingId = bettingService.addBetting(userAdaptor.getUsers(), scheduleId, bettingServiceDto);
 
         return SuccessResponseDto.getResponseEntity(bettingId, SuccessMessage.ADD_SUCCESS, HttpStatus.OK);
     }
@@ -36,7 +39,8 @@ public class BettingController {
     @GetMapping("/{bettingId}")
     public ResponseEntity<BettingResponseDto> getBetting(@PathVariable Long bettingId) {
 
-        BettingResponseDto bettingResponseDto = bettingService.findBetting(bettingId);
+        BettingServiceDto bettingServiceDto = bettingService.findBetting(bettingId);
+        BettingResponseDto bettingResponseDto = BettingResponseDto.toDto(bettingServiceDto);
 
         return new ResponseEntity(bettingResponseDto, HttpStatus.OK);
     }
@@ -46,7 +50,9 @@ public class BettingController {
             @AuthenticationPrincipal UserAdaptor userAdaptor,
             @PathVariable Long scheduleId, @PathVariable Long bettingId,
             @RequestBody BettingModifyDto bettingModifyDto) {
-        Long updateId = bettingService.updateBetting(userAdaptor.getUsers(), scheduleId, bettingId, bettingModifyDto);
+        BettingServiceDto bettingServiceDto = bettingModifyDto.toServiceDto();
+
+        Long updateId = bettingService.updateBetting(userAdaptor.getUsers(), scheduleId, bettingId, bettingServiceDto);
 
         return SuccessResponseDto.getResponseEntity(updateId, SuccessMessage.MODIFY_SUCCESS, HttpStatus.OK);
 
@@ -63,9 +69,11 @@ public class BettingController {
 
     @GetMapping
     public ResponseEntity<List<BettingResponseDto>> getBettings(@PathVariable Long scheduleId, @RequestParam String bettingType) {
-        List<BettingResponseDto> bettingList = bettingService.getBettingsByType(scheduleId, bettingType);
+        List<BettingServiceDto> bettingList = bettingService.getBettingsByType(scheduleId, bettingType);
 
-        return new ResponseEntity(bettingList, HttpStatus.OK);
+        List<BettingResponseDto> responseDtoList = bettingList.stream().map(BettingResponseDto::toDto).collect(Collectors.toList());
+
+        return new ResponseEntity(responseDtoList, HttpStatus.OK);
     }
 
 }

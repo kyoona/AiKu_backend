@@ -5,6 +5,7 @@ import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.UserService;
+import konkuk.aiku.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,13 +35,15 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUsers(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
         UserResponseDto userDto = UserResponseDto.toDto(users);
-        return new ResponseEntity<UserResponseDto>(userDto, HttpStatus.OK);
+        return new ResponseEntity(userDto, HttpStatus.OK);
     }
 
     @PatchMapping
     public ResponseEntity<SuccessResponseDto> updateUsers(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody UserUpdateDto userUpdateDTO) {
         Users users = userAdaptor.getUsers();
-        Long userId = userService.updateUser(users, userUpdateDTO);
+        UserServiceDto userServiceDto = userUpdateDTO.toServiceDto();
+
+        Long userId = userService.updateUser(users, userServiceDto);
         return SuccessResponseDto.getResponseEntity(userId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 

@@ -3,6 +3,8 @@ package konkuk.aiku.controller.dto;
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.UserRole;
 import konkuk.aiku.domain.Users;
+import konkuk.aiku.service.dto.UserServiceDto;
+import konkuk.aiku.service.dto.UserSimpleServiceDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +35,23 @@ public class UserAddDto {
                 .isBettingAlarmOn(setting.isBettingAlarmOn())
                 .isScheduleAlarmOn(setting.isScheduleAlarmOn())
                 .isPinchAlarmOn(setting.isPinchAlarmOn())
+                .build();
+    }
+
+    public UserServiceDto toServiceDto() {
+        Setting setting = Setting.builder()
+                .isLocationInformationOn(isLocationInformationOn)
+                .isVoiceAuthorityOn(isVoiceAuthorityOn)
+                .isBettingAlarmOn(isBettingAlarmOn)
+                .isScheduleAlarmOn(isScheduleAlarmOn)
+                .isPinchAlarmOn(isPinchAlarmOn)
+                .build();
+
+        return UserServiceDto.builder()
+                .username(username)
+                .phoneNumber(phoneNumber)
+                .kakaoId(kakaoId)
+                .setting(setting)
                 .build();
     }
 

@@ -1,8 +1,5 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.controller.dto.BettingAddDto;
-import konkuk.aiku.controller.dto.BettingModifyDto;
-import konkuk.aiku.controller.dto.BettingResponseDto;
 import konkuk.aiku.domain.Betting;
 import konkuk.aiku.domain.BettingType;
 import konkuk.aiku.domain.UserSchedule;
@@ -13,8 +10,10 @@ import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
+import konkuk.aiku.service.dto.BettingServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,23 +32,30 @@ public class BettingService {
         return scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId);
     }
 
-    private Betting findBettingById(Long bettingId) {
-        return bettingRepository.findById(bettingId)
-                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_BETTING));
-    }
-
     private Users findUserById(Long userId) {
         return usersRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USERS));
     }
 
-    public Long addBetting(Users users, Long scheduleId, BettingAddDto bettingAddDto) {
+    private Betting findBettingById(Long bettingId) {
+        return bettingRepository.findById(bettingId)
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_BETTING));
+    }
+
+    @Transactional
+    public BettingServiceDto findBetting(Long bettingId) {
+        Betting betting = findBettingById(bettingId);
+
+        return BettingServiceDto.toServiceDto(betting);
+    }
+
+    public Long addBetting(Users users, Long scheduleId, BettingServiceDto bettingServiceDto) {
         Optional<UserSchedule> userInSchedule = findUserInSchedule(users.getId(), scheduleId);
 
         if (userInSchedule.isEmpty()) {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
-        Users targetUser = usersRepository.findById(bettingAddDto.getTargetUserId())
+        Users targetUser = usersRepository.findById(bettingServiceDto.getTargetUser().getUserId())
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USERS));
 
         UserSchedule userSchedule = userInSchedule.get();
@@ -57,9 +63,9 @@ public class BettingService {
         Betting betting = Betting.builder()
                 .bettor(users)
                 .targetUser(targetUser)
-                .point(bettingAddDto.getPoint())
+                .point(bettingServiceDto.getPoint())
                 .schedule(userSchedule.getSchedule())
-                .bettingType(bettingAddDto.getBettingType())
+                .bettingType(bettingServiceDto.getBettingType())
                 .build();
 
         bettingRepository.save(betting);
@@ -67,13 +73,7 @@ public class BettingService {
         return betting.getId();
     }
 
-    public BettingResponseDto findBetting(Long bettingId) {
-        Betting betting = findBettingById(bettingId);
-
-        return BettingResponseDto.toDto(betting);
-    }
-
-    public Long updateBetting(Users users, Long scheduleId, Long bettingId, BettingModifyDto bettingModifyDto) {
+    public Long updateBetting(Users users, Long scheduleId, Long bettingId, BettingServiceDto bettingServiceDto) {
         Optional<UserSchedule> userInSchedule = findUserInSchedule(users.getId(), scheduleId);
 
         if (userInSchedule.isEmpty()) {
@@ -81,10 +81,10 @@ public class BettingService {
         }
         // Schedule 검증
         Betting betting = findBettingById(bettingId);
-        Users target = findUserById(bettingModifyDto.getTargetUserId());
+        Users target = findUserById(bettingServiceDto.getTargetUser().getUserId());
 
         betting.setTargetUser(target);
-        betting.setPoint(bettingModifyDto.getPoint());
+        betting.setPoint(bettingServiceDto.getPoint());
 
         return betting.getId();
     }
@@ -101,11 +101,11 @@ public class BettingService {
         return bettingId;
     }
 
-    public List<BettingResponseDto> getBettingsByType(Long scheduleId, String bettingType) {
+    public List<BettingServiceDto> getBettingsByType(Long scheduleId, String bettingType) {
         List<Betting> bettings = bettingRepository.findBettingsByScheduleIdAndBettingType(scheduleId, BettingType.valueOf(bettingType));
 
         return bettings.stream()
-                .map(BettingResponseDto::toDto)
+                .map(BettingServiceDto::toServiceDto)
                 .collect(Collectors.toList());
     }
 }

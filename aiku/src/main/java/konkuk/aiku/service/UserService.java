@@ -12,6 +12,7 @@ import konkuk.aiku.repository.TitleRepository;
 import konkuk.aiku.repository.UserItemRepository;
 import konkuk.aiku.repository.UserTitleRepository;
 import konkuk.aiku.repository.UsersRepository;
+import konkuk.aiku.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,9 +56,9 @@ public class UserService {
     }
 
     @Transactional
-    public Long updateUser(Users users, UserUpdateDto userUpdateDTO) {
-        users.setUsername(userUpdateDTO.getUsername());
-        UserTitle userTitle = userTitleRepository.findByUserTitleId(userUpdateDTO.getUserTitleId())
+    public Long updateUser(Users users, UserServiceDto userServiceDto) {
+        users.setUsername(userServiceDto.getUsername());
+        UserTitle userTitle = userTitleRepository.findByUserTitleId(userServiceDto.getMainTitle().getId())
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_TITLE));
         users.setMainTitle(userTitle);
 

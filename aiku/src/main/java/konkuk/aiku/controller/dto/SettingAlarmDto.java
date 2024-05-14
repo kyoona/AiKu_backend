@@ -1,6 +1,7 @@
 package konkuk.aiku.controller.dto;
 
 import konkuk.aiku.domain.Setting;
+import konkuk.aiku.service.dto.SettingServiceDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
