@@ -132,4 +132,7 @@ public class AlarmService {
         }
         return user;
     }
+
+    //==이벤트 메서드==
+
 }

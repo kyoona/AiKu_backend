@@ -5,6 +5,7 @@ import konkuk.aiku.domain.UserSchedule;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.firebase.MessageSender;
 import konkuk.aiku.firebase.dto.UserArrivalMessage;
+import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -24,6 +27,7 @@ import java.util.Map;
 public class ScheduleEventHandler {
 
     private final ScheduleService scheduleService;
+    private final AlarmService alarmService;
     private final MessageSender messageSender;
 
     @Async
@@ -42,8 +46,13 @@ public class ScheduleEventHandler {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void scheduleAlarmEvent(ScheduleAlarmEvent event){
+    public void RegisterScheduleAlarmEvent(ScheduleAlarmEvent event){
+        Long scheduleId = event.getScheduleId();
 
+
+        Long delay = 0l;
+        Executors.newScheduledThreadPool(1)
+                        .schedule(() -> {}, delay, TimeUnit.DAYS);
     }
 
     //==편의 메서드==
