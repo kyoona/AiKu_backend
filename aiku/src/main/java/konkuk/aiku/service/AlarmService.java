@@ -1,6 +1,5 @@
 package konkuk.aiku.service;
 
-import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.domain.*;
@@ -87,7 +86,7 @@ public class AlarmService {
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
-        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, receiver, emojiMessageDto.getEmojiId())
+        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, receiver, emojiMessageDto.getEmojiType())
                 .toStringMap();
 
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
