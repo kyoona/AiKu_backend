@@ -1,6 +1,5 @@
 package konkuk.aiku.service;
 
-import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.domain.*;
@@ -97,7 +96,7 @@ public class AlarmService {
     private void checkUserArrival(Users user, Schedule schedule, RealTimeLocationDto locationDto){
         Double distance = locationDto.distance(schedule.getLocation().getLatitude(), schedule.getLocation().getLongitude());
         if(distance < 0.001){
-            scheduleEventPublisher.userArriveInSchedule(user, schedule);
+            scheduleEventPublisher.userArriveInScheduleEvent(user, schedule);
         }
     }
 
@@ -133,4 +132,7 @@ public class AlarmService {
         }
         return user;
     }
+
+    //==이벤트 메서드==
+
 }
