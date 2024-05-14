@@ -19,4 +19,8 @@ public class LocationDto {
     public static LocationDto toDto(LocationServiceDto serviceDTO){
         return new LocationDto(serviceDTO.getLatitude(), serviceDTO.getLongitude(), serviceDTO.getLocationName());
     }
+
+    public LocationServiceDto toServiceDto(){
+        return new LocationServiceDto(this.latitude, this.longitude, this.locationName);
+    }
 }

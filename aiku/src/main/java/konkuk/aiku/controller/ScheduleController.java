@@ -29,13 +29,10 @@ public class ScheduleController {
                                                           @RequestBody @Valid ScheduleDto scheduleDTO,
                                                           @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName(scheduleDTO.getScheduleName())
-                .location(createLocationServiceDTO(scheduleDTO.getLocation()))
-                .scheduleTime(scheduleDTO.getScheduleTime())
-                .build();
 
-        Long addId = scheduleService.addSchedule(user, groupId, scheduleServiceDTO);
+        ScheduleServiceDto serviceDto = scheduleDTO.toServiceDto();
+
+        Long addId = scheduleService.addSchedule(user, groupId, serviceDto);
         return SuccessResponseDto.getResponseEntity(addId, ADD_SUCCESS, HttpStatus.OK);
     }
 
@@ -46,13 +43,9 @@ public class ScheduleController {
                                                              @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName(scheduleDTO.getScheduleName())
-                .location(createLocationServiceDTO(scheduleDTO.getLocation()))
-                .scheduleTime(scheduleDTO.getScheduleTime())
-                .build();
+        ScheduleServiceDto serviceDto = scheduleDTO.toServiceDto();
 
-        Long modifyId = scheduleService.modifySchedule(user, groupId, scheduleId, scheduleServiceDTO);
+        Long modifyId = scheduleService.modifySchedule(user, groupId, scheduleId, serviceDto);
         return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 
@@ -63,10 +56,6 @@ public class ScheduleController {
         Users user = userAdaptor.getUsers();
         Long deleteId = scheduleService.deleteSchedule(user, groupId, scheduleId);
         return SuccessResponseDto.getResponseEntity(deleteId, DELETE_SUCCESS, HttpStatus.OK);
-    }
-
-    private LocationServiceDto createLocationServiceDTO(LocationDto location){
-        return new LocationServiceDto(location.getLatitude(), location.getLongitude(), location.getLocationName());
     }
 
     @GetMapping("/{scheduleId}")
@@ -99,7 +88,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/{scheduleId}/result")
-    private ResponseEntity<ScheduleResultReponseDto> scheduleResult(@PathVariable Long groupId,
+    public ResponseEntity<ScheduleResultReponseDto> scheduleResult(@PathVariable Long groupId,
                                                                     @PathVariable Long scheduleId,
                                                                     @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
