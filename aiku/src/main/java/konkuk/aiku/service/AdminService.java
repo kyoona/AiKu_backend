@@ -1,30 +1,32 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.controller.dto.ItemDto;
-import konkuk.aiku.controller.dto.TitleDto;
 import konkuk.aiku.domain.Title;
 import konkuk.aiku.domain.item.Item;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.ItemRepository;
 import konkuk.aiku.repository.TitleRepository;
+import konkuk.aiku.service.dto.ItemServiceDto;
+import konkuk.aiku.service.dto.TitleServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AdminService {
     private final ItemRepository itemRepository;
     private final TitleRepository titleRepository;
 
-    public Long addItem(ItemDto itemDto) {
+    public Long addItem(ItemServiceDto itemDto) {
         Item item = itemDto.toEntity();
         itemRepository.save(item);
 
         return item.getId();
     }
 
-    public Long updateItem(Long itemId, ItemDto itemDto) {
+    public Long updateItem(Long itemId, ItemServiceDto itemDto) {
         Item item = findItemById(itemId);
         item.updateItem(itemDto.getItemName(), itemDto.getItemCategory(), itemDto.getPrice(), itemDto.getEventPrice(), itemDto.getEventStatus());
 
@@ -42,16 +44,16 @@ public class AdminService {
         return itemId;
     }
 
-    public Long addTitle(TitleDto titleDto) {
-        Title title = titleDto.toEntity();
+    public Long addTitle(TitleServiceDto titleServiceDto) {
+        Title title = titleServiceDto.toEntity();
         titleRepository.save(title);
 
         return title.getId();
     }
 
-    public Long updateTitle(Long titleId, TitleDto titleDto) {
+    public Long updateTitle(Long titleId, TitleServiceDto titleServiceDto) {
         Title title = findTitleById(titleId);
-        title.updateTitle(titleDto.getTitleName(), titleDto.getDescription());
+        title.updateTitle(titleServiceDto.getTitleName(), titleServiceDto.getDescription());
 
         return title.getId();
     }

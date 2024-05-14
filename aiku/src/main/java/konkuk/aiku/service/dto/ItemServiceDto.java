@@ -1,30 +1,34 @@
-package konkuk.aiku.controller.dto;
+package konkuk.aiku.service.dto;
 
 import konkuk.aiku.domain.EventStatus;
 import konkuk.aiku.domain.ItemCategory;
 import konkuk.aiku.domain.item.Item;
-import konkuk.aiku.service.dto.ItemServiceDto;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter @Setter
-@Builder
-public class ItemDto {
+@Getter @Builder
+public class ItemServiceDto {
+    private Long id;
+
     private String itemName;
+    private String itemImg;
+
     private ItemCategory itemCategory;
     private int price;
     private int eventPrice;
+    private String eventDescription;
+
     private EventStatus eventStatus;
 
-    public ItemServiceDto toServiceDto() {
-        return ItemServiceDto.builder()
+    public Item toEntity() {
+        return Item.builder()
                 .itemName(itemName)
+                .itemImg(itemImg)
                 .itemCategory(itemCategory)
                 .price(price)
                 .eventPrice(eventPrice)
+                .eventDescription(eventDescription)
                 .eventStatus(eventStatus)
                 .build();
-
     }
 }

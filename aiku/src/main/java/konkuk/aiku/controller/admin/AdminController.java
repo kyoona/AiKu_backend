@@ -4,6 +4,8 @@ import konkuk.aiku.controller.dto.ItemDto;
 import konkuk.aiku.controller.dto.SuccessResponseDto;
 import konkuk.aiku.controller.dto.TitleDto;
 import konkuk.aiku.service.AdminService;
+import konkuk.aiku.service.dto.ItemServiceDto;
+import konkuk.aiku.service.dto.TitleServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +22,17 @@ public class AdminController {
 
     @PostMapping("/items")
     public ResponseEntity<SuccessResponseDto> addItem(ItemDto itemDto){
-        Long itemId = adminService.addItem(itemDto);
+        ItemServiceDto itemServiceDto = itemDto.toServiceDto();
+
+        Long itemId = adminService.addItem(itemServiceDto);
 
         return SuccessResponseDto.getResponseEntity(itemId, ADD_SUCCESS, HttpStatus.OK);
     }
 
     @PatchMapping("/items/{itemId}")
     public ResponseEntity<SuccessResponseDto> updateItem(@PathVariable Long itemId, ItemDto itemDto){
-        Long updateItemId = adminService.updateItem(itemId, itemDto);
+        ItemServiceDto itemServiceDto = itemDto.toServiceDto();
+        Long updateItemId = adminService.updateItem(itemId, itemServiceDto);
 
         return SuccessResponseDto.getResponseEntity(updateItemId, MODIFY_SUCCESS, HttpStatus.OK);
     }
@@ -41,14 +46,16 @@ public class AdminController {
 
     @PostMapping("/titles")
     public ResponseEntity<SuccessResponseDto> addTitle(TitleDto titleDto){
-        Long titleId = adminService.addTitle(titleDto);
+        TitleServiceDto titleServiceDto = titleDto.toServiceDto();
+        Long titleId = adminService.addTitle(titleServiceDto);
 
         return SuccessResponseDto.getResponseEntity(titleId, ADD_SUCCESS, HttpStatus.OK);
     }
 
     @PatchMapping("/titles/{titleId}")
     public ResponseEntity<SuccessResponseDto> updateTitle(@PathVariable Long titleId, TitleDto titleDto){
-        Long updateTitleId = adminService.updateTitle(titleId, titleDto);
+        TitleServiceDto titleServiceDto = titleDto.toServiceDto();
+        Long updateTitleId = adminService.updateTitle(titleId, titleServiceDto);
 
         return SuccessResponseDto.getResponseEntity(updateTitleId, MODIFY_SUCCESS, HttpStatus.OK);
     }

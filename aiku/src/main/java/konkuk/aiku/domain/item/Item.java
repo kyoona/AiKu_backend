@@ -32,12 +32,14 @@ public class Item extends TimeEntity {
     private EventStatus eventStatus;
 
     @Builder
-    public Item(String itemName, ItemCategory itemCategory, int price, int eventPrice, EventStatus eventStatus) {
+    public Item(String itemName, String itemImg, ItemCategory itemCategory, int price, int eventPrice, EventStatus eventStatus, String eventDescription) {
         this.itemName = itemName;
+        this.itemImg = itemImg;
         this.itemCategory = itemCategory;
         this.price = price;
         this.eventPrice = eventPrice;
         this.eventStatus = eventStatus;
+        this.eventDescription = eventDescription;
     }
 
     public void updateItem(String itemName, ItemCategory itemCategory, int price, int eventPrice, EventStatus eventStatus) {

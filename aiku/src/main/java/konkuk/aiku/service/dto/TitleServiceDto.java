@@ -24,4 +24,12 @@ public class TitleServiceDto extends TimeEntity {
                 .titleImg(title.getTitleImg())
                 .build();
     }
+
+    public Title toEntity() {
+        return Title.builder()
+                .titleName(titleName)
+                .description(description)
+                .titleImg(titleImg)
+                .build();
+    }
 }
