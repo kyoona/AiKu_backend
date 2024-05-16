@@ -1,6 +1,5 @@
 package konkuk.aiku.service;
 
-import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.domain.*;
@@ -12,8 +11,10 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.firebase.FcmToken;
 import konkuk.aiku.firebase.FcmTokenProvider;
 import konkuk.aiku.firebase.MessageSender;
+import konkuk.aiku.firebase.dto.MessageTitle;
 import konkuk.aiku.firebase.dto.RealTimeLocationMessage;
 import konkuk.aiku.firebase.dto.SendingEmojiMessage;
+import konkuk.aiku.firebase.dto.ScheduleAlarmMessage;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -59,24 +61,47 @@ public class AlarmService {
 
     public void sendLocationInSchedule(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
         Schedule schedule = findScheduleById(scheduleId);
+        List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
 
         checkUserInSchedule(user.getId(), scheduleId);
         checkIsScheduleRun(schedule);
+        if (scheduleUsers.size() == 0) return;
 
-        List<String> receiverToken = new ArrayList<>();
-        for (UserSchedule userSchedule : schedule.getUsers()) {
-            Users scheUser = userSchedule.getUser();
-            if(scheUser.getId() != user.getId()){
-                receiverToken.add(scheUser.getFcmToken());
-            }
-        }
+        List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
 
-        Map<String, String> messageDataMap = RealTimeLocationMessage.createMessage(user, locationDto.getLatitude(), locationDto.getLongitude())
+        Map<String, String> messageDataMap = RealTimeLocationMessage
+                .createMessage(user, locationDto.getLatitude(), locationDto.getLongitude())
                 .toStringMap();
-        messageSender.sendMessageToUsers(messageDataMap, receiverToken);
+        messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
 
-        //유저가 도착했을 시 이벤트 발행
         checkUserArrival(user, schedule, locationDto);
+    }
+
+    //==이벤트 서비스==
+    public Runnable sendStartScheduleRunnable(Long scheduleId){
+        return () -> {
+            Schedule schedule = findScheduleById(scheduleId);
+            List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+
+            List<String> userTokens = getUserFcmTokens(scheduleUsers);
+            Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.START_SCHEDULE, schedule)
+                    .toStringMap();
+
+            messageSender.sendMessageToUsers(messageDataMap, userTokens);
+        };
+    }
+
+    public Runnable sendNextScheduleRunnable(Long scheduleId) {
+        return () -> {
+            Schedule schedule = findScheduleById(scheduleId);
+            List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+
+            List<String> userTokens = getUserFcmTokens(scheduleUsers);
+            Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.NEXT_SCHEDULE, schedule)
+                    .toStringMap();
+
+            messageSender.sendMessageToUsers(messageDataMap, userTokens);
+        };
     }
 
     public void sendEmojiToUser(Users user, Long scheduleId, EmojiMessageDto emojiMessageDto){
@@ -87,7 +112,7 @@ public class AlarmService {
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
-        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, receiver, emojiMessageDto.getEmojiId())
+        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, receiver, emojiMessageDto.getEmojiType())
                 .toStringMap();
 
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
@@ -97,7 +122,7 @@ public class AlarmService {
     private void checkUserArrival(Users user, Schedule schedule, RealTimeLocationDto locationDto){
         Double distance = locationDto.distance(schedule.getLocation().getLatitude(), schedule.getLocation().getLongitude());
         if(distance < 0.001){
-            scheduleEventPublisher.userArriveInSchedule(user, schedule);
+            scheduleEventPublisher.userArriveInScheduleEvent(user, schedule);
         }
     }
 
@@ -126,11 +151,27 @@ public class AlarmService {
         return schedule;
     }
 
+    private List<Users> findUsersByScheduleIdFetchJoin(Long scheduleID){
+        return scheduleRepository.findUsersByScheduleId(scheduleID);
+    }
+
     private Users findUserById(Long userId){
         Users user = usersRepository.findById(userId).orElse(null);
         if (user == null) {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_USER);
         }
         return user;
+    }
+
+    //==편의 메서드==
+    public Long getScheduleAlarmTimeDelay(Long scheduleId){
+        Schedule schedule = findScheduleById(scheduleId);
+        LocalDateTime scheduleTime = schedule.getScheduleTime();
+
+        return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();
+    }
+
+    private List<String> getUserFcmTokens(List<Users> users){
+        return users.stream().map((user) -> user.getFcmToken()).toList();
     }
 }

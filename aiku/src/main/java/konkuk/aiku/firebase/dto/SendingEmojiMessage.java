@@ -1,5 +1,6 @@
 package konkuk.aiku.firebase.dto;
 
+import konkuk.aiku.domain.Emoji;
 import konkuk.aiku.domain.Users;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,11 +16,10 @@ public class SendingEmojiMessage extends Message{
     protected String receiverName;
     protected String receiverImg;
 
-    protected Long emojiId;
-    protected Long emojiImg;
+    protected Emoji emojiType;
 
     @Builder(access = AccessLevel.PROTECTED)
-    protected SendingEmojiMessage(Long senderId, String senderName, String senderImg, Long receiverId, String receiverName, String receiverImg, Long emojiId, Long emojiImg) {
+    protected SendingEmojiMessage(Long senderId, String senderName, String senderImg, Long receiverId, String receiverName, String receiverImg, Emoji emojiType) {
         this.title = MessageTitle.EMOJI_TO_USER.getTitle();
         this.senderId = senderId;
         this.senderName = senderName;
@@ -27,10 +27,10 @@ public class SendingEmojiMessage extends Message{
         this.receiverId = receiverId;
         this.receiverName = receiverName;
         this.receiverImg = receiverImg;
-        this.emojiId = emojiId;
+        this.emojiType = emojiType;
     }
 
-    public static SendingEmojiMessage createMessage(Users sender, Users receiver, Long emojiId){
+    public static SendingEmojiMessage createMessage(Users sender, Users receiver, Emoji emojiType){
         return SendingEmojiMessage.builder()
                 .senderId(sender.getId())
                 .senderName(sender.getUsername())
@@ -38,7 +38,7 @@ public class SendingEmojiMessage extends Message{
                 .receiverId(receiver.getId())
                 .receiverName(receiver.getUsername())
                 .receiverImg(receiver.getUserImg())
-                .emojiId(emojiId)
+                .emojiType(emojiType)
                 .build();
     }
 }

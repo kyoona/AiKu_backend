@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import konkuk.aiku.service.dto.LocationServiceDto;
 import konkuk.aiku.service.dto.ScheduleServiceDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,5 +31,13 @@ public class ScheduleDto {
                 .scheduleTime(serviceDto.getScheduleTime())
                 .build();
         return scheduleDTO;
+    }
+
+    public ScheduleServiceDto toServiceDto(){
+        return ScheduleServiceDto.builder()
+                .scheduleName(this.scheduleName)
+                .location(this.location.toServiceDto())
+                .scheduleTime(this.scheduleTime)
+                .build();
     }
 }
