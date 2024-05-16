@@ -16,7 +16,7 @@ public class Groups extends TimeEntity{
 
     private String groupName;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserGroup> userGroups = new ArrayList<>();
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
@@ -45,6 +45,10 @@ public class Groups extends TimeEntity{
     public void addUser(Users user){
         UserGroup userGroup = new UserGroup(user, this);
         this.userGroups.add(userGroup);
+    }
+
+    public void deleteUser(UserGroup userGroup){
+        userGroups.remove(userGroup);
     }
 
     public void addSchedule(Schedule schedule){

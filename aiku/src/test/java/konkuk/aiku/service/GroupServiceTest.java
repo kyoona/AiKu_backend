@@ -130,8 +130,10 @@ class GroupServiceTest {
     void exitGroup() {
         Users user = createUser(1L, "user1");
         Groups group = Groups.createGroups(user, "group1", "그룹1");
+        UserGroup userGroup = group.getUserGroups().get(0);
 
         when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
 
         //when
         Long groupId = groupService.exitGroup(user, group.getId());

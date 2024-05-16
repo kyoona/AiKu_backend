@@ -196,11 +196,8 @@ class GroupServiceIntegrationTest {
         groupService.exitGroup(userA, groupId);
 
         //then
-        /**
-         * JPQL과 Persistence Context비동기화 문제 -> 다른식으로 테스트해야함
-         */
-//        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
-//        assertThat(groupsRepository.findByUserAndGroup(userA, findGroup)).isEmpty();
+        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
+        assertThat(groupsRepository.findByUserAndGroup(userA, findGroup)).isEmpty();
     }
 
     @Test

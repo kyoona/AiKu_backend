@@ -72,9 +72,8 @@ public class GroupService {
         Groups group = findGroupById(groupId);
 
         UserGroup userGroup = checkUserInGroup(user, group);
+        group.deleteUser(userGroup);
 
-        
-        groupsRepository.deleteUserGroup(userGroup);
         return groupId;
     }
 
