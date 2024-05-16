@@ -5,6 +5,7 @@ import konkuk.aiku.domain.UserTitle;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.service.dto.TitleServiceDto;
 import konkuk.aiku.service.dto.UserServiceDto;
+import konkuk.aiku.service.dto.UserTitleServiceDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +37,7 @@ public class UserResponseDto {
     }
 
     public static UserServiceDto toServiceDto(Users users) {
-        TitleServiceDto titleDto = TitleServiceDto.toDto(users.getMainTitle());
+        UserTitleServiceDto titleDto = UserTitleServiceDto.toServiceDto(users.getMainTitle());
 
         return UserServiceDto.builder()
                 .id(users.getId())

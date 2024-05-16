@@ -104,7 +104,7 @@ public class UserService {
 
         return userItems.stream()
                 .map(UserItem::getItem)
-                .map(ItemResponseDto::toDto)
+                .map(ItemResponseDto::fromEntityToDto)
                 .collect(Collectors.toList());
     }
 

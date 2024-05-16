@@ -22,13 +22,13 @@ public class ItemService {
         ItemCategory category = ItemCategory.valueOf(itemType);
 
         return itemRepository.findItemsByItemCategory(category)
-                .stream().map(ItemResponseDto::toDto)
+                .stream().map(ItemResponseDto::fromEntityToDto)
                 .collect(Collectors.toList());
     }
 
     public List<ItemResponseDto> getSaleItem() {
         return itemRepository.findItemsByEventStatus(EventStatus.EVENT)
-                .stream().map(ItemResponseDto::toDto)
+                .stream().map(ItemResponseDto::fromEntityToDto)
                 .collect(Collectors.toList());
     }
 }
