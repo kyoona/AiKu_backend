@@ -77,19 +77,21 @@ public class GroupService {
         return groupId;
     }
 
-    private Groups findGroupById(Long groupId){
-        Groups group = groupsRepository.findById(groupId).orElse(null);
-        if (group == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
-        }
-        return group;
-    }
-
+    //==검증 메서드==
     private UserGroup checkUserInGroup(Users user, Groups groups){
         UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
         if(userGroup == null){
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userGroup;
+    }
+
+    //==레파지토리 조회 메서드==
+    private Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 }
