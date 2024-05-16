@@ -20,6 +20,7 @@ public class SuccessResponseDto {
     }
 
     public enum SuccessMessage {
+        LOGOUT_SUCCESS("로그아웃 성공하였습니다."),
         ADD_SUCCESS("등록 성공하였습니다."),
         MODIFY_SUCCESS("수정 성공하였습니다."),
         DELETE_SUCCESS("삭제 성공하였습니다."),

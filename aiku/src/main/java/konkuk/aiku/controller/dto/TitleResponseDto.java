@@ -24,4 +24,14 @@ public class TitleResponseDto {
                 .titleImg(title.getTitleImg())
                 .build();
     }
+
+    public static TitleResponseDto toTitleDto(Title title) {
+
+        return TitleResponseDto.builder()
+                .titleId(title.getId())
+                .titleName(title.getTitleName())
+                .description(title.getDescription())
+                .titleImg(title.getTitleImg())
+                .build();
+    }
 }

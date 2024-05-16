@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface UserTitleRepository extends JpaRepository<UserTitle, Long>{
     @Query("select u from UserTitle u where u.id = :userTitleId")
     Optional<UserTitle> findByUserTitleId(Long userTitleId);
+
+    @Query("select u from UserTitle u where u.user.id = ?1")
+    Optional<UserTitle> findByUserId(Long userId);
 }

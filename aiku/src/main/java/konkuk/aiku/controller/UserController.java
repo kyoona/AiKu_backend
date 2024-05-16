@@ -5,12 +5,15 @@ import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.UserService;
+import konkuk.aiku.service.dto.UserServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
 
@@ -32,13 +35,15 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUsers(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
         UserResponseDto userDto = UserResponseDto.toDto(users);
-        return new ResponseEntity<UserResponseDto>(userDto, HttpStatus.OK);
+        return new ResponseEntity(userDto, HttpStatus.OK);
     }
 
     @PatchMapping
     public ResponseEntity<SuccessResponseDto> updateUsers(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody UserUpdateDto userUpdateDTO) {
         Users users = userAdaptor.getUsers();
-        Long userId = userService.updateUser(users, userUpdateDTO);
+        UserServiceDto userServiceDto = userUpdateDTO.toServiceDto();
+
+        Long userId = userService.updateUser(users, userServiceDto);
         return SuccessResponseDto.getResponseEntity(userId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 
@@ -84,10 +89,28 @@ public class UserController {
         // S3 이미지 등록 로직
     }
 
+    @GetMapping("/items")
+    public ResponseEntity<List<ItemResponseDto>> getUserItems(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestParam String itemType) {
+        Users users = userAdaptor.getUsers();
+        List<ItemResponseDto> itemList = userService.getUserItems(users, itemType);
+
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
+    }
+
+    @GetMapping("/titles")
+    public ResponseEntity<List<TitleResponseDto>> getUserTitles(@AuthenticationPrincipal UserAdaptor userAdaptor) {
+        Users users = userAdaptor.getUsers();
+        List<TitleResponseDto> titleList = userService.getUserTitle(users.getId());
+
+        return new ResponseEntity<>(titleList, HttpStatus.OK);
+    }
+
     @PostMapping("/logout")
-    public void logout(@AuthenticationPrincipal UserAdaptor userAdaptor) {
+    public ResponseEntity<SuccessResponseDto> logout(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         String kakaoId = userAdaptor.getUsername();
-        userService.logout(Long.valueOf(kakaoId));
+        Long userId = userService.logout(Long.valueOf(kakaoId));
+
+        return SuccessResponseDto.getResponseEntity(userId, LOGOUT_SUCCESS, HttpStatus.OK);
     }
 
 }

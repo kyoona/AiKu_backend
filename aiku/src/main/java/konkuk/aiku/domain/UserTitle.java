@@ -21,5 +21,4 @@ public class UserTitle extends TimeEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "titleId")
     private Title title;
-    private boolean isUsed;
 }

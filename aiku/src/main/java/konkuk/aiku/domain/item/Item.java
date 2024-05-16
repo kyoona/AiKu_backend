@@ -1,16 +1,16 @@
 package konkuk.aiku.domain.item;
 
 import jakarta.persistence.*;
+import konkuk.aiku.controller.dto.ItemDto;
 import konkuk.aiku.domain.EventStatus;
 import konkuk.aiku.domain.ItemCategory;
 import konkuk.aiku.domain.TimeEntity;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "itemType")
+@NoArgsConstructor
 @Getter @Setter
 public class Item extends TimeEntity {
 
@@ -30,4 +30,23 @@ public class Item extends TimeEntity {
 
     @Enumerated(value = EnumType.STRING)
     private EventStatus eventStatus;
+
+    @Builder
+    public Item(String itemName, String itemImg, ItemCategory itemCategory, int price, int eventPrice, EventStatus eventStatus, String eventDescription) {
+        this.itemName = itemName;
+        this.itemImg = itemImg;
+        this.itemCategory = itemCategory;
+        this.price = price;
+        this.eventPrice = eventPrice;
+        this.eventStatus = eventStatus;
+        this.eventDescription = eventDescription;
+    }
+
+    public void updateItem(String itemName, ItemCategory itemCategory, int price, int eventPrice, EventStatus eventStatus) {
+        this.itemName = itemName;
+        this.itemCategory = itemCategory;
+        this.price = price;
+        this.eventPrice = eventPrice;
+        this.eventStatus = eventStatus;
+    }
 }

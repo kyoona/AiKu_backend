@@ -1,7 +1,11 @@
 package konkuk.aiku.controller.dto;
 
+import konkuk.aiku.domain.Title;
 import konkuk.aiku.domain.UserTitle;
 import konkuk.aiku.domain.Users;
+import konkuk.aiku.service.dto.TitleServiceDto;
+import konkuk.aiku.service.dto.UserServiceDto;
+import konkuk.aiku.service.dto.UserTitleServiceDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +23,7 @@ public class UserResponseDto {
     private TitleResponseDto title;
 
     public static UserResponseDto toDto(Users users) {
-        List<UserTitle> userTitles = users.getUserTitles();
-
-        UserTitle userTitle = userTitles.stream().filter(title -> title.isUsed()).findAny()
-                .orElseThrow(() -> new RuntimeException("타이틀이 존재하지 않습니다."));
-
-        TitleResponseDto titleDto = TitleResponseDto.toDto(userTitle);
+        TitleResponseDto titleDto = TitleResponseDto.toDto(users.getMainTitle());
 
         return UserResponseDto.builder()
                 .userId(users.getId())
@@ -33,6 +32,20 @@ public class UserResponseDto {
                 .phoneNumber(users.getPhoneNumber())
                 .point(users.getPoint())
                 .title(titleDto)
+                .build();
+
+    }
+
+    public static UserServiceDto toServiceDto(Users users) {
+        UserTitleServiceDto titleDto = UserTitleServiceDto.toServiceDto(users.getMainTitle());
+
+        return UserServiceDto.builder()
+                .id(users.getId())
+                .username(users.getUsername())
+                .userImg(users.getUserImg())
+                .phoneNumber(users.getPhoneNumber())
+                .point(users.getPoint())
+                .mainTitle(titleDto)
                 .build();
 
     }

@@ -2,12 +2,11 @@ package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
 import konkuk.aiku.domain.item.Item;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Orders extends TimeEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderId")
@@ -29,4 +28,24 @@ public class Orders extends TimeEntity{
     private int eventPrice;
     private String eventDescription;
     int count;
+
+    public void changeStatus(OrderStatus orderStatus) {
+        this.status = orderStatus;
+    }
+
+    public void setUserAndItem(Users user, Item item) {
+        this.item = item;
+        this.user = user;
+    }
+
+    @Builder
+    public Orders(Users user, Item item, OrderStatus status, int price, int eventPrice, String eventDescription, int count) {
+        this.user = user;
+        this.item = item;
+        this.status = status;
+        this.price = price;
+        this.eventPrice = eventPrice;
+        this.eventDescription = eventDescription;
+        this.count = count;
+    }
 }

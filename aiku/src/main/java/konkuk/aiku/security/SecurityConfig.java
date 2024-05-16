@@ -33,7 +33,9 @@ public class SecurityConfig {
                                 .requestMatchers("/login/sign-in").permitAll() // 모든 사용자 허용
                                 .requestMatchers("/login/refresh").permitAll() // 모든 사용자 허용
                                 .requestMatchers("/login/test").hasRole("USER") // User 권한에 한해 허용
-                                .anyRequest().authenticated() // 이외 모든 요청 인증 필요
+                                .requestMatchers("/admin").hasRole("MANAGER") // User 권한에 한해 허용
+//                                .anyRequest().authenticated() // 이외 모든 요청 인증 필요
+                                .anyRequest().permitAll() // 이외 모든 요청 허용
                         )
                 // 구현한 필터 적용
                 .addFilterBefore(
