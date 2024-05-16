@@ -1,9 +1,6 @@
 package konkuk.aiku.firebase.dto;
 
-import konkuk.aiku.domain.Schedule;
-import konkuk.aiku.domain.Setting;
-import konkuk.aiku.domain.UserRole;
-import konkuk.aiku.domain.Users;
+import konkuk.aiku.domain.*;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -62,10 +59,10 @@ class MessageTest {
         String receiverImg = "url2";
         Users receiver = createUser(receiverId, receiverName, receiverImg);
 
-        Long emojiId = 1l;
+        Emoji emojiType = Emoji.HEART;
 
         //when
-        Map<String, String> stringMap = SendingEmojiMessage.createMessage(sender, receiver, emojiId)
+        Map<String, String> stringMap = SendingEmojiMessage.createMessage(sender, receiver, emojiType)
                 .toStringMap();
 
         //then
@@ -75,7 +72,7 @@ class MessageTest {
         assertThat(stringMap).containsEntry("receiverId", String.valueOf(receiverId));
         assertThat(stringMap).containsEntry("receiverName", receiverName);
         assertThat(stringMap).containsEntry("receiverImg", receiverImg);
-        assertThat(stringMap).containsEntry("emojiId", String.valueOf(emojiId));
+        assertThat(stringMap).containsEntry("emojiType", String.valueOf(emojiType));
     }
 
     public Users createUser(Long userId, String userName, String userImg){
