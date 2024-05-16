@@ -4,6 +4,8 @@ import konkuk.aiku.domain.Groups;
 import konkuk.aiku.domain.Setting;
 import konkuk.aiku.domain.UserGroup;
 import konkuk.aiku.domain.Users;
+import konkuk.aiku.exception.NoAthorityToAccessException;
+import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.service.dto.GroupDetailServiceDto;
 import konkuk.aiku.service.dto.GroupServiceDto;
@@ -54,6 +56,7 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 수정")
     void modifyGroup() {
+        //given
         Users user = createUser(3L, "user3");
         Groups group = Groups.createGroups(user, "group3", "수정 전 그룹3");
         UserGroup userGroup = group.getUserGroups().get(0);
@@ -70,7 +73,23 @@ class GroupServiceTest {
     }
 
     @Test
+    @DisplayName("그룹 수정-존재하지 않는 그룹")
+    void modifyFaultGroup() {
+        //given
+        Users user = createUser(3L, "user3");
+        Groups group = Groups.createGroups(user, "group3", "수정 전 그룹3");
+        GroupServiceDto dto = createDto(4L, "group4", "modifyGroup");
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.empty());
+
+        //when
+        assertThatThrownBy(()->groupService.modifyGroup(user, group.getId(), dto)).isInstanceOf(NoSuchEntityException.class);
+    }
+
+    @Test
+    @DisplayName("그룹 삭제")
     void deleteGroup() {
+        //given
         Users user = createUser(5L, "user5");
         Groups group = Groups.createGroups(user, "group6", "그룹6");
         UserGroup userGroup = group.getUserGroups().get(0);
@@ -89,6 +108,7 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 상세 조회")
     void findGroupDetailById() {
+        //given
         Users user = createUser(1L, "user1!");
         Groups group = Groups.createGroups(user, "group1", "그룹1");
         UserGroup userGroup = group.getUserGroups().get(0);
@@ -111,6 +131,7 @@ class GroupServiceTest {
     @Test
     @DisplayName("그룹 입장")
     void enterGroup() {
+        //given
         Users user = createUser(1L, "user1");
         Users enterUser = createUser(2L, "enterUser");
         Groups group = Groups.createGroups(user, "group1", "그룹1");
@@ -127,7 +148,9 @@ class GroupServiceTest {
     }
 
     @Test
+    @DisplayName("그룹 퇴장")
     void exitGroup() {
+        //given
         Users user = createUser(1L, "user1");
         Groups group = Groups.createGroups(user, "group1", "그룹1");
         UserGroup userGroup = group.getUserGroups().get(0);
@@ -141,6 +164,20 @@ class GroupServiceTest {
         //then
         assertThat(groupId).isEqualTo(group.getId());
         assertThat(group.getUserGroups().size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("그룹 퇴장-유저가 그룹에 없을 때")
+    void exitGroupWhenUserNotInGroup() {
+        //given
+        Users user = createUser(1L, "user1");
+        Groups group = Groups.createGroups(user, "group1", "그룹1");
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.empty());
+
+        //when
+        assertThatThrownBy(()->groupService.exitGroup(user, group.getId())).isInstanceOf(NoAthorityToAccessException.class);
     }
 
     Users createUser(Long id, String userName){
