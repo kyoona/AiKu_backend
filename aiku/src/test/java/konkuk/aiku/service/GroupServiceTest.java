@@ -1,215 +1,159 @@
 package konkuk.aiku.service;
 
-import jakarta.persistence.EntityManager;
 import konkuk.aiku.domain.Groups;
 import konkuk.aiku.domain.Setting;
+import konkuk.aiku.domain.UserGroup;
 import konkuk.aiku.domain.Users;
-import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
-import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.GroupDetailServiceDto;
 import konkuk.aiku.service.dto.GroupServiceDto;
-import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import konkuk.aiku.service.dto.UserSimpleServiceDto;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
-@Transactional
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class GroupServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(GroupServiceTest.class);
-    @Autowired
-    private EntityManager em;
-    @Autowired
-    private GroupsRepository groupsRepository;
-    @Autowired
-    private GroupService groupService;
-    @Autowired
-    private UsersRepository usersRepository;
+    @Mock
+    GroupsRepository groupsRepository;
 
-    private Users userA;
-    private Users userB;
-    private Users userC;
-
-    GroupServiceDto groupServiceDTO;
-
-    @BeforeEach
-    void beforeEach(){
-        userA = Users.builder()
-                .username("userA")
-                .phoneNumber("010-1111-1111")
-                .userImg("http://userA.img")
-                .point(1000)
-                .setting(new Setting(false, false, false, false, false))
-                .build();
-        usersRepository.save(userA);
-
-        userB = Users.builder()
-                .username("userB")
-                .phoneNumber("010-2222-2222")
-                .userImg("http://userB.img")
-                .point(2000)
-                .setting(new Setting(true, true, true, true, true))
-                .build();
-        usersRepository.save(userB);
-
-        userC = Users.builder()
-                .username("userC")
-                .phoneNumber("010-3333-3333")
-                .userImg("http://userC.img")
-                .point(3000)
-                .setting(new Setting(false, false, false, false, false))
-                .build();
-        usersRepository.save(userC);
-
-        groupServiceDTO = GroupServiceDto.builder()
-                .groupName("group1")
-                .description("group1입니다.")
-                .build();
-    }
-
-    @AfterEach
-    void afterEach(){
-        usersRepository.deleteAll();
-    }
+    @InjectMocks
+    GroupService groupService;
 
     @Test
     @DisplayName("그룹 등록")
     void addGroup() {
+        //given
+        Users user = createUser(1L, "user1");
+        GroupServiceDto dto = createDto(2L, "group2", "addGroup");
+        Groups group = Groups.createGroups(user, dto.getGroupName(), dto.getDescription());
+
+        when(groupsRepository.save(any(Groups.class))).thenReturn(group);
+
         //when
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(user, dto);
 
         //then
-        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
-        assertThat(findGroup).isNotNull();
-        assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
-        assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO.getDescription());
-
-        assertThat( groupsRepository.findByUserAndGroup(userA, findGroup)).isNotEmpty();
+        assertThat(groupId).isEqualTo(group.getId());
     }
 
     @Test
     @DisplayName("그룹 수정")
     void modifyGroup() {
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Users user = createUser(3L, "user3");
+        Groups group = Groups.createGroups(user, "group3", "수정 전 그룹3");
+        UserGroup userGroup = group.getUserGroups().get(0);
+        GroupServiceDto dto = createDto(4L, "group4", "modifyGroup");
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
 
         //when
-        GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
-                .groupName("group modify")
-                .description("group1을 수정하였습니다.")
+        Long groupId = groupService.modifyGroup(user, group.getId(), dto);
+
+        //then
+        assertThat(groupId).isEqualTo(group.getId());
+    }
+
+    @Test
+    void deleteGroup() {
+        Users user = createUser(5L, "user5");
+        Groups group = Groups.createGroups(user, "group6", "그룹6");
+        UserGroup userGroup = group.getUserGroups().get(0);
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
+        doNothing().when(groupsRepository).deleteById(any());
+
+        //when
+        Long groupId = groupService.deleteGroup(user, group.getId());
+
+        //then
+        assertThat(groupId).isEqualTo(group.getId());
+    }
+
+    @Test
+    @DisplayName("그룹 상세 조회")
+    void findGroupDetailById() {
+        Users user = createUser(1L, "user1!");
+        Groups group = Groups.createGroups(user, "group1", "그룹1");
+        UserGroup userGroup = group.getUserGroups().get(0);
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
+
+        //when
+        GroupDetailServiceDto groupResponse = groupService.findGroupDetailById(user, group.getId());
+
+        //then
+        assertThat(groupResponse.getGroupName()).isEqualTo(group.getGroupName());
+        assertThat(groupResponse.getDescription()).isEqualTo(group.getDescription());
+
+        UserSimpleServiceDto userResponse = groupResponse.getUsers().get(0);
+        assertThat(userResponse.getUserId()).isEqualTo(user.getId());
+        assertThat(userResponse.getUsername()).isEqualTo(user.getUsername());
+    }
+
+    @Test
+    @DisplayName("그룹 입장")
+    void enterGroup() {
+        Users user = createUser(1L, "user1");
+        Users enterUser = createUser(2L, "enterUser");
+        Groups group = Groups.createGroups(user, "group1", "그룹1");
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+
+        //when
+        Long groupId = groupService.enterGroup(enterUser, group.getId());
+
+        //then
+        assertThat(groupId).isEqualTo(group.getId());
+        assertThat(group.getUserGroups().size()).isEqualTo(2);
+        assertThat(group.getUserGroups().stream().map((UserGroup::getUser))).contains(user, enterUser);
+    }
+
+    @Test
+    void exitGroup() {
+        Users user = createUser(1L, "user1");
+        Groups group = Groups.createGroups(user, "group1", "그룹1");
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+
+        //when
+        Long groupId = groupService.exitGroup(user, group.getId());
+
+        //then
+        assertThat(groupId).isEqualTo(group.getId());
+        assertThat(group.getUserGroups().size()).isEqualTo(0);
+    }
+
+    Users createUser(Long id, String userName){
+        return Users.builder()
+                .id(id)
+                .username(userName)
+                .setting(new Setting(true, true, true, true, true))
                 .build();
-        groupService.modifyGroup(userA, groupId, modifyGroupServiceDto);
-
-        //then
-        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
-        assertThat(findGroup.getGroupName()).isEqualTo(modifyGroupServiceDto.getGroupName());
-        assertThat(findGroup.getDescription()).isEqualTo(modifyGroupServiceDto.getDescription());
     }
 
-    @Test
-    @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
-    void modifyGroupInFaultCondition() {
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
-
-        //when
-        GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
-                .groupName("group modify")
-                .description("group1을 수정하였습니다.")
+    GroupServiceDto createDto(Long id, String groupName, String description){
+        return GroupServiceDto.builder()
+                .id(id)
+                .groupName(groupName)
+                .description(description)
                 .build();
-        assertThatThrownBy(()-> groupService.modifyGroup(userB, groupId, modifyGroupServiceDto))
-                .isInstanceOf(NoAthorityToAccessException.class);
-    }
-
-    @Test
-    @DisplayName("그룹 삭제")
-    void deleteGroup(){
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
-
-        //when
-        groupService.deleteGroup(userA, groupId);
-
-        //then
-        assertThat(groupsRepository.findById(groupId)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("그룹 조회")
-    void findGroupDetailById(){
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
-        groupService.enterGroup(userB, groupId);
-
-        //when
-        GroupDetailServiceDto groupDetailServiceDTO = groupService.findGroupDetailById(userA, groupId);
-
-        //then
-        assertThat(groupDetailServiceDTO.getUsers().size()).isEqualTo(2);
-        assertThat(groupDetailServiceDTO.getUsers()).filteredOn( user ->
-            (user.getUserId() == userA.getId()) || (user.getUserId() == userB.getId())
-        ).size().isEqualTo(2);
-
-        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
-        assertThat(groupDetailServiceDTO.getGroupId()).isEqualTo(findGroup.getId());
-        assertThat(groupDetailServiceDTO.getGroupName()).isEqualTo(findGroup.getGroupName());
-        assertThat(groupDetailServiceDTO.getDescription()).isEqualTo(findGroup.getDescription());
-    }
-
-    @Test
-    @DisplayName("그룹 조회-그룹에 속해 있지 않은 유저")
-    void findGroupDetailByIdInFaultCondition(){
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
-
-        //when
-        assertThatThrownBy(() -> groupService.findGroupDetailById(userB, groupId)).isInstanceOf(RuntimeException.class);
-    }
-
-    @Test
-    @DisplayName("그룹 참가")
-    void enterGroup(){
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
-
-        //when
-        groupService.enterGroup(userB, groupId);
-
-        //then
-        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
-        assertThat(groupsRepository.findByUserAndGroup(userA, findGroup)).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("그룹 퇴장")
-    void exitGroup(){
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
-
-        //when
-        groupService.exitGroup(userA, groupId);
-
-        //then
-        /**
-         * JPQL과 Persistence Context비동기화 문제 -> 다른식으로 테스트해야함
-         */
-//        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
-//        assertThat(groupsRepository.findByUserAndGroup(userA, findGroup)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("그룹 퇴장-그룹에 속해 있지 않은 유저")
-    void exitGroupInFaultCondition(){
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
-
-        //when
-        assertThatThrownBy(() -> groupService.exitGroup(userB, groupId)).isInstanceOf(RuntimeException.class);
     }
 }

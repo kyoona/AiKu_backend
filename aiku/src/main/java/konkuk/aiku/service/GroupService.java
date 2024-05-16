@@ -73,6 +73,7 @@ public class GroupService {
 
         UserGroup userGroup = checkUserInGroup(user, group);
 
+        
         groupsRepository.deleteUserGroup(userGroup);
         return groupId;
     }
