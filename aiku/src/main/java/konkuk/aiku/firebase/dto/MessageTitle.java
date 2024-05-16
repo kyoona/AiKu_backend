@@ -3,7 +3,9 @@ package konkuk.aiku.firebase.dto;
 public enum MessageTitle {
     USER_SCHEDULE_ARRIVAL("USER_SCHEDULE_ARRIVAL"),
     USER_REAL_TIME_LOCATION("USER_REAL_TIME_LOCATION"),
-    EMOJI_TO_USER("EMOJI_TO_USER");
+    EMOJI_TO_USER("EMOJI_TO_USER"),
+    START_SCHEDULE("START_SCHEDULE"),
+    NEXT_SCHEDULE("NEXT_SCHEDULE");
 
     private String title;
 

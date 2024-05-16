@@ -50,9 +50,14 @@ public class ScheduleEventHandler {
         Long scheduleId = event.getScheduleId();
 
 
-        Long delay = 0l;
+        Long delay = alarmService.getScheduleAlarmTimeDelay(scheduleId);
         Executors.newScheduledThreadPool(1)
-                        .schedule(() -> {}, delay, TimeUnit.DAYS);
+                .schedule(alarmService.sendStartScheduleRunnable(scheduleId), delay, TimeUnit.MINUTES);
+
+        if(delay > 1440){ //스케줄 예정시간과 등록시간의 차이가 24시간 이상일 경우->24시간 전 알람 발생
+            Executors.newScheduledThreadPool(1)
+                    .schedule(alarmService.sendNextScheduleRunnable(scheduleId), delay - 1440, TimeUnit.MINUTES);
+        }
     }
 
     //==편의 메서드==
