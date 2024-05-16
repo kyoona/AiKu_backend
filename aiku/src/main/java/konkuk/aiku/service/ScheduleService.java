@@ -40,8 +40,8 @@ public class ScheduleService {
                 .scheduleTime(scheduleServiceDTO.getScheduleTime())
                 .build();
 
-        schedule.addUser(user, new UserSchedule());
         group.addSchedule(schedule);
+        schedule.addUser(user, new UserSchedule());
 
         scheduleRepository.save(schedule);
 

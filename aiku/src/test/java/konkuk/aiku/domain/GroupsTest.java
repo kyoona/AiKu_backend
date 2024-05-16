@@ -47,18 +47,27 @@ class GroupsTest {
         //given
         Users user = createUser(2L, "user2");
         Groups group = Groups.createGroups(user, "group1", "group1입니다.");
+        Schedule schedule = createSchedule(2L, "schedule2");
 
         //when
-        group.addSchedule();
+        group.addSchedule(schedule);
 
         //then
-
+        assertThat(schedule.getGroup()).isEqualTo(group);
+        assertThat(group.getSchedules().get(0)).isEqualTo(schedule);
     }
 
     Users createUser(Long id, String username){
         return Users.builder()
                 .id(id)
                 .username(username)
+                .build();
+    }
+
+    Schedule createSchedule(Long id, String scheduleName){
+        return Schedule.builder()
+                .id(id)
+                .scheduleName(scheduleName)
                 .build();
     }
 }
