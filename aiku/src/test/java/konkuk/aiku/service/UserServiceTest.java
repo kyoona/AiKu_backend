@@ -41,7 +41,6 @@ class UserServiceTest {
     void save() {
         Users entity = userAddDTO.toEntity();
         Long id = userService.save(entity);
-        em.flush();
 
         log.info("save id = {}", id);
 

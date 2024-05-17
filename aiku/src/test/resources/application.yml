@@ -1,7 +1,7 @@
 spring:
   datasource:
-#    url: jdbc:h2:mem:testdb
-    url: jdbc:h2:tcp://localhost/~/Downloads/aikuTest
+    url: jdbc:h2:mem:testdb
+#    url: jdbc:h2:tcp://localhost/~/Downloads/aikuTest
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -13,6 +13,7 @@ spring:
       hibernate:
         #        show_sql: true
         format_sql: true
+    show-sql: true
 jwt:
   secret: f48d729a72445f378eb3be26525615782ddd1555889c9997d41ddab82d560c51
 

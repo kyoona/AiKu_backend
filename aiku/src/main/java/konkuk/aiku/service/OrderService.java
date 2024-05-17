@@ -47,7 +47,7 @@ public class OrderService {
     }
 
     public List<OrderFindServiceDto> findOrders(Users users, String startDate, String endDate, Integer minPrice, Integer maxPrice, String itemName, String itemType) {
-        return ordersRepository.findOrdersByCondition(
+        return ordersRepository.findOrdersInCondition(
                 users.getId(), LocalDateTime.parse(startDate), LocalDateTime.parse(endDate),
                 minPrice, maxPrice, itemName, ItemCategory.valueOf(itemType)
         );

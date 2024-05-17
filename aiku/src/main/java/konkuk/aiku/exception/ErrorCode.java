@@ -28,6 +28,7 @@ public enum ErrorCode {
     NO_SUCH_ORDER(4045, "존재하지 않는 주문입니다."),
     NO_SUCH_BETTING(4046, "존재하지 않는 베팅입니다."),
     NO_SUCH_TITLE(4047, "존재하지 않는 칭호입니다."),
+    NO_SUCH_ITEM(4048, "존재하지 않는 칭호입니다."),
 
     //5XX Server error response
     INTERNAL_SERVER_ERROR(5001, "서버 내부 오류"),
