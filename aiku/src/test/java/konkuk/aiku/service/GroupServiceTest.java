@@ -7,23 +7,22 @@ import konkuk.aiku.domain.Users;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
-import konkuk.aiku.service.dto.GroupDetailServiceDto;
-import konkuk.aiku.service.dto.GroupServiceDto;
-import konkuk.aiku.service.dto.UserSimpleServiceDto;
-import org.assertj.core.api.Assertions;
+import konkuk.aiku.repository.ScheduleRepository;
+import konkuk.aiku.service.dto.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +31,8 @@ class GroupServiceTest {
 
     @Mock
     GroupsRepository groupsRepository;
+    @Mock
+    ScheduleRepository scheduleRepository;
 
     @InjectMocks
     GroupService groupService;
@@ -107,7 +108,7 @@ class GroupServiceTest {
 
     @Test
     @DisplayName("그룹 상세 조회")
-    void findGroupDetailById() {
+    void findGroupDetail() {
         //given
         Users user = createUser(1L, "user1!");
         Groups group = Groups.createGroups(user, "group1", "그룹1");
@@ -115,9 +116,10 @@ class GroupServiceTest {
 
         when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
         when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
+        when(groupsRepository.findUserGroupWithUser(any())).thenReturn(List.of(userGroup));
 
         //when
-        GroupDetailServiceDto groupResponse = groupService.findGroupDetailById(user, group.getId());
+        GroupDetailServiceDto groupResponse = groupService.findGroupDetail(user, group.getId());
 
         //then
         assertThat(groupResponse.getGroupName()).isEqualTo(group.getGroupName());
@@ -126,6 +128,30 @@ class GroupServiceTest {
         UserSimpleServiceDto userResponse = groupResponse.getUsers().get(0);
         assertThat(userResponse.getUserId()).isEqualTo(user.getId());
         assertThat(userResponse.getUsername()).isEqualTo(user.getUsername());
+    }
+
+    @Test
+    @DisplayName("그룹 목록 조회")
+    void findGroupList() {
+        //given
+        Users user = createUser(1L, "user1!");
+        Groups group1 = Groups.createGroups(user, "group1", "그룹1");
+        Groups group2 = Groups.createGroups(user, "group2", "그룹2");
+        List<UserGroup> userGroups = List.of(group1.getUserGroups().get(0), group2.getUserGroups().get(0));
+
+        when(groupsRepository.findUserGroupWithGroup(any(Long.class))).thenReturn(userGroups);
+        when(groupsRepository.countOfGroupUsers(any())).thenReturn(1);
+        when(scheduleRepository.findLatestScheduleTimeByGroupId(any())).thenReturn(Optional.of(LocalDateTime.now()));
+
+        //when
+        GroupListServiceDto response = groupService.findGroupList(user);
+
+        //then
+        assertThat(response.getUserId()).isEqualTo(user.getId());
+
+        List<GroupSimpleServiceDto> responseData = response.getData();
+        assertThat(responseData.size()).isEqualTo(2);
+        assertThat(responseData.stream().map(GroupSimpleServiceDto::getGroupName)).contains(group1.getGroupName(), group2.getGroupName());
     }
 
     @Test

@@ -75,7 +75,7 @@ public class GroupController {
                                                          @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        GroupDetailServiceDto serviceDTO = groupService.findGroupDetailById(user, groupId);
+        GroupDetailServiceDto serviceDTO = groupService.findGroupDetail(user, groupId);
 
         GroupResponseDto responseDto = GroupResponseDto.toDto(serviceDTO);
         return new ResponseEntity<GroupResponseDto>(responseDto, HttpStatus.OK);

@@ -53,7 +53,7 @@ public class GroupService {
         return groupId;
     }
 
-    public GroupDetailServiceDto findGroupDetailById(Users user, Long groupId) {
+    public GroupDetailServiceDto findGroupDetail(Users user, Long groupId) {
         Groups group = findGroupById(groupId);
         checkUserInGroup(user, group);
 

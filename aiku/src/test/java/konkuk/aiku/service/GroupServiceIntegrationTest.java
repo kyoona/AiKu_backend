@@ -142,13 +142,13 @@ class GroupServiceIntegrationTest {
 
     @Test
     @DisplayName("그룹 조회")
-    void findGroupDetailById(){
+    void findGroupDetail(){
         //given
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
         groupService.enterGroup(userB, groupId);
 
         //when
-        GroupDetailServiceDto groupDetailServiceDTO = groupService.findGroupDetailById(userA, groupId);
+        GroupDetailServiceDto groupDetailServiceDTO = groupService.findGroupDetail(userA, groupId);
 
         //then
         assertThat(groupDetailServiceDTO.getUsers().size()).isEqualTo(2);
@@ -164,12 +164,12 @@ class GroupServiceIntegrationTest {
 
     @Test
     @DisplayName("그룹 조회-그룹에 속해 있지 않은 유저")
-    void findGroupDetailByIdInFaultCondition(){
+    void findGroupDetailInFaultCondition(){
         //given
         Long groupId = groupService.addGroup(userA, groupServiceDTO);
 
         //when
-        assertThatThrownBy(() -> groupService.findGroupDetailById(userB, groupId)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> groupService.findGroupDetail(userB, groupId)).isInstanceOf(RuntimeException.class);
     }
 
     @Test
