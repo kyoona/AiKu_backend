@@ -152,7 +152,7 @@ public class AlarmService {
     }
 
     private List<Users> findUsersByScheduleIdFetchJoin(Long scheduleID){
-        return scheduleRepository.findUsersByScheduleId(scheduleID);
+        return scheduleRepository.findUsersByScheduleId(scheduleID).stream().map(UserSchedule::getUser).toList();
     }
 
     private Users findUserById(Long userId){

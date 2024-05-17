@@ -5,28 +5,27 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@Getter
 @Builder
-public class GroupDetailServiceDto {
+@Getter
+public class GroupSimpleServiceDto {
     private Long groupId;
     private String groupName;
     private String description;
-    @Builder.Default private List<UserSimpleServiceDto> users = new ArrayList<>();
+    private int memberSize;
+    private LocalDateTime lastScheduleTime;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public static GroupDetailServiceDto toDto(Groups group, List<UserSimpleServiceDto> userSimpleServiceDtos){
-        GroupDetailServiceDto groupDetailServiceDTO = GroupDetailServiceDto.builder()
+    public static GroupSimpleServiceDto toDto(Groups group, int memberSize, LocalDateTime lastScheduleTime){
+        return GroupSimpleServiceDto.builder()
                 .groupId(group.getId())
                 .groupName(group.getGroupName())
                 .description(group.getDescription())
-                .users(userSimpleServiceDtos)
+                .memberSize(memberSize)
+                .lastScheduleTime(lastScheduleTime)
                 .createdAt(group.getCreatedAt())
                 .modifiedAt(group.getModifiedAt())
                 .build();
-        return groupDetailServiceDTO;
     }
 }

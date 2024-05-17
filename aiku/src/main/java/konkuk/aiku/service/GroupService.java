@@ -5,12 +5,15 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
+import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +23,7 @@ import java.util.List;
 public class GroupService {
 
     private final GroupsRepository groupsRepository;
+    private final ScheduleRepository scheduleRepository;
 
     @Transactional
     public Long addGroup(Users user, GroupServiceDto groupDto){
@@ -49,15 +53,33 @@ public class GroupService {
         return groupId;
     }
 
-    public GroupDetailServiceDto findGroupDetailById(Users user, Long groupId) {
+    public GroupDetailServiceDto findGroupDetail(Users user, Long groupId) {
         Groups group = findGroupById(groupId);
         checkUserInGroup(user, group);
 
-        List<UserGroup> userGroups = group.getUserGroups();
+        List<UserGroup> userGroups = groupsRepository.findUserGroupWithUser(groupId);
 
         List<UserSimpleServiceDto> userSimpleServiceDtos = UserSimpleServiceDto.toDtoListByUserGroup(userGroups);
         GroupDetailServiceDto serviceDto = GroupDetailServiceDto.toDto(group, userSimpleServiceDtos);
         return serviceDto;
+    }
+
+    public GroupListServiceDto findGroupList(Users user){
+        List<UserGroup> userGroups = groupsRepository.findUserGroupWithGroup(user.getId());
+
+        List<GroupSimpleServiceDto> groupDtos = createGroupListDataDtos(userGroups);
+        return GroupListServiceDto.toDto(user.getId(), groupDtos);
+    }
+
+    private List<GroupSimpleServiceDto> createGroupListDataDtos(List<UserGroup> userGroups) {
+        List<GroupSimpleServiceDto> dto = new ArrayList<>();
+        for (UserGroup userGroup : userGroups) {
+            Groups group = userGroup.getGroup();
+            int groupMemberSize = groupsRepository.countOfGroupUsers(group.getId());
+            LocalDateTime lastScheduleTime = scheduleRepository.findLatestScheduleTimeByGroupId(group.getId()).orElse(null);
+            dto.add(GroupSimpleServiceDto.toDto(group, groupMemberSize, lastScheduleTime));
+        }
+        return dto;
     }
 
     @Transactional
@@ -72,24 +94,26 @@ public class GroupService {
         Groups group = findGroupById(groupId);
 
         UserGroup userGroup = checkUserInGroup(user, group);
+        group.deleteUser(userGroup);
 
-        groupsRepository.deleteUserGroup(userGroup);
         return groupId;
     }
 
-    private Groups findGroupById(Long groupId){
-        Groups group = groupsRepository.findById(groupId).orElse(null);
-        if (group == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
-        }
-        return group;
-    }
-
+    //==검증 메서드==
     private UserGroup checkUserInGroup(Users user, Groups groups){
         UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
         if(userGroup == null){
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userGroup;
+    }
+
+    //==레파지토리 조회 메서드==
+    private Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 }
