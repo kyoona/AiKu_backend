@@ -5,12 +5,15 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
+import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +23,7 @@ import java.util.List;
 public class GroupService {
 
     private final GroupsRepository groupsRepository;
+    private final ScheduleRepository scheduleRepository;
 
     @Transactional
     public Long addGroup(Users user, GroupServiceDto groupDto){
@@ -60,8 +64,22 @@ public class GroupService {
         return serviceDto;
     }
 
-    public void findGroupList(Users user, String groupName){
+    public GroupListServiceDto findGroupList(Users user){
+        List<UserGroup> userGroups = groupsRepository.findUserGroupWithGroup(user.getId());
 
+        List<GroupSimpleServiceDto> groupDtos = createGroupListDataDtos(userGroups);
+        return GroupListServiceDto.toDto(user.getId(), groupDtos);
+    }
+
+    private List<GroupSimpleServiceDto> createGroupListDataDtos(List<UserGroup> userGroups) {
+        List<GroupSimpleServiceDto> dto = new ArrayList<>();
+        for (UserGroup userGroup : userGroups) {
+            Groups group = userGroup.getGroup();
+            int groupMemberSize = groupsRepository.countOfGroupUsers(group.getId());
+            LocalDateTime lastScheduleTime = scheduleRepository.findLatestScheduleTimeByGroupId(group.getId()).orElse(null);
+            dto.add(GroupSimpleServiceDto.toDto(group, groupMemberSize, lastScheduleTime));
+        }
+        return dto;
     }
 
     @Transactional

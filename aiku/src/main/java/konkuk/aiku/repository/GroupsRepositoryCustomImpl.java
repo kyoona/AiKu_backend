@@ -1,5 +1,6 @@
 package konkuk.aiku.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -9,11 +10,13 @@ import konkuk.aiku.domain.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class GroupsRepositoryCustomImpl implements GroupsRepositoryCustom{
+
     @PersistenceContext
     private final EntityManager entityManager;
 

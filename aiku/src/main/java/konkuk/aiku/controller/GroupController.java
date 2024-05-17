@@ -2,12 +2,14 @@ package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.GroupDto;
+import konkuk.aiku.controller.dto.GroupListResponseDto;
 import konkuk.aiku.controller.dto.GroupResponseDto;
 import konkuk.aiku.controller.dto.SuccessResponseDto;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
 import konkuk.aiku.service.dto.GroupDetailServiceDto;
+import konkuk.aiku.service.dto.GroupListServiceDto;
 import konkuk.aiku.service.dto.GroupServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,10 +61,13 @@ public class GroupController {
     }
 
     @GetMapping
-    public void groupsList(@RequestParam String groupName,
-                           @AuthenticationPrincipal UserAdaptor userAdaptor){
+    public ResponseEntity<GroupListResponseDto> groupsList(@AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        groupService.findGroupList(user, groupName);
+
+        GroupListServiceDto serviceDto = groupService.findGroupList(user);
+
+        GroupListResponseDto responseDto = GroupListResponseDto.toDto(serviceDto);
+        return new ResponseEntity<GroupListResponseDto>(responseDto, HttpStatus.OK);
     }
 
     @GetMapping("/{groupId}")
