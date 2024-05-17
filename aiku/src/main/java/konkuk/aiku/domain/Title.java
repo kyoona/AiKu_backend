@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter @Setter
+@Getter @Setter @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Title extends TimeEntity{
 
@@ -24,8 +24,9 @@ public class Title extends TimeEntity{
         this.titleImg = titleImg;
     }
 
-    public void updateTitle(String titleName, String description) {
+    public void updateTitle(String titleName, String description, String titleImg) {
         this.titleName = titleName;
         this.description = description;
+        this.titleImg = titleImg;
     }
 }

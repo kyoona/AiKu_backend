@@ -4,6 +4,7 @@ import konkuk.aiku.service.dto.ItemServiceDto;
 import konkuk.aiku.service.dto.OrderServiceDto;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter @Builder
 public class OrderItemSimpleDto {

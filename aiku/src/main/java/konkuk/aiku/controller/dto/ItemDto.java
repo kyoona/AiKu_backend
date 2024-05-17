@@ -7,6 +7,7 @@ import konkuk.aiku.service.dto.ItemServiceDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter @Setter
 @Builder
@@ -15,7 +16,9 @@ public class ItemDto {
     private ItemCategory itemCategory;
     private int price;
     private int eventPrice;
+    private String eventDescription;;
     private EventStatus eventStatus;
+    private String itemImg;
 
     public ItemServiceDto toServiceDto() {
         return ItemServiceDto.builder()
@@ -24,6 +27,8 @@ public class ItemDto {
                 .price(price)
                 .eventPrice(eventPrice)
                 .eventStatus(eventStatus)
+                .eventDescription(eventDescription)
+                .itemImg(itemImg)
                 .build();
 
     }

@@ -5,10 +5,12 @@ import konkuk.aiku.domain.BettingType;
 import konkuk.aiku.service.dto.BettingServiceDto;
 import konkuk.aiku.service.dto.UserServiceDto;
 import konkuk.aiku.service.dto.UserSimpleServiceDto;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
+@Builder
 public class BettingAddDto {
     private Long targetUserId;
     private int point;
@@ -16,6 +18,7 @@ public class BettingAddDto {
 
     public BettingServiceDto toServiceDto() {
         UserSimpleServiceDto target = UserSimpleServiceDto.builder().userId(targetUserId).build();
+
         return BettingServiceDto.builder()
                 .targetUser(target)
                 .point(point)

@@ -28,12 +28,12 @@ public class AdminService {
 
     public Long updateItem(Long itemId, ItemServiceDto itemDto) {
         Item item = findItemById(itemId);
-        item.updateItem(itemDto.getItemName(), itemDto.getItemCategory(), itemDto.getPrice(), itemDto.getEventPrice(), itemDto.getEventStatus());
+        item.updateItem(itemDto.getItemName(), itemDto.getItemCategory(), itemDto.getPrice(), itemDto.getEventPrice(), itemDto.getEventStatus(), itemDto.getEventDescription());
 
         return item.getId();
     }
 
-    private Item findItemById(Long itemId) {
+    public Item findItemById(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_ITEM));
     }
@@ -53,12 +53,12 @@ public class AdminService {
 
     public Long updateTitle(Long titleId, TitleServiceDto titleServiceDto) {
         Title title = findTitleById(titleId);
-        title.updateTitle(titleServiceDto.getTitleName(), titleServiceDto.getDescription());
+        title.updateTitle(titleServiceDto.getTitleName(), titleServiceDto.getDescription(), titleServiceDto.getTitleImg());
 
         return title.getId();
     }
 
-    private Title findTitleById(Long titleId) {
+    public Title findTitleById(Long titleId) {
         return titleRepository.findById(titleId)
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_TITLE));
     }

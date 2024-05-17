@@ -21,6 +21,7 @@ public class OrderServiceDto {
                 .price(item.getPrice())
                 .eventPrice(item.getEventPrice())
                 .eventDescription(item.getEventDescription())
+                .status(OrderStatus.FAIL)
                 .count(count)
                 .build();
     }
