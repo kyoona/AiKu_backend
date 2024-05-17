@@ -6,16 +6,18 @@ import konkuk.aiku.domain.ItemCategory;
 import konkuk.aiku.domain.QOrders;
 import konkuk.aiku.service.dto.OrderFindServiceDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 @RequiredArgsConstructor
-public class OrderRepositoryCustomImpl implements OrdersRepositoryCustom {
+public class OrdersRepositoryCustomImpl implements OrdersRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<OrderFindServiceDto> findOrdersByCondition(Long userId, LocalDateTime startDate, LocalDateTime endDate, Integer minPrice, Integer maxPrice, String itemName, ItemCategory itemCategory) {
+    public List<OrderFindServiceDto> findOrdersInCondition(Long userId, LocalDateTime startDate, LocalDateTime endDate, Integer minPrice, Integer maxPrice, String itemName, ItemCategory itemCategory) {
         QOrders qOrders = QOrders.orders;
         return jpaQueryFactory.select(Projections.constructor(OrderFindServiceDto.class,
                         qOrders.id, qOrders.item, qOrders.createdAt, qOrders.status, qOrders.price, qOrders.eventPrice, qOrders.eventDescription, qOrders.count

@@ -34,7 +34,7 @@ public class BettingService {
 
     private Users findUserById(Long userId) {
         return usersRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USERS));
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
     }
 
     private Betting findBettingById(Long bettingId) {
@@ -56,7 +56,7 @@ public class BettingService {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         Users targetUser = usersRepository.findById(bettingServiceDto.getTargetUser().getUserId())
-                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USERS));
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
 
         UserSchedule userSchedule = userInSchedule.get();
 
