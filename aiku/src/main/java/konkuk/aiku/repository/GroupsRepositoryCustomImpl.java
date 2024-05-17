@@ -25,9 +25,4 @@ public class GroupsRepositoryCustomImpl implements GroupsRepositoryCustom{
                 .setParameter("groupId", group.getId());
         return query.getResultList().stream().findFirst();
     }
-
-    @Override
-    public void deleteUserGroup(UserGroup userGroup) {
-        entityManager.remove(userGroup);
-    }
 }

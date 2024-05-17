@@ -60,6 +60,10 @@ public class GroupService {
         return serviceDto;
     }
 
+    public void findGroupList(Users user, String groupName){
+
+    }
+
     @Transactional
     public Long enterGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);

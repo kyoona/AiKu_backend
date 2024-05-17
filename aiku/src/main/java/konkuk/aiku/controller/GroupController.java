@@ -58,6 +58,13 @@ public class GroupController {
         return SuccessResponseDto.getResponseEntity(deleteId, DELETE_SUCCESS, HttpStatus.OK);
     }
 
+    @GetMapping
+    public void groupsList(@RequestParam String groupName,
+                           @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        groupService.findGroupList(user, groupName);
+    }
+
     @GetMapping("/{groupId}")
     public ResponseEntity<GroupResponseDto> groupDetails(@PathVariable Long groupId,
                                                          @AuthenticationPrincipal UserAdaptor userAdaptor){
@@ -84,7 +91,4 @@ public class GroupController {
         Long exitId = groupService.exitGroup(user, groupId);
         return SuccessResponseDto.getResponseEntity(exitId, EXIT_SUCCESS, HttpStatus.OK);
     }
-
-    
-
 }
