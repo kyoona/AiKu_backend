@@ -27,7 +27,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<SuccessResponseDto> save(@RequestBody UserAddDto userAddDTO) {
-        Long userId = userService.save(userAddDTO.toEntity());
+        Long userId = userService.save(userAddDTO.toServiceDto());
         return SuccessResponseDto.getResponseEntity(userId, ADD_SUCCESS, HttpStatus.OK);
     }
 
@@ -52,6 +52,13 @@ public class UserController {
         Users users = userAdaptor.getUsers();
         Long userId = userService.deleteUsers(users);
         return SuccessResponseDto.getResponseEntity(userId, DELETE_SUCCESS, HttpStatus.OK);
+    }
+
+    @PostMapping("/titles/{titleId}")
+    public ResponseEntity<SuccessResponseDto> addUserTitle(@AuthenticationPrincipal UserAdaptor userAdaptor, @PathVariable Long titleId) {
+        Users users = userAdaptor.getUsers();
+        Long userTitleId = userService.addUserTitle(users, titleId);
+        return SuccessResponseDto.getResponseEntity(userTitleId, ADD_SUCCESS, HttpStatus.OK);
     }
 
     @PatchMapping("/setting/alarm")
@@ -100,7 +107,7 @@ public class UserController {
     @GetMapping("/titles")
     public ResponseEntity<List<TitleResponseDto>> getUserTitles(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
-        List<TitleResponseDto> titleList = userService.getUserTitle(users.getId());
+        List<TitleResponseDto> titleList = userService.getUserTitles(users.getId());
 
         return new ResponseEntity<>(titleList, HttpStatus.OK);
     }

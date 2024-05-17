@@ -8,8 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter @Builder
@@ -51,6 +50,38 @@ public class UserServiceDto {
                 .fcmToken(users.getFcmToken())
                 .fcmTokenCreateAt(users.getFcmTokenCreateAt())
                 .refreshToken(users.getRefreshToken())
+                .build();
+    }
+
+    public Users toEntity() {
+        List<UserTitleServiceDto> userTitleServiceDtos = Optional.ofNullable(userTitles)
+                .orElse(Collections.emptyList());
+
+        List<UserTitle> userTitleList = userTitleServiceDtos
+                .stream()
+                .map(UserTitleServiceDto::toEntity)
+                .collect(Collectors.toList());
+
+        UserTitle mainTitleEntity = null;
+        if(!Objects.isNull(mainTitle)) {
+            mainTitleEntity = mainTitle.toEntity();
+        }
+
+        return Users.builder()
+                .id(id)
+                .username(username)
+                .phoneNumber(phoneNumber)
+                .userImg(userImg)
+                .kakaoId(kakaoId)
+                .password(password)
+                .setting(setting)
+                .userTitles(userTitleList)
+                .mainTitle(mainTitleEntity)
+                .point(point)
+                .role(role)
+                .fcmToken(fcmToken)
+                .fcmTokenCreateAt(fcmTokenCreateAt)
+                .refreshToken(refreshToken)
                 .build();
     }
 }

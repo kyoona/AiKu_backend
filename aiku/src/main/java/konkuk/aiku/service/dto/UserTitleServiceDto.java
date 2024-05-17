@@ -20,4 +20,12 @@ public class UserTitleServiceDto {
                 .title(title)
                 .build();
     }
+
+    public UserTitle toEntity() {
+        return UserTitle.builder()
+                .id(id)
+                .title(title.toEntity())
+                .user(user.toEntity())
+                .build();
+    }
 }
