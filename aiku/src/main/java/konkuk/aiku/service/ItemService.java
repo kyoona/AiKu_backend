@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ItemService {
 
     private final ItemRepository itemRepository;
 
-    @Transactional
     public List<ItemResponseDto> getItemList(String itemType) {
         ItemCategory category = ItemCategory.valueOf(itemType);
 

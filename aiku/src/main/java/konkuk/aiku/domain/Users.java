@@ -65,6 +65,10 @@ public class Users extends TimeEntity {
         this.setting = setting;
     }
 
+    public void addTitle(UserTitle userTitle) {
+        this.userTitles.add(userTitle);
+    }
+
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
         this.fcmTokenCreateAt = LocalDateTime.now();

@@ -2,12 +2,16 @@ package konkuk.aiku.service;
 
 import jakarta.persistence.EntityManager;
 import konkuk.aiku.controller.dto.SettingAlarmDto;
+import konkuk.aiku.controller.dto.TitleDto;
 import konkuk.aiku.controller.dto.UserAddDto;
 import konkuk.aiku.controller.dto.UserUpdateDto;
+import konkuk.aiku.domain.UserTitle;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.exception.NoSuchEntityException;
+import konkuk.aiku.service.dto.UserServiceDto;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,8 @@ class UserServiceTest {
     @Autowired
     UserService userService;
     @Autowired
+    AdminService adminService;
+    @Autowired
     EntityManager em;
 
     UserAddDto userAddDTO;
@@ -39,8 +45,8 @@ class UserServiceTest {
 
     @Test
     void save() {
-        Users entity = userAddDTO.toEntity();
-        Long id = userService.save(entity);
+        UserServiceDto userServiceDto = userAddDTO.toServiceDto();
+        Long id = userService.save(userServiceDto);
 
         log.info("save id = {}", id);
 
@@ -49,9 +55,8 @@ class UserServiceTest {
 
     @Test
     void findByKakaoId() {
-        Users entity = userAddDTO.toEntity();
-        Long saveId = userService.save(entity);
-        em.flush();
+        UserServiceDto userServiceDto = userAddDTO.toServiceDto();
+        Long saveId = userService.save(userServiceDto);
 
         Users byKakaoId = userService.findByKakaoId(100L);
 
@@ -60,21 +65,15 @@ class UserServiceTest {
 
     @Test
     void logout() {
-        Users entity = userAddDTO.toEntity();
-        Long saveId = userService.save(entity);
-        em.flush();
-        em.clear();
+        UserServiceDto userServiceDto = userAddDTO.toServiceDto();
+        Long saveId = userService.save(userServiceDto);
 
         Users byId = userService.findById(saveId);
         byId.setRefreshToken("abcd");
         log.info("refreshToken before = {}", byId.getRefreshToken());
-        em.flush();
-        em.clear();
 
         userService.logout(saveId);
         log.info("refreshToken after = {}", byId.getRefreshToken());
-        em.flush();
-        em.clear();
 
         byId = userService.findById(saveId);
 
@@ -83,19 +82,46 @@ class UserServiceTest {
 
     @Test
     void updateUser() {
-        UserUpdateDto userUpdateDTO = new UserUpdateDto();
-        userUpdateDTO.setUserTitleId(null);
-        userUpdateDTO.setUsername("가나다");
-//        userService.updateUser(save, userUpdateDTO);
+        UserServiceDto userServiceDto = userAddDTO.toServiceDto();
+        Long saveId = userService.save(userServiceDto);
+        Users users = userService.findById(saveId);
 
-        // 칭호 생성 로직 작성 후 진행
+        TitleDto testTitleA = new TitleDto();
+        testTitleA.setTitleName("테스트타이틀A");
+        testTitleA.setDescription("테스트용 타이틀입니다.");
+        TitleDto testTitleB = new TitleDto();
+        testTitleB.setTitleName("테스트타이틀B");
+        testTitleB.setDescription("테스트용 타이틀입니다.");
+
+        Long titleAId = adminService.addTitle(testTitleA.toServiceDto());
+        Long userTitleAId = userService.addUserTitle(users, titleAId);
+        Long titleBId = adminService.addTitle(testTitleB.toServiceDto());
+        Long userTitleBId = userService.addUserTitle(users, titleBId);
+        log.info("userTitleBId={}",userTitleBId);
+
+
+        UserTitle userTitleBefore = userService.getUserTitle(userTitleAId);
+        users.setMainTitle(userTitleBefore);
+        log.info("userTitleBefore={}",users.getMainTitle().getTitle().getTitleName());
+
+        UserUpdateDto userUpdateDTO = new UserUpdateDto();
+        userUpdateDTO.setUserTitleId(userTitleBId);
+        userUpdateDTO.setUsername("가나다");
+
+        UserServiceDto userUpdateServiceDto = userUpdateDTO.toServiceDto();
+        userService.updateUser(users, userUpdateServiceDto);
+
+        log.info("userTitleAfter={}",users.getMainTitle().getTitle().getTitleName());
+
+        Assertions.assertThat(users.getMainTitle().getTitle().getTitleName()).isEqualTo("테스트타이틀B");
+        Assertions.assertThat(users.getUsername()).isEqualTo("가나다");
 
     }
 
     @Test
     void deleteUsers() {
-        Users entity = userAddDTO.toEntity();
-        Long saveId = userService.save(entity);
+        UserServiceDto userServiceDto = userAddDTO.toServiceDto();
+        Long saveId = userService.save(userServiceDto);
         em.flush();
 
         Users users = userService.findById(saveId);
@@ -106,8 +132,8 @@ class UserServiceTest {
 
     @Test
     void setAlarm() {
-        Users entity = userAddDTO.toEntity();
-        Long saveId = userService.save(entity);
+        UserServiceDto userServiceDto = userAddDTO.toServiceDto();
+        Long saveId = userService.save(userServiceDto);
         em.flush();
 
         Users users = userService.findById(saveId);
