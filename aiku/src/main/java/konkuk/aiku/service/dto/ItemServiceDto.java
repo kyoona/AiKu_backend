@@ -5,8 +5,10 @@ import konkuk.aiku.domain.ItemCategory;
 import konkuk.aiku.domain.item.Item;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter @Builder
+@ToString
 public class ItemServiceDto {
     private Long id;
 
@@ -29,6 +31,19 @@ public class ItemServiceDto {
                 .eventPrice(eventPrice)
                 .eventDescription(eventDescription)
                 .eventStatus(eventStatus)
+                .build();
+    }
+
+    public static ItemServiceDto toServiceDto(Item item) {
+        return ItemServiceDto.builder()
+                .id(item.getId())
+                .itemName(item.getItemName())
+                .itemImg(item.getItemImg())
+                .itemCategory(item.getItemCategory())
+                .price(item.getPrice())
+                .eventPrice(item.getEventPrice())
+                .eventDescription(item.getEventDescription())
+                .eventStatus(item.getEventStatus())
                 .build();
     }
 }

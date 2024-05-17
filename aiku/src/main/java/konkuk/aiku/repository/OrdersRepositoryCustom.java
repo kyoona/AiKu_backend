@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrdersRepositoryCustom {
-    List<OrderFindServiceDto> findOrdersInCondition(Long userId, LocalDateTime startDate, LocalDateTime endDate, Integer minPrice, Integer maxPrice, String itemName, ItemCategory itemCategory);
+    List<OrderFindServiceDto> findOrdersInCondition(Long userId, String startDate, String endDate, Integer minPrice, Integer maxPrice, String itemName, String itemCategory);
 }

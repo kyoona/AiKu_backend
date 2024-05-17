@@ -1,6 +1,7 @@
 package konkuk.aiku.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.aiku.domain.ItemCategory;
 import konkuk.aiku.domain.QOrders;
@@ -15,23 +16,66 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrdersRepositoryCustomImpl implements OrdersRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
+    private QOrders qOrders = QOrders.orders;
 
     @Override
-    public List<OrderFindServiceDto> findOrdersInCondition(Long userId, LocalDateTime startDate, LocalDateTime endDate, Integer minPrice, Integer maxPrice, String itemName, ItemCategory itemCategory) {
-        QOrders qOrders = QOrders.orders;
+    public List<OrderFindServiceDto> findOrdersInCondition(Long userId, String startDate, String endDate, Integer minPrice, Integer maxPrice, String itemName, String itemCategory) {
+
         return jpaQueryFactory.select(Projections.constructor(OrderFindServiceDto.class,
                         qOrders.id, qOrders.item, qOrders.createdAt, qOrders.status, qOrders.price, qOrders.eventPrice, qOrders.eventDescription, qOrders.count
                 ))
                 .from(qOrders)
                 .where(
-                        qOrders.user.id.eq(userId)
-                                .and(qOrders.createdAt.after(startDate))
-                                .and(qOrders.createdAt.before(endDate))
-                                .and(qOrders.eventPrice.goe(minPrice))
-                                .and(qOrders.eventPrice.loe(maxPrice))
-                                .and(qOrders.item.itemName.eq(itemName))
-                                .and(qOrders.item.itemCategory.eq(itemCategory))
+                        qOrders.user.id.eq(userId),
+                        dateAfter(startDate),
+                        dateBefore(endDate),
+                        priceGoe(minPrice),
+                        priceLoe(maxPrice),
+                        itemNameEq(itemName),
+                        itemTypeEq(itemCategory)
                 ).orderBy(qOrders.createdAt.desc())
                 .fetch();
+    }
+
+    private BooleanExpression dateAfter(String startDate) {
+        if (startDate == null) {
+            return null;
+        }
+        return qOrders.createdAt.after(LocalDateTime.parse(startDate));
+    }
+
+    private BooleanExpression dateBefore(String endDate) {
+        if (endDate == null) {
+            return null;
+        }
+        return qOrders.createdAt.before(LocalDateTime.parse(endDate));
+    }
+
+    private BooleanExpression priceGoe(Integer minPrice) {
+        if (minPrice == null) {
+            return null;
+        }
+        return qOrders.eventPrice.goe(minPrice);
+    }
+
+    private BooleanExpression priceLoe(Integer maxPrice) {
+        if (maxPrice == null) {
+            return null;
+        }
+        return qOrders.eventPrice.loe(maxPrice);
+    }
+
+    private BooleanExpression itemNameEq(String itemName) {
+        if (itemName == null) {
+            return null;
+        }
+        return qOrders.item.itemName.eq(itemName);
+    }
+
+    private BooleanExpression itemTypeEq(String itemCategory) {
+        if (itemCategory == null) {
+            return null;
+        }
+        return qOrders.item.itemCategory.eq(ItemCategory.valueOf(itemCategory));
     }
 }

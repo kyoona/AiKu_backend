@@ -6,7 +6,7 @@ import lombok.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
+@Getter @ToString
 public class Orders extends TimeEntity{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderId")
@@ -36,6 +36,9 @@ public class Orders extends TimeEntity{
     public void setUserAndItem(Users user, Item item) {
         this.item = item;
         this.user = user;
+        this.price = item.getPrice();
+        this.eventPrice = item.getEventPrice();
+        this.eventDescription = item.getEventDescription();
     }
 
     @Builder

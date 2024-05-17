@@ -11,12 +11,14 @@ import konkuk.aiku.service.dto.OrderFindServiceDto;
 import konkuk.aiku.service.dto.OrderServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class OrderService {
 
@@ -41,15 +43,20 @@ public class OrderService {
         return orderIds;
     }
 
-    private Item findItemById(Long itemId) {
+    public Item findItemById(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_ITEM));
     }
 
     public List<OrderFindServiceDto> findOrders(Users users, String startDate, String endDate, Integer minPrice, Integer maxPrice, String itemName, String itemType) {
         return ordersRepository.findOrdersInCondition(
-                users.getId(), LocalDateTime.parse(startDate), LocalDateTime.parse(endDate),
-                minPrice, maxPrice, itemName, ItemCategory.valueOf(itemType)
+                users.getId(), startDate, endDate,
+                minPrice, maxPrice, itemName, itemType
         );
+    }
+
+    public Orders findOrderById(Long orderId) {
+        return ordersRepository.findById(orderId)
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_ORDER));
     }
 }
