@@ -53,7 +53,7 @@ public class GroupService {
         Groups group = findGroupById(groupId);
         checkUserInGroup(user, group);
 
-        List<UserGroup> userGroups = group.getUserGroups();
+        List<UserGroup> userGroups = groupsRepository.findUserGroupWithUser(groupId);
 
         List<UserSimpleServiceDto> userSimpleServiceDtos = UserSimpleServiceDto.toDtoListByUserGroup(userGroups);
         GroupDetailServiceDto serviceDto = GroupDetailServiceDto.toDto(group, userSimpleServiceDtos);
