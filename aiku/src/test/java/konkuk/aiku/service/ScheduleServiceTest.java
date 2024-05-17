@@ -202,7 +202,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 상세 조회")
-    public void findScheduleDetailById() {
+    public void findScheduleDetail() {
         //given
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
@@ -212,7 +212,7 @@ class ScheduleServiceTest {
         Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
 
         //when
-        ScheduleDetailServiceDto scheduleDetailServiceDTO = scheduleService.findScheduleDetailById(userA1, groupA.getId(), scheduleId);
+        ScheduleDetailServiceDto scheduleDetailServiceDTO = scheduleService.findScheduleDetail(userA1, groupA.getId(), scheduleId);
 
         //then
         assertThat(scheduleDetailServiceDTO.getId()).isEqualTo(scheduleId);

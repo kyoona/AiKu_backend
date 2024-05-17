@@ -1,5 +1,6 @@
 package konkuk.aiku.service;
 
+import konkuk.aiku.controller.dto.ScheduleCond;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.event.ScheduleEventPublisher;
 import konkuk.aiku.exception.AlreadyInException;
@@ -71,7 +72,7 @@ public class ScheduleService {
         return scheduleId;
     }
 
-    public ScheduleDetailServiceDto findScheduleDetailById(Users user, Long groupId, Long scheduleId){
+    public ScheduleDetailServiceDto findScheduleDetail(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
@@ -79,6 +80,11 @@ public class ScheduleService {
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
         return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
+    }
+
+    public void findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
+        scheduleRepository.findScheduleByGroupId(
+                groupId, LocalDateTime.parse(cond.getStartDate()), LocalDateTime.parse(cond.getEndDate()), cond.getStatus());
     }
 
     @Transactional
@@ -123,7 +129,6 @@ public class ScheduleService {
     }
 
     //==검증 메서드==
-
     private UserGroup checkUserInGroup(Users user, Groups groups){
         UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
         if(userGroup == null){

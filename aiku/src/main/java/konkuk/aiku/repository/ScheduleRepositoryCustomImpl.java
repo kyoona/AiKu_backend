@@ -1,15 +1,15 @@
 package konkuk.aiku.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import konkuk.aiku.domain.UserArrivalData;
-import konkuk.aiku.domain.UserSchedule;
-import konkuk.aiku.domain.Users;
+import konkuk.aiku.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +20,7 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
 
     @PersistenceContext
     private final EntityManager entityManager;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public Optional<UserSchedule> findUserScheduleByUserIdAndScheduleId(Long userId, Long scheduleId) {
@@ -55,4 +56,14 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
                 .setParameter("scheduleId", scheduleId);
         return query.getResultList().stream().findFirst();
     }
+
+    @Override
+    public List<Schedule> findScheduleByGroupId(Long GroupId, LocalDateTime startTime, LocalDateTime endTime, ScheduleStatus status) {
+        QSchedule schedule = QSchedule.schedule;
+        jpaQueryFactory.
+                selectFrom(schedule)
+                .where()
+    }
+
+
 }
