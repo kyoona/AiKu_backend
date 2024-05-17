@@ -11,7 +11,7 @@ import lombok.*;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "itemType")
 @NoArgsConstructor
-@Getter @Setter
+@Getter @Setter @ToString
 public class Item extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,11 +42,12 @@ public class Item extends TimeEntity {
         this.eventDescription = eventDescription;
     }
 
-    public void updateItem(String itemName, ItemCategory itemCategory, int price, int eventPrice, EventStatus eventStatus) {
+    public void updateItem(String itemName, ItemCategory itemCategory, int price, int eventPrice, EventStatus eventStatus, String eventDescription) {
         this.itemName = itemName;
         this.itemCategory = itemCategory;
         this.price = price;
         this.eventPrice = eventPrice;
         this.eventStatus = eventStatus;
+        this.eventDescription = eventDescription;
     }
 }

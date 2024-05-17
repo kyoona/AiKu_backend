@@ -15,6 +15,7 @@ public class ItemDto {
     private ItemCategory itemCategory;
     private int price;
     private int eventPrice;
+    private String eventDescription;;
     private EventStatus eventStatus;
 
     public ItemServiceDto toServiceDto() {
@@ -24,6 +25,7 @@ public class ItemDto {
                 .price(price)
                 .eventPrice(eventPrice)
                 .eventStatus(eventStatus)
+                .eventDescription(eventDescription)
                 .build();
 
     }
