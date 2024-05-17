@@ -8,13 +8,17 @@ import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.GroupDetailServiceDto;
+import konkuk.aiku.service.dto.GroupListServiceDto;
 import konkuk.aiku.service.dto.GroupServiceDto;
+import konkuk.aiku.service.dto.GroupSimpleServiceDto;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -36,7 +40,8 @@ class GroupServiceIntegrationTest {
     private Users userB;
     private Users userC;
 
-    GroupServiceDto groupServiceDTO;
+    GroupServiceDto groupServiceDTO1;
+    GroupServiceDto groupServiceDTO2;
 
     @BeforeEach
     void beforeEach(){
@@ -67,9 +72,14 @@ class GroupServiceIntegrationTest {
                 .build();
         usersRepository.save(userC);
 
-        groupServiceDTO = GroupServiceDto.builder()
+        groupServiceDTO1 = GroupServiceDto.builder()
                 .groupName("group1")
                 .description("group1입니다.")
+                .build();
+
+        groupServiceDTO2 = GroupServiceDto.builder()
+                .groupName("group2")
+                .description("group2입니다.")
                 .build();
     }
 
@@ -82,13 +92,13 @@ class GroupServiceIntegrationTest {
     @DisplayName("그룹 등록")
     void addGroup() {
         //when
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //then
         Groups findGroup = groupsRepository.findById(groupId).orElse(null);
         assertThat(findGroup).isNotNull();
-        assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO.getGroupName());
-        assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO.getDescription());
+        assertThat(findGroup.getGroupName()).isEqualTo(groupServiceDTO1.getGroupName());
+        assertThat(findGroup.getDescription()).isEqualTo(groupServiceDTO1.getDescription());
 
         assertThat( groupsRepository.findByUserAndGroup(userA, findGroup)).isNotEmpty();
     }
@@ -97,7 +107,7 @@ class GroupServiceIntegrationTest {
     @DisplayName("그룹 수정")
     void modifyGroup() {
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //when
         GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
@@ -116,7 +126,7 @@ class GroupServiceIntegrationTest {
     @DisplayName("그룹 수정-그룹에 속해 있지 않은 유저")
     void modifyGroupInFaultCondition() {
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //when
         GroupServiceDto modifyGroupServiceDto = GroupServiceDto.builder()
@@ -131,7 +141,7 @@ class GroupServiceIntegrationTest {
     @DisplayName("그룹 삭제")
     void deleteGroup(){
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //when
         groupService.deleteGroup(userA, groupId);
@@ -141,10 +151,10 @@ class GroupServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("그룹 조회")
+    @DisplayName("그룹 상세 조회")
     void findGroupDetail(){
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
         groupService.enterGroup(userB, groupId);
 
         //when
@@ -163,20 +173,38 @@ class GroupServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("그룹 조회-그룹에 속해 있지 않은 유저")
+    @DisplayName("그룹 상세 조회-그룹에 속해 있지 않은 유저")
     void findGroupDetailInFaultCondition(){
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //when
         assertThatThrownBy(() -> groupService.findGroupDetail(userB, groupId)).isInstanceOf(RuntimeException.class);
     }
 
     @Test
+    @DisplayName("그룹 목록 조회")
+    void findGroupList(){
+        //given
+        Long groupId1 = groupService.addGroup(userA, groupServiceDTO1);
+        Long groupId2 = groupService.addGroup(userA, groupServiceDTO2);
+
+        //when
+        GroupListServiceDto serviceDto = groupService.findGroupList(userA);
+
+        //then
+        assertThat(serviceDto.getUserId()).isEqualTo(userA.getId());
+
+        List<GroupSimpleServiceDto> dataDto = serviceDto.getData();
+        assertThat(dataDto.size()).isEqualTo(2);
+        assertThat(dataDto.stream().map(GroupSimpleServiceDto::getGroupId).toList()).contains(groupId1, groupId2);
+    }
+
+    @Test
     @DisplayName("그룹 참가")
     void enterGroup(){
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //when
         groupService.enterGroup(userB, groupId);
@@ -190,7 +218,7 @@ class GroupServiceIntegrationTest {
     @DisplayName("그룹 퇴장")
     void exitGroup(){
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //when
         groupService.exitGroup(userA, groupId);
@@ -204,7 +232,7 @@ class GroupServiceIntegrationTest {
     @DisplayName("그룹 퇴장-그룹에 속해 있지 않은 유저")
     void exitGroupInFaultCondition(){
         //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO);
+        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
 
         //when
         assertThatThrownBy(() -> groupService.exitGroup(userB, groupId)).isInstanceOf(RuntimeException.class);
