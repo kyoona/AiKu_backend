@@ -18,6 +18,7 @@ public class ItemDto {
     private int eventPrice;
     private String eventDescription;;
     private EventStatus eventStatus;
+    private String itemImg;
 
     public ItemServiceDto toServiceDto() {
         return ItemServiceDto.builder()
@@ -27,6 +28,7 @@ public class ItemDto {
                 .eventPrice(eventPrice)
                 .eventStatus(eventStatus)
                 .eventDescription(eventDescription)
+                .itemImg(itemImg)
                 .build();
 
     }

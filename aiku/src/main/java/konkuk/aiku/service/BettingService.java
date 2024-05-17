@@ -12,6 +12,7 @@ import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.BettingServiceDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
+@Transactional
 @RequiredArgsConstructor
 public class BettingService {
 
@@ -42,7 +45,6 @@ public class BettingService {
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_BETTING));
     }
 
-    @Transactional
     public BettingServiceDto findBetting(Long bettingId) {
         Betting betting = findBettingById(bettingId);
 

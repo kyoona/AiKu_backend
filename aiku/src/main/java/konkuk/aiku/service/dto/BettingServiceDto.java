@@ -6,9 +6,10 @@ import konkuk.aiku.domain.BettingType;
 import konkuk.aiku.domain.ResultType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
-@Builder
+@Builder @ToString
 public class BettingServiceDto {
     private Long id;
     private UserSimpleServiceDto bettor;
@@ -20,7 +21,7 @@ public class BettingServiceDto {
 
     public static BettingServiceDto toServiceDto(Betting betting) {
         UserSimpleServiceDto bettorDto = UserSimpleServiceDto.toDto(betting.getBettor());
-        UserSimpleServiceDto targetDto = UserSimpleServiceDto.toDto(betting.getBettor());
+        UserSimpleServiceDto targetDto = UserSimpleServiceDto.toDto(betting.getTargetUser());
         ScheduleServiceDto scheduleDto = ScheduleServiceDto.toDto(betting.getSchedule());
 
         return BettingServiceDto.builder()
