@@ -18,6 +18,7 @@ public class ScheduleDetailServiceDto {
     private LocationServiceDto location;
     private LocalDateTime scheduleTime;
     private ScheduleStatus status;
+    private int userCount;
     @Builder.Default private List<UserSimpleServiceDto> acceptUsers = new ArrayList<>();
     @Builder.Default private List<UserSimpleServiceDto> waitUsers = new ArrayList<>();
     private LocalDateTime createdAt;
@@ -30,6 +31,7 @@ public class ScheduleDetailServiceDto {
                 .scheduleName(schedule.getScheduleName())
                 .location(LocationServiceDto.toDto(schedule.getLocation()))
                 .scheduleTime(schedule.getScheduleTime())
+                .userCount(schedule.getUserCount())
                 .acceptUsers(UserSimpleServiceDto.toDtosByUserSchedule(schedule.getUsers()))
                 .waitUsers(UserSimpleServiceDto.toDtosByUser(waitUsers))
                 .createdAt(schedule.getCreatedAt())
