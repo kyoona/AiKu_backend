@@ -33,6 +33,10 @@ public class Betting extends TimeEntity{
     @Enumerated
     private BettingType bettingType; // RACING, BETTING
 
+    public void updateBettingResult(ResultType resultType) {
+        this.resultType = resultType;
+    }
+
     @Builder
     public Betting(Users bettor, Users targetUser, Schedule schedule, int point, BettingType bettingType) {
         this.bettor = bettor;
