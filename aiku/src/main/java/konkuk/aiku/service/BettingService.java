@@ -142,8 +142,10 @@ public class BettingService {
      * 스케줄 종료시 베팅 결과 생성 로직
      * @param betting 결과 생성을 원하는 베팅
      * @return 베팅 아이디
+     * TODO: Schedule 종료 시 해당 메소드 실행
      */
-    public Long setBettingResult(Betting betting) {
+    public Long setBettingResult(Long bettingId) {
+        Betting betting = findBettingById(bettingId);
         Users bettor = betting.getBettor();
         Users targetUser = betting.getTargetUser();
 
