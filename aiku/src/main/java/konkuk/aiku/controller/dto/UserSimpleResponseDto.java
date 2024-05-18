@@ -1,5 +1,6 @@
 package konkuk.aiku.controller.dto;
 
+import konkuk.aiku.domain.UserImgData;
 import konkuk.aiku.service.dto.UserSimpleServiceDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,12 +14,14 @@ public class UserSimpleResponseDto {
     private Long userId;
     private String username;
     private String userImg;
+    private UserImgData userImgData;
 
     public static UserSimpleResponseDto toDto(UserSimpleServiceDto serviceDTO){
         UserSimpleResponseDto dto = UserSimpleResponseDto.builder()
                 .userId(serviceDTO.getUserId())
                 .username(serviceDTO.getUsername())
                 .userImg(serviceDTO.getUserImg())
+                .userImgData(serviceDTO.getUserImgData())
                 .build();
         return dto;
     }

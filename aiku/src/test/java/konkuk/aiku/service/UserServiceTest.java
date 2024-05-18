@@ -5,6 +5,7 @@ import konkuk.aiku.controller.dto.SettingAlarmDto;
 import konkuk.aiku.controller.dto.TitleDto;
 import konkuk.aiku.controller.dto.UserAddDto;
 import konkuk.aiku.controller.dto.UserUpdateDto;
+import konkuk.aiku.domain.UserImgData;
 import konkuk.aiku.domain.UserTitle;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.exception.NoSuchEntityException;
@@ -36,9 +37,13 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
+        UserImgData userImgData = UserImgData.builder()
+                .imgData(UserImgData.ImgType.DEFAULT1)
+                .colorCode("AABBCC")
+                .build();
         userAddDTO = new UserAddDto(
                 "abcd", "010-0000-0000", 100L,
-                true, true, true,
+                "", userImgData,true, true, true,
                 true, true
         );
     }
@@ -85,6 +90,32 @@ class UserServiceTest {
         UserServiceDto userServiceDto = userAddDTO.toServiceDto();
         Long saveId = userService.save(userServiceDto);
         Users users = userService.findById(saveId);
+        log.info("colorCodeBefore={}",users.getUserImgData().getColorCode());
+
+        UserUpdateDto userUpdateDTO = new UserUpdateDto();
+        userUpdateDTO.setUsername("가나다");
+        userUpdateDTO.setUserImg("");
+
+        UserImgData changeImgData = UserImgData.builder()
+                .colorCode("bbccdd")
+                .imgData(UserImgData.ImgType.DEFAULT2)
+                .build();
+        userUpdateDTO.setUserImgData(changeImgData);
+
+        UserServiceDto userUpdateServiceDto = userUpdateDTO.toServiceDto();
+        userService.updateUser(users, userUpdateServiceDto);
+
+        log.info("colorCodeAfter={}",users.getUserImgData().getColorCode());
+
+        Assertions.assertThat(users.getUserImgData().getColorCode()).isEqualTo("bbccdd");
+        Assertions.assertThat(users.getUsername()).isEqualTo("가나다");
+    }
+
+    @Test
+    void updateUserTitle() {
+        UserServiceDto userServiceDto = userAddDTO.toServiceDto();
+        Long saveId = userService.save(userServiceDto);
+        Users users = userService.findById(saveId);
 
         TitleDto testTitleA = new TitleDto();
         testTitleA.setTitleName("테스트타이틀A");
@@ -104,17 +135,11 @@ class UserServiceTest {
         users.setMainTitle(userTitleBefore);
         log.info("userTitleBefore={}",users.getMainTitle().getTitle().getTitleName());
 
-        UserUpdateDto userUpdateDTO = new UserUpdateDto();
-        userUpdateDTO.setUserTitleId(userTitleBId);
-        userUpdateDTO.setUsername("가나다");
-
-        UserServiceDto userUpdateServiceDto = userUpdateDTO.toServiceDto();
-        userService.updateUser(users, userUpdateServiceDto);
+        userService.updateMainTitle(users, userTitleBId);
 
         log.info("userTitleAfter={}",users.getMainTitle().getTitle().getTitleName());
 
         Assertions.assertThat(users.getMainTitle().getTitle().getTitleName()).isEqualTo("테스트타이틀B");
-        Assertions.assertThat(users.getUsername()).isEqualTo("가나다");
 
     }
 

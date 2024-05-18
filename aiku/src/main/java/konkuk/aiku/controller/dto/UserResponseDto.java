@@ -1,6 +1,7 @@
 package konkuk.aiku.controller.dto;
 
 import konkuk.aiku.domain.Title;
+import konkuk.aiku.domain.UserImgData;
 import konkuk.aiku.domain.UserTitle;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.service.dto.TitleServiceDto;
@@ -18,6 +19,7 @@ public class UserResponseDto {
     private Long userId;
     private String username;
     private String userImg;
+    private UserImgData userImgData;
     private String phoneNumber;
     private int point;
     private TitleResponseDto title;
@@ -29,6 +31,7 @@ public class UserResponseDto {
                 .userId(users.getId())
                 .username(users.getUsername())
                 .userImg(users.getUserImg())
+                .userImgData(users.getUserImgData())
                 .phoneNumber(users.getPhoneNumber())
                 .point(users.getPoint())
                 .title(titleDto)
@@ -43,6 +46,7 @@ public class UserResponseDto {
                 .id(users.getId())
                 .username(users.getUsername())
                 .userImg(users.getUserImg())
+                .userImgData(users.getUserImgData())
                 .phoneNumber(users.getPhoneNumber())
                 .point(users.getPoint())
                 .mainTitle(titleDto)

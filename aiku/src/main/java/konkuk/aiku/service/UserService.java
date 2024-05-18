@@ -53,10 +53,7 @@ public class UserService {
 
     public Long updateUser(Users users, UserServiceDto userServiceDto) {
         users.setUsername(userServiceDto.getUsername());
-        Long mainTitleId = userServiceDto.getMainTitle().getId();
-        UserTitle userTitle = getUserTitle(mainTitleId);
-
-        users.setMainTitle(userTitle);
+        users.updateUserImg(userServiceDto.getUserImg(), userServiceDto.getUserImgData());
 
         return users.getId();
     }
@@ -125,5 +122,11 @@ public class UserService {
     private Title findTitleById(Long titleId) {
         return titleRepository.findById(titleId)
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_TITLE));
+    }
+
+    public Long updateMainTitle(Users users, Long userTitleId) {
+        UserTitle userTitle = getUserTitle(userTitleId);
+        users.setMainTitle(userTitle);
+        return users.getId();
     }
 }

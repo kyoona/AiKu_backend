@@ -1,9 +1,6 @@
 package konkuk.aiku.service.dto;
 
-import konkuk.aiku.domain.UserGroup;
-import konkuk.aiku.domain.UserRole;
-import konkuk.aiku.domain.UserSchedule;
-import konkuk.aiku.domain.Users;
+import konkuk.aiku.domain.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,6 +15,7 @@ public class UserSimpleServiceDto {
     private String username;
     private String phoneNumber;
     private String userImg;
+    private UserImgData userImgData;
     private SettingServiceDto setting;
     private int point;
     private UserRole role;
@@ -30,6 +28,7 @@ public class UserSimpleServiceDto {
                 .username(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
                 .userImg(user.getUserImg())
+                .userImgData(user.getUserImgData())
                 .setting(SettingServiceDto.toDto(user.getSetting()))
                 .point(user.getPoint())
                 .role(user.getRole())

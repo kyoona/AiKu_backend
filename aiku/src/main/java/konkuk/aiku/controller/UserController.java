@@ -47,6 +47,14 @@ public class UserController {
         return SuccessResponseDto.getResponseEntity(userId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 
+    @PatchMapping("/titles/{userTitleId}")
+    public ResponseEntity<SuccessResponseDto> updateMainTitle(@AuthenticationPrincipal UserAdaptor userAdaptor, @PathVariable Long userTitleId) {
+        Users users = userAdaptor.getUsers();
+        Long userId = userService.updateMainTitle(users, userTitleId);
+
+        return SuccessResponseDto.getResponseEntity(userId, MODIFY_SUCCESS, HttpStatus.OK);
+    }
+
     @DeleteMapping
     public ResponseEntity<SuccessResponseDto> deleteUsers(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
