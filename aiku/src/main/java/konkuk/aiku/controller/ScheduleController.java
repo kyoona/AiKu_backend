@@ -70,13 +70,23 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public ResponseEntity<ScheduleListResponseDto> groupScheduleList(@PathVariable Long groupId,
-                                                                     @ModelAttribute ScheduleCond cond,
-                                                                     @AuthenticationPrincipal UserAdaptor userAdaptor) {
+    public ResponseEntity<GroupScheduleListResponseDto> groupScheduleList(@PathVariable Long groupId,
+                                                                          @ModelAttribute ScheduleCond cond,
+                                                                          @AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users user = userAdaptor.getUsers();
 
-        ScheduleListServiceDto serviceDto = scheduleService.findGroupScheduleList(user, groupId, cond);
-        ScheduleListResponseDto responseDto = ScheduleListResponseDto.toDto(serviceDto);
+        GroupScheduleListServiceDto serviceDto = scheduleService.findGroupScheduleList(user, groupId, cond);
+        GroupScheduleListResponseDto responseDto = GroupScheduleListResponseDto.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<UserScheduleListResponseDto> userScheduleList(@ModelAttribute ScheduleCond cond,
+                                                                         @AuthenticationPrincipal UserAdaptor userAdaptor) {
+        Users user = userAdaptor.getUsers();
+
+        UserScheduleListServiceDto serviceDto = scheduleService.findUserScheduleList(user, cond);
+        UserScheduleListResponseDto responseDto = UserScheduleListResponseDto.toDto(serviceDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

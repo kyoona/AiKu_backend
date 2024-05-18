@@ -83,31 +83,40 @@ public class ScheduleService {
         return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
     }
 
-    public ScheduleListServiceDto findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
+    public GroupScheduleListServiceDto findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
         Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
 
-        List<Schedule> schedules = scheduleRepository.findScheduleWithUserByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
+        List<Schedule> schedules = scheduleRepository.findScheduleByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
 
         Integer runSchedule = 0;
         Integer waitSchedule = 0;
         Integer termSchedule = 0;
         List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, runSchedule, waitSchedule, termSchedule);
-        return ScheduleListServiceDto.toDto(group, runSchedule, waitSchedule, termSchedule, dataDto);
+        return GroupScheduleListServiceDto.toDto(group, runSchedule, waitSchedule, termSchedule, dataDto);
     }
 
     private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(List<Schedule> schedules, Integer runSchedule, Integer waitSchedule, Integer termSchedule) {
         List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
         for (Schedule schedule : schedules) {
-            int memberSize = scheduleRepository.findUserCountInSchedule(schedule.getId());
-            dtos.add(ScheduleSimpleServiceDto.toDto(schedule, memberSize));
+            dtos.add(ScheduleSimpleServiceDto.toDto(schedule));
 
             if (schedule.getStatus() == ScheduleStatus.RUN) runSchedule++;
             else if(schedule.getStatus() == ScheduleStatus.WAIT) waitSchedule++;
             else if(schedule.getStatus() == ScheduleStatus.TERM) termSchedule++;
         }
         return dtos;
+    }
+
+    public UserScheduleListServiceDto findUserScheduleList(Users user, ScheduleCond cond){
+        List<Schedule> schedules = scheduleRepository.findScheduleByUserId(user.getId(), cond.getStartDate(), cond.getEndDate(), cond.getStatus());
+
+        Integer runSchedule = 0;
+        Integer waitSchedule = 0;
+        Integer termSchedule = 0;
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, runSchedule, waitSchedule, termSchedule);
+        return UserScheduleListServiceDto.toDto(user, runSchedule, waitSchedule, termSchedule, dataDto);
     }
 
     @Transactional
@@ -119,6 +128,7 @@ public class ScheduleService {
         checkUserAlreadyInSchedule(user.getId(), scheduleId);
 
         schedule.addUser(user, new UserSchedule());
+        scheduleRepository.upScheduleUserCount(scheduleId);
         return schedule.getId();
     }
 

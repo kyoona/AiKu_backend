@@ -62,37 +62,54 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     }
 
     @Override
-    public List<Schedule> findScheduleWithUserByGroupId(Long groupId, String startTime, String endTime, ScheduleStatus status) {
-        return jpaQueryFactory.
-                selectFrom(qSchedule)
-                .leftJoin(qSchedule.users, qUserSchedule).fetchJoin()
+    public List<Schedule> findScheduleByGroupId(Long groupId, String startTime, String endTime, ScheduleStatus status) {
+        return jpaQueryFactory
+                .selectFrom(qSchedule)
                 .where(
                         qSchedule.group.id.eq(groupId),
-                        dateAfter(startTime),
-                        dateBefore(endTime),
-                        statusEq(status)
+                        dateAfter(startTime,0),
+                        dateBefore(endTime, 0),
+                        statusEq(status, 0)
                 ).orderBy(qSchedule.scheduleTime.desc())
                 .fetch();
     }
 
-    private BooleanExpression dateAfter(String startDate) {
+    @Override
+    public List<Schedule> findScheduleByUserId(Long userId, String startTime, String endTime, ScheduleStatus status) {
+        return jpaQueryFactory
+                .select(qUserSchedule.schedule)
+                .from(qUserSchedule)
+                .leftJoin(qUserSchedule.schedule, qSchedule).fetchJoin()
+                .where(
+                        qUserSchedule.user.id.eq(userId),
+                        dateAfter(startTime, 1),
+                        dateBefore(endTime, 1),
+                        statusEq(status, 1)
+                ).orderBy(qSchedule.scheduleTime.desc())
+                .fetch();
+    }
+
+    private BooleanExpression dateAfter(String startDate, int type) {
         if (startDate == null) {
             return null;
         }
-        return qSchedule.scheduleTime.after(LocalDateTime.parse(startDate));
+        if (type == 0) return qSchedule.scheduleTime.after(LocalDateTime.parse(startDate));
+        else return qUserSchedule.schedule.scheduleTime.after(LocalDateTime.parse(startDate));
     }
 
-    private BooleanExpression dateBefore(String endDate) {
+    private BooleanExpression dateBefore(String endDate, int type) {
         if (endDate == null) {
             return null;
         }
-        return qSchedule.scheduleTime.before(LocalDateTime.parse(endDate));
+        if (type == 0) return qSchedule.scheduleTime.before(LocalDateTime.parse(endDate));
+        else return qUserSchedule.schedule.scheduleTime.before(LocalDateTime.parse(endDate));
     }
 
-    private BooleanExpression statusEq(ScheduleStatus status) {
+    private BooleanExpression statusEq(ScheduleStatus status, int type) {
         if (status == null) {
             return null;
         }
-        return qSchedule.status.eq(status);
+        if (type == 0) return qSchedule.status.eq(status);
+        else return qUserSchedule.schedule.status.eq(status);
     }
 }

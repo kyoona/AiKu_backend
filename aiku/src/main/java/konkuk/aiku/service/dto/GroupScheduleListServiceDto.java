@@ -10,7 +10,7 @@ import java.util.List;
 
 @Builder(access = AccessLevel.PROTECTED)
 @Getter
-public class ScheduleListServiceDto {
+public class GroupScheduleListServiceDto {
     private Long groupId;
     private String groupName;
     private String description;
@@ -19,8 +19,8 @@ public class ScheduleListServiceDto {
     private int termSchedule;
     @Builder.Default private List<ScheduleSimpleServiceDto> data = new ArrayList<>();
 
-    public static ScheduleListServiceDto toDto(Groups group, int runSchedule, int waitSchedule, int termSchedule, List<ScheduleSimpleServiceDto> data){
-        return ScheduleListServiceDto.builder()
+    public static GroupScheduleListServiceDto toDto(Groups group, int runSchedule, int waitSchedule, int termSchedule, List<ScheduleSimpleServiceDto> data){
+        return GroupScheduleListServiceDto.builder()
                 .groupId(group.getId())
                 .groupName(group.getGroupName())
                 .description(group.getDescription())

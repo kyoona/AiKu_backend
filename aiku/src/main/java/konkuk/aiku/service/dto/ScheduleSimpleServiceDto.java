@@ -20,14 +20,14 @@ public class ScheduleSimpleServiceDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public static ScheduleSimpleServiceDto toDto(Schedule schedule, int memberSize) {
+    public static ScheduleSimpleServiceDto toDto(Schedule schedule) {
         return ScheduleSimpleServiceDto.builder()
                 .scheduleId(schedule.getId())
                 .scheduleName(schedule.getScheduleName())
                 .location(LocationServiceDto.toDto(schedule.getLocation()))
                 .scheduleTime(schedule.getScheduleTime())
                 .status(schedule.getStatus())
-                .memberSize(memberSize)
+                .memberSize(schedule.getUserCount())
                 .createdAt(schedule.getCreatedAt())
                 .modifiedAt(schedule.getModifiedAt())
                 .build();
