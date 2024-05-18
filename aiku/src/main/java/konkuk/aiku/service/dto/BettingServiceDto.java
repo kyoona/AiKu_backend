@@ -2,6 +2,7 @@ package konkuk.aiku.service.dto;
 
 import jakarta.persistence.*;
 import konkuk.aiku.domain.Betting;
+import konkuk.aiku.domain.BettingStatus;
 import konkuk.aiku.domain.BettingType;
 import konkuk.aiku.domain.ResultType;
 import lombok.Builder;
@@ -18,6 +19,7 @@ public class BettingServiceDto {
     private int point;
     private ResultType resultType; // WIN, LOSE
     private BettingType bettingType; // RACING, BETTING
+    private BettingStatus bettingStatus;
 
     public static BettingServiceDto toServiceDto(Betting betting) {
         UserSimpleServiceDto bettorDto = UserSimpleServiceDto.toDto(betting.getBettor());
@@ -32,6 +34,7 @@ public class BettingServiceDto {
                 .point(betting.getPoint())
                 .resultType(betting.getResultType())
                 .bettingType(betting.getBettingType())
+                .bettingStatus(betting.getBettingStatus())
                 .build();
     }
 }

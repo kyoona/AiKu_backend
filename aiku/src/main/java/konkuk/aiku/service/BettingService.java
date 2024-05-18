@@ -68,13 +68,39 @@ public class BettingService {
                 .point(bettingServiceDto.getPoint())
                 .schedule(userSchedule.getSchedule())
                 .bettingType(bettingServiceDto.getBettingType())
+                .bettingStatus(BettingStatus.WAIT)
                 .build();
 
         bettingRepository.save(betting);
 
+        // TODO : 스케줄러 로직 (1분)
+        // TODO : 베팅 상대에게 알림 메시지
+
         return betting.getId();
     }
 
+    public Long acceptBetting(Long bettingId) {
+        Betting betting = findBettingById(bettingId);
+        betting.setBettingStatus(BettingStatus.ACCEPT);
+
+        // TODO : 베팅 주인에게 수락 알림 메시지
+
+        return betting.getId();
+    }
+
+    // TODO : 베팅 미수락 시 베팅 삭제 로직
+    public Long deleteBettingById(Long bettingId) {
+        Betting betting = findBettingById(bettingId);
+        // 베팅이 수락되지 않은 경우
+        if (!betting.getBettingStatus().equals(BettingStatus.ACCEPT)) {
+            bettingRepository.deleteById(bettingId);
+        }
+
+        return bettingId;
+    }
+
+
+    // 베팅 업데이트 로직 미사용(Deprecated)
     public Long updateBetting(Users users, Long scheduleId, Long bettingId, BettingServiceDto bettingServiceDto) {
         Optional<UserSchedule> userInSchedule = findUserInSchedule(users.getId(), scheduleId);
 
@@ -161,6 +187,7 @@ public class BettingService {
         }
 
         betting.updateBettingResult(resultType);
+        betting.setBettingStatus(BettingStatus.DONE);
 
         return betting.getId();
     }
