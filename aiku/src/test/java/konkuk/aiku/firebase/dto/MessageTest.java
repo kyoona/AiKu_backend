@@ -31,7 +31,7 @@ class MessageTest {
         Double latitude = 127.1;
         Double longitude = 127.1;
 
-        Users user = createUser(userId, userName, userImg);
+        Users user = createUser(userId, userName);
 
         //when
         Map<String, String> stringMap = RealTimeLocationMessage.createMessage(user, latitude, longitude)
@@ -52,12 +52,12 @@ class MessageTest {
         Long senderId = 1l;
         String senderName = "userA";
         String senderImg = "url";
-        Users sender = createUser(senderId, senderName, senderImg);
+        Users sender = createUser(senderId, senderName);
 
         Long receiverId = 2l;
         String receiverName = "userB";
         String receiverImg = "url2";
-        Users receiver = createUser(receiverId, receiverName, receiverImg);
+        Users receiver = createUser(receiverId, receiverName);
 
         Emoji emojiType = Emoji.HEART;
 
@@ -75,9 +75,12 @@ class MessageTest {
         assertThat(stringMap).containsEntry("emojiType", String.valueOf(emojiType));
     }
 
-    public Users createUser(Long userId, String userName, String userImg){
-        return new Users(userId, userName, "01000000000", userImg, 1L, "pass",
-                new Setting(true, true, true, true,true),
-                null, null, 1000, UserRole.USER, "1", LocalDateTime.now(), "refresh");
+    public Users createUser(Long userId, String userName){
+        return Users.builder()
+                .id(userId)
+                .username(userName)
+                .setting(new Setting(true, true, true, true, true))
+                .userImgData(new UserImgData(UserImgData.ImgType.DEFAULT1, "#000000"))
+                .build();
     }
 }
