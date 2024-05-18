@@ -18,6 +18,7 @@ public class UserServiceDto {
     private String username;
     private String phoneNumber;
     private String userImg;
+    private UserImgData userImgData;
     private Long kakaoId;
     private String password;
     private Setting setting;
@@ -40,6 +41,7 @@ public class UserServiceDto {
                 .username(users.getUsername())
                 .phoneNumber(users.getPhoneNumber())
                 .userImg(users.getUserImg())
+                .userImgData(users.getUserImgData())
                 .kakaoId(users.getKakaoId())
                 .password(users.getPassword())
                 .setting(users.getSetting())
@@ -72,6 +74,7 @@ public class UserServiceDto {
                 .username(username)
                 .phoneNumber(phoneNumber)
                 .userImg(userImg)
+                .userImgData(userImgData)
                 .kakaoId(kakaoId)
                 .password(password)
                 .setting(setting)

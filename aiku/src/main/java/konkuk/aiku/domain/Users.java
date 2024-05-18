@@ -28,6 +28,9 @@ public class Users extends TimeEntity {
     private String phoneNumber;
     private String userImg;
 
+    @Embedded
+    private UserImgData userImgData;
+
     private Long kakaoId;
 
     @Setter
@@ -67,6 +70,11 @@ public class Users extends TimeEntity {
 
     public void addTitle(UserTitle userTitle) {
         this.userTitles.add(userTitle);
+    }
+
+    public void updateUserImg(String userImg, UserImgData userImgData) {
+        this.userImg = userImg;
+        this.userImgData = userImgData;
     }
 
     public void setFcmToken(String fcmToken) {
