@@ -27,7 +27,6 @@ class MessageTest {
         //given
         Long userId = 1l;
         String userName = "userA";
-        String userImg = "url";
         Double latitude = 127.1;
         Double longitude = 127.1;
 
@@ -40,7 +39,6 @@ class MessageTest {
         //then
         assertThat(stringMap).containsEntry("userId", String.valueOf(userId));
         assertThat(stringMap).containsEntry("userName", userName);
-        assertThat(stringMap).containsEntry("userImg", userImg);
         assertThat(stringMap).containsEntry("latitude", String.valueOf(latitude));
         assertThat(stringMap).containsEntry("longitude", String.valueOf(longitude));
     }
@@ -51,12 +49,10 @@ class MessageTest {
         //given
         Long senderId = 1l;
         String senderName = "userA";
-        String senderImg = "url";
         Users sender = createUser(senderId, senderName);
 
         Long receiverId = 2l;
         String receiverName = "userB";
-        String receiverImg = "url2";
         Users receiver = createUser(receiverId, receiverName);
 
         Emoji emojiType = Emoji.HEART;
@@ -68,10 +64,8 @@ class MessageTest {
         //then
         assertThat(stringMap).containsEntry("senderId", String.valueOf(senderId));
         assertThat(stringMap).containsEntry("senderName", senderName);
-        assertThat(stringMap).containsEntry("senderImg", senderImg);
         assertThat(stringMap).containsEntry("receiverId", String.valueOf(receiverId));
         assertThat(stringMap).containsEntry("receiverName", receiverName);
-        assertThat(stringMap).containsEntry("receiverImg", receiverImg);
         assertThat(stringMap).containsEntry("emojiType", String.valueOf(emojiType));
     }
 
