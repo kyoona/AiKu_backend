@@ -36,6 +36,13 @@ public class BettingController {
         return SuccessResponseDto.getResponseEntity(bettingId, SuccessMessage.ADD_SUCCESS, HttpStatus.OK);
     }
 
+    @PatchMapping("/{bettingId}")
+    public ResponseEntity<SuccessResponseDto> acceptBetting(@PathVariable Long bettingId) {
+        Long updateBettingId = bettingService.acceptBetting(bettingId);
+
+        return SuccessResponseDto.getResponseEntity(updateBettingId, SuccessMessage.ADD_SUCCESS, HttpStatus.OK);
+    }
+
     @GetMapping("/{bettingId}")
     public ResponseEntity<BettingResponseDto> getBetting(@PathVariable Long bettingId) {
 
@@ -45,18 +52,19 @@ public class BettingController {
         return new ResponseEntity(bettingResponseDto, HttpStatus.OK);
     }
 
-    @PatchMapping("/{bettingId}")
-    public ResponseEntity<SuccessResponseDto> modifyBetting(
-            @AuthenticationPrincipal UserAdaptor userAdaptor,
-            @PathVariable Long scheduleId, @PathVariable Long bettingId,
-            @RequestBody BettingModifyDto bettingModifyDto) {
-        BettingServiceDto bettingServiceDto = bettingModifyDto.toServiceDto();
-
-        Long updateId = bettingService.updateBetting(userAdaptor.getUsers(), scheduleId, bettingId, bettingServiceDto);
-
-        return SuccessResponseDto.getResponseEntity(updateId, SuccessMessage.MODIFY_SUCCESS, HttpStatus.OK);
-
-    }
+    // 베팅 업데이트 미사용(Deprecated)
+//    @PatchMapping("/{bettingId}")
+//    public ResponseEntity<SuccessResponseDto> modifyBetting(
+//            @AuthenticationPrincipal UserAdaptor userAdaptor,
+//            @PathVariable Long scheduleId, @PathVariable Long bettingId,
+//            @RequestBody BettingModifyDto bettingModifyDto) {
+//        BettingServiceDto bettingServiceDto = bettingModifyDto.toServiceDto();
+//
+//        Long updateId = bettingService.updateBetting(userAdaptor.getUsers(), scheduleId, bettingId, bettingServiceDto);
+//
+//        return SuccessResponseDto.getResponseEntity(updateId, SuccessMessage.MODIFY_SUCCESS, HttpStatus.OK);
+//
+//    }
 
     @DeleteMapping("/{bettingId}")
     public ResponseEntity<SuccessResponseDto> deleteBetting(

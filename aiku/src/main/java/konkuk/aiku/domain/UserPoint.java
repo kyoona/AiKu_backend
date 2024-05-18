@@ -1,10 +1,11 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserPoint extends TimeEntity{
 
     @Id
@@ -19,5 +20,16 @@ public class UserPoint extends TimeEntity{
     private int point;
 
     @Enumerated
+    private PointChangeType pointChangeType;
+
+    @Enumerated
     private PointType pointType;
+
+    @Builder
+    public UserPoint(Users user, int point, PointChangeType pointChangeType, PointType pointType) {
+        this.user = user;
+        this.point = point;
+        this.pointChangeType = pointChangeType;
+        this.pointType = pointType;
+    }
 }

@@ -1,7 +1,6 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.*;
-import konkuk.aiku.controller.dto.UserUpdateDto;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -80,5 +79,13 @@ public class Users extends TimeEntity {
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
         this.fcmTokenCreateAt = LocalDateTime.now();
+    }
+
+    public void plusPoint(int point) {
+        this.point += point;
+    }
+
+    public void minusPoint(int point) {
+        this.point -= point;
     }
 }

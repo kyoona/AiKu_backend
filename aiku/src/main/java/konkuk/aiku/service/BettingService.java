@@ -1,9 +1,7 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.domain.Betting;
-import konkuk.aiku.domain.BettingType;
-import konkuk.aiku.domain.UserSchedule;
-import konkuk.aiku.domain.Users;
+import konkuk.aiku.domain.*;
+import konkuk.aiku.event.UserPointEventPublisher;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
@@ -16,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +28,7 @@ public class BettingService {
     private final BettingRepository bettingRepository;
     private final ScheduleRepository scheduleRepository;
     private final UsersRepository usersRepository;
+    private final UserPointEventPublisher userPointEventPublisher;
 
 
     private Optional<UserSchedule> findUserInSchedule(Long userId, Long scheduleId) {
@@ -68,13 +68,39 @@ public class BettingService {
                 .point(bettingServiceDto.getPoint())
                 .schedule(userSchedule.getSchedule())
                 .bettingType(bettingServiceDto.getBettingType())
+                .bettingStatus(BettingStatus.WAIT)
                 .build();
 
         bettingRepository.save(betting);
 
+        // TODO : 스케줄러 로직 (1분)
+        // TODO : 베팅 상대에게 알림 메시지
+
         return betting.getId();
     }
 
+    public Long acceptBetting(Long bettingId) {
+        Betting betting = findBettingById(bettingId);
+        betting.setBettingStatus(BettingStatus.ACCEPT);
+
+        // TODO : 베팅 주인에게 수락 알림 메시지
+
+        return betting.getId();
+    }
+
+    // TODO : 베팅 미수락 시 베팅 삭제 로직
+    public Long deleteBettingById(Long bettingId) {
+        Betting betting = findBettingById(bettingId);
+        // 베팅이 수락되지 않은 경우
+        if (!betting.getBettingStatus().equals(BettingStatus.ACCEPT)) {
+            bettingRepository.deleteById(bettingId);
+        }
+
+        return bettingId;
+    }
+
+
+    // 베팅 업데이트 로직 미사용(Deprecated)
     public Long updateBetting(Users users, Long scheduleId, Long bettingId, BettingServiceDto bettingServiceDto) {
         Optional<UserSchedule> userInSchedule = findUserInSchedule(users.getId(), scheduleId);
 
@@ -109,5 +135,62 @@ public class BettingService {
         return bettings.stream()
                 .map(BettingServiceDto::toServiceDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 이벤트 발생 메서드
+     * 스케줄 종료시 베팅 결과 생성 로직
+     * @param betting 결과 생성을 원하는 베팅
+     * @return 베팅 아이디
+     * TODO: Schedule 종료 시 해당 메소드 실행
+     */
+    public Long setBettingResult(Long bettingId) {
+        Betting betting = findBettingById(bettingId);
+        Users bettor = betting.getBettor();
+        Users targetUser = betting.getTargetUser();
+
+        Schedule schedule = betting.getSchedule();
+        List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
+        UserArrivalData bettorArrivalData = userArrivalDatas.stream().filter(u -> u.getUser().getId() == bettor.getId())
+                .findAny().orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
+        UserArrivalData targetArrivalDate = userArrivalDatas.stream().filter(u -> u.getUser().getId() == targetUser.getId())
+                .findAny().orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
+
+        LocalDateTime bettorTime = bettorArrivalData.getArrivalTime();
+        LocalDateTime targetTime = targetArrivalDate.getArrivalTime();
+
+        ResultType resultType;
+        int point = betting.getPoint();
+
+        // 플러스 포인트 : 베팅 걸린 시점에서 베팅 포인트 가져갔기 때문에 2배로 더해준다.
+        int plusPoint = point * 2;
+
+        if (bettorTime.isBefore(targetTime)) {
+            resultType = ResultType.WIN;
+            // 베팅 건 사람 플러스 포인트
+            bettor.plusPoint(plusPoint);
+
+            userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        } else if (bettorTime.isAfter(targetTime)) {
+            resultType = ResultType.LOSE;
+            // 베팅 걸린 사람 플러스 포인트
+            targetUser.plusPoint(plusPoint);
+
+            userPointEventPublisher.userPointChangeEvent(targetUser, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        } else {
+            resultType = ResultType.DRAW;
+            // 베팅 건 금액 돌려주기
+            bettor.plusPoint(point);
+            targetUser.plusPoint(point);
+
+            userPointEventPublisher.userPointChangeEvent(bettor, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+            userPointEventPublisher.userPointChangeEvent(targetUser, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+
+        }
+
+        betting.updateBettingResult(resultType);
+        betting.setBettingStatus(BettingStatus.DONE);
+
+        return betting.getId();
     }
 }
