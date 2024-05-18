@@ -1,5 +1,6 @@
 package konkuk.aiku.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -21,6 +22,9 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     @PersistenceContext
     private final EntityManager entityManager;
     private final JPAQueryFactory jpaQueryFactory;
+
+    QSchedule qSchedule = QSchedule.schedule;
+    QUserSchedule qUserSchedule = QUserSchedule.userSchedule;
 
     @Override
     public Optional<UserSchedule> findUserScheduleByUserIdAndScheduleId(Long userId, Long scheduleId) {
@@ -58,12 +62,37 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     }
 
     @Override
-    public List<Schedule> findScheduleByGroupId(Long GroupId, LocalDateTime startTime, LocalDateTime endTime, ScheduleStatus status) {
-        QSchedule schedule = QSchedule.schedule;
-        jpaQueryFactory.
-                selectFrom(schedule)
-                .where()
+    public List<Schedule> findScheduleWithUserByGroupId(Long groupId, String startTime, String endTime, ScheduleStatus status) {
+        return jpaQueryFactory.
+                selectFrom(qSchedule)
+                .leftJoin(qSchedule.users, qUserSchedule).fetchJoin()
+                .where(
+                        qSchedule.group.id.eq(groupId),
+                        dateAfter(startTime),
+                        dateBefore(endTime),
+                        statusEq(status)
+                ).orderBy(qSchedule.scheduleTime.desc())
+                .fetch();
     }
 
+    private BooleanExpression dateAfter(String startDate) {
+        if (startDate == null) {
+            return null;
+        }
+        return qSchedule.scheduleTime.after(LocalDateTime.parse(startDate));
+    }
 
+    private BooleanExpression dateBefore(String endDate) {
+        if (endDate == null) {
+            return null;
+        }
+        return qSchedule.scheduleTime.before(LocalDateTime.parse(endDate));
+    }
+
+    private BooleanExpression statusEq(ScheduleStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return qSchedule.status.eq(status);
+    }
 }

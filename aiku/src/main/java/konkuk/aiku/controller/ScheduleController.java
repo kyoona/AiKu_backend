@@ -70,12 +70,14 @@ public class ScheduleController {
     }
 
     @GetMapping
-    public void groupScheduleList(@PathVariable Long groupId,
-                                  @ModelAttribute ScheduleCond cond,
-                                  @AuthenticationPrincipal UserAdaptor userAdaptor) {
+    public ResponseEntity<ScheduleListResponseDto> groupScheduleList(@PathVariable Long groupId,
+                                                                     @ModelAttribute ScheduleCond cond,
+                                                                     @AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users user = userAdaptor.getUsers();
 
-        scheduleService.findGroupScheduleList(user, groupId, cond);
+        ScheduleListServiceDto serviceDto = scheduleService.findGroupScheduleList(user, groupId, cond);
+        ScheduleListResponseDto responseDto = ScheduleListResponseDto.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PostMapping("/{scheduleId}/enter")

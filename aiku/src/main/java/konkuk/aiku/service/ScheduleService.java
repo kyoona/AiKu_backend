@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
@@ -82,9 +83,31 @@ public class ScheduleService {
         return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
     }
 
-    public void findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
-        scheduleRepository.findScheduleByGroupId(
-                groupId, LocalDateTime.parse(cond.getStartDate()), LocalDateTime.parse(cond.getEndDate()), cond.getStatus());
+    public ScheduleListServiceDto findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
+        List<Schedule> schedules = scheduleRepository.findScheduleWithUserByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
+
+        Integer runSchedule = 0;
+        Integer waitSchedule = 0;
+        Integer termSchedule = 0;
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, runSchedule, waitSchedule, termSchedule);
+        return ScheduleListServiceDto.toDto(group, runSchedule, waitSchedule, termSchedule, dataDto);
+    }
+
+    private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(List<Schedule> schedules, Integer runSchedule, Integer waitSchedule, Integer termSchedule) {
+        List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
+        for (Schedule schedule : schedules) {
+            int memberSize = scheduleRepository.findUserCountInSchedule(schedule.getId());
+            dtos.add(ScheduleSimpleServiceDto.toDto(schedule, memberSize));
+
+            if (schedule.getStatus() == ScheduleStatus.RUN) runSchedule++;
+            else if(schedule.getStatus() == ScheduleStatus.WAIT) waitSchedule++;
+            else if(schedule.getStatus() == ScheduleStatus.TERM) termSchedule++;
+        }
+        return dtos;
     }
 
     @Transactional

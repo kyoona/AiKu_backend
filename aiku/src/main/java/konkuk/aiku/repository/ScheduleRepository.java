@@ -15,4 +15,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
     List<UserSchedule> findUsersByScheduleId(@Param("scheduleId") Long scheduleId);
     @Query("SELECT s.scheduleTime FROM Schedule s WHERE s.group.id = :groupId ORDER BY s.scheduleTime DESC")
     Optional<LocalDateTime> findLatestScheduleTimeByGroupId(@Param("groupId") Long groupId);
+    @Query("SELECT COUNT(us) FROM UserSchedule us WHERE us.schedule.id = :scheduleId")
+    int findUserCountInSchedule(@Param("scheduleId") Long scheduleId);
 }
