@@ -15,6 +15,7 @@ public class ScheduleServiceDto {
     private LocationServiceDto location;
     private LocalDateTime scheduleTime;
     private ScheduleStatus status;
+    private int userCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -25,6 +26,7 @@ public class ScheduleServiceDto {
                 .location(LocationServiceDto.toDto(schedule.getLocation()))
                 .scheduleTime(schedule.getScheduleTime())
                 .status(schedule.getStatus())
+                .userCount(schedule.getUserCount())
                 .createdAt(schedule.getCreatedAt())
                 .modifiedAt(schedule.getModifiedAt())
                 .build();

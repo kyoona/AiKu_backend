@@ -16,7 +16,7 @@ public class ScheduleSimpleServiceDto {
     private LocationServiceDto location;
     private LocalDateTime scheduleTime;
     private ScheduleStatus status;
-    private int memberSize;
+    private int userCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -27,7 +27,7 @@ public class ScheduleSimpleServiceDto {
                 .location(LocationServiceDto.toDto(schedule.getLocation()))
                 .scheduleTime(schedule.getScheduleTime())
                 .status(schedule.getStatus())
-                .memberSize(schedule.getUserCount())
+                .userCount(schedule.getUserCount())
                 .createdAt(schedule.getCreatedAt())
                 .modifiedAt(schedule.getModifiedAt())
                 .build();
