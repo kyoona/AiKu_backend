@@ -3,6 +3,7 @@ package konkuk.aiku.repository;
 import konkuk.aiku.domain.Schedule;
 import konkuk.aiku.domain.UserSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,4 +16,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
     List<UserSchedule> findUsersByScheduleId(@Param("scheduleId") Long scheduleId);
     @Query("SELECT s.scheduleTime FROM Schedule s WHERE s.group.id = :groupId ORDER BY s.scheduleTime DESC")
     Optional<LocalDateTime> findLatestScheduleTimeByGroupId(@Param("groupId") Long groupId);
+    @Modifying
+    @Query("UPDATE Schedule s SET s.userCount = s.userCount + 1 WHERE s.id = :scheduleId")
+    void upScheduleUserCount(@Param("scheduleId") Long scheduleId);
 }

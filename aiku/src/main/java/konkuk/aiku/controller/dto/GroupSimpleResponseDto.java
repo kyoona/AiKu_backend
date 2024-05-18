@@ -18,10 +18,7 @@ public class GroupSimpleResponseDto {
 
     public static List<GroupSimpleResponseDto> toDtos(List<GroupSimpleServiceDto> serviceDtos){
         List<GroupSimpleResponseDto> dtos = new ArrayList<>();
-        for (GroupSimpleServiceDto serviceDto : serviceDtos) {
-            GroupSimpleResponseDto dto = toDto(serviceDto);
-            dtos.add(dto);
-        }
+        serviceDtos.stream().forEach((serviceDto) -> dtos.add(toDto(serviceDto)));
         return dtos;
     }
 

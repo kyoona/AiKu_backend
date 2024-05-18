@@ -63,9 +63,30 @@ public class ScheduleController {
                                                                @PathVariable Long scheduleId,
                                                                @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        ScheduleDetailServiceDto serviceDto = scheduleService.findScheduleDetailById(user, groupId, scheduleId);
+        ScheduleDetailServiceDto serviceDto = scheduleService.findScheduleDetail(user, groupId, scheduleId);
 
         ScheduleResponseDto responseDto = ScheduleResponseDto.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<GroupScheduleListResponseDto> groupScheduleList(@PathVariable Long groupId,
+                                                                          @ModelAttribute ScheduleCond cond,
+                                                                          @AuthenticationPrincipal UserAdaptor userAdaptor) {
+        Users user = userAdaptor.getUsers();
+
+        GroupScheduleListServiceDto serviceDto = scheduleService.findGroupScheduleList(user, groupId, cond);
+        GroupScheduleListResponseDto responseDto = GroupScheduleListResponseDto.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<UserScheduleListResponseDto> userScheduleList(@ModelAttribute ScheduleCond cond,
+                                                                         @AuthenticationPrincipal UserAdaptor userAdaptor) {
+        Users user = userAdaptor.getUsers();
+
+        UserScheduleListServiceDto serviceDto = scheduleService.findUserScheduleList(user, cond);
+        UserScheduleListResponseDto responseDto = UserScheduleListResponseDto.toDto(serviceDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

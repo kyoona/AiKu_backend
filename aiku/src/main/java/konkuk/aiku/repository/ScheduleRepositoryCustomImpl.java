@@ -1,15 +1,16 @@
 package konkuk.aiku.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import konkuk.aiku.domain.UserArrivalData;
-import konkuk.aiku.domain.UserSchedule;
-import konkuk.aiku.domain.Users;
+import konkuk.aiku.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,10 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
 
     @PersistenceContext
     private final EntityManager entityManager;
+    private final JPAQueryFactory jpaQueryFactory;
+
+    QSchedule qSchedule = QSchedule.schedule;
+    QUserSchedule qUserSchedule = QUserSchedule.userSchedule;
 
     @Override
     public Optional<UserSchedule> findUserScheduleByUserIdAndScheduleId(Long userId, Long scheduleId) {
@@ -54,5 +59,57 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
                 .setParameter("userId", userId)
                 .setParameter("scheduleId", scheduleId);
         return query.getResultList().stream().findFirst();
+    }
+
+    @Override
+    public List<Schedule> findScheduleByGroupId(Long groupId, String startTime, String endTime, ScheduleStatus status) {
+        return jpaQueryFactory
+                .selectFrom(qSchedule)
+                .where(
+                        qSchedule.group.id.eq(groupId),
+                        dateAfter(startTime,0),
+                        dateBefore(endTime, 0),
+                        statusEq(status, 0)
+                ).orderBy(qSchedule.scheduleTime.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Schedule> findScheduleByUserId(Long userId, String startTime, String endTime, ScheduleStatus status) {
+        return jpaQueryFactory
+                .select(qUserSchedule.schedule)
+                .from(qUserSchedule)
+                .leftJoin(qUserSchedule.schedule, qSchedule).fetchJoin()
+                .where(
+                        qUserSchedule.user.id.eq(userId),
+                        dateAfter(startTime, 1),
+                        dateBefore(endTime, 1),
+                        statusEq(status, 1)
+                ).orderBy(qSchedule.scheduleTime.desc())
+                .fetch();
+    }
+
+    private BooleanExpression dateAfter(String startDate, int type) {
+        if (startDate == null) {
+            return null;
+        }
+        if (type == 0) return qSchedule.scheduleTime.after(LocalDateTime.parse(startDate));
+        else return qUserSchedule.schedule.scheduleTime.after(LocalDateTime.parse(startDate));
+    }
+
+    private BooleanExpression dateBefore(String endDate, int type) {
+        if (endDate == null) {
+            return null;
+        }
+        if (type == 0) return qSchedule.scheduleTime.before(LocalDateTime.parse(endDate));
+        else return qUserSchedule.schedule.scheduleTime.before(LocalDateTime.parse(endDate));
+    }
+
+    private BooleanExpression statusEq(ScheduleStatus status, int type) {
+        if (status == null) {
+            return null;
+        }
+        if (type == 0) return qSchedule.status.eq(status);
+        else return qUserSchedule.schedule.status.eq(status);
     }
 }

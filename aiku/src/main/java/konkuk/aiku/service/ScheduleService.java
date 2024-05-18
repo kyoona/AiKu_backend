@@ -1,5 +1,6 @@
 package konkuk.aiku.service;
 
+import konkuk.aiku.controller.dto.ScheduleCond;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.event.ScheduleEventPublisher;
 import konkuk.aiku.exception.AlreadyInException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
@@ -71,7 +73,7 @@ public class ScheduleService {
         return scheduleId;
     }
 
-    public ScheduleDetailServiceDto findScheduleDetailById(Users user, Long groupId, Long scheduleId){
+    public ScheduleDetailServiceDto findScheduleDetail(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
@@ -79,6 +81,42 @@ public class ScheduleService {
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
         return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
+    }
+
+    public GroupScheduleListServiceDto findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
+        List<Schedule> schedules = scheduleRepository.findScheduleByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
+
+        Integer runSchedule = 0;
+        Integer waitSchedule = 0;
+        Integer termSchedule = 0;
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, runSchedule, waitSchedule, termSchedule);
+        return GroupScheduleListServiceDto.toDto(group, runSchedule, waitSchedule, termSchedule, dataDto);
+    }
+
+    private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(List<Schedule> schedules, Integer runSchedule, Integer waitSchedule, Integer termSchedule) {
+        List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
+        for (Schedule schedule : schedules) {
+            dtos.add(ScheduleSimpleServiceDto.toDto(schedule));
+
+            if (schedule.getStatus() == ScheduleStatus.RUN) runSchedule++;
+            else if(schedule.getStatus() == ScheduleStatus.WAIT) waitSchedule++;
+            else if(schedule.getStatus() == ScheduleStatus.TERM) termSchedule++;
+        }
+        return dtos;
+    }
+
+    public UserScheduleListServiceDto findUserScheduleList(Users user, ScheduleCond cond){
+        List<Schedule> schedules = scheduleRepository.findScheduleByUserId(user.getId(), cond.getStartDate(), cond.getEndDate(), cond.getStatus());
+
+        Integer runSchedule = 0;
+        Integer waitSchedule = 0;
+        Integer termSchedule = 0;
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, runSchedule, waitSchedule, termSchedule);
+        return UserScheduleListServiceDto.toDto(user, runSchedule, waitSchedule, termSchedule, dataDto);
     }
 
     @Transactional
@@ -90,6 +128,7 @@ public class ScheduleService {
         checkUserAlreadyInSchedule(user.getId(), scheduleId);
 
         schedule.addUser(user, new UserSchedule());
+        scheduleRepository.upScheduleUserCount(scheduleId);
         return schedule.getId();
     }
 
@@ -123,7 +162,6 @@ public class ScheduleService {
     }
 
     //==검증 메서드==
-
     private UserGroup checkUserInGroup(Users user, Groups groups){
         UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
         if(userGroup == null){
