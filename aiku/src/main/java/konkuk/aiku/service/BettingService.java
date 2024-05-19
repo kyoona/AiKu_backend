@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,20 +62,30 @@ public class BettingService {
                 .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
 
         UserSchedule userSchedule = userInSchedule.get();
+        Schedule schedule = userSchedule.getSchedule();
 
         Betting betting = Betting.builder()
                 .bettor(users)
                 .targetUser(targetUser)
                 .point(bettingServiceDto.getPoint())
-                .schedule(userSchedule.getSchedule())
+                .schedule(schedule)
                 .bettingType(bettingServiceDto.getBettingType())
                 .bettingStatus(BettingStatus.WAIT)
                 .build();
 
         bettingRepository.save(betting);
 
-        // TODO : 스케줄러 로직 (1분)
-        // TODO : 베팅 상대에게 알림 메시지
+        // 1대1 레이싱인 경우
+        if (betting.getBettingType().equals(BettingType.RACING)) {
+            // TODO : 스케줄러 로직 (1분)
+            // TODO : 베팅 상대에게 알림 메시지
+        } else {
+            // 베팅인 경우
+            // 베팅 금액 지불
+            users.minusPoint(betting.getPoint());
+            betting.setBettingStatus(BettingStatus.ACCEPT);
+            schedule.addBetting(betting);
+        }
 
         return betting.getId();
     }
@@ -85,10 +96,22 @@ public class BettingService {
 
         // TODO : 베팅 주인에게 수락 알림 메시지
 
+        Users bettor = betting.getBettor();
+        Users targetUser = betting.getTargetUser();
+
+        // 베팅 거는 비용
+        int point = betting.getPoint();
+
+        bettor.minusPoint(point);
+        targetUser.minusPoint(point);
+
+        // schedule에 레이싱 추가
+        betting.getSchedule().addRacing(betting);
+
         return betting.getId();
     }
 
-    // TODO : 베팅 미수락 시 베팅 삭제 로직
+    // TODO : 레이싱 미수락 시 베팅 삭제 로직
     public Long deleteBettingById(Long bettingId) {
         Betting betting = findBettingById(bettingId);
         // 베팅이 수락되지 않은 경우
@@ -139,25 +162,28 @@ public class BettingService {
 
     /**
      * 이벤트 발생 메서드
-     * 스케줄 종료시 베팅 결과 생성 로직
-     * @param betting 결과 생성을 원하는 베팅
-     * @return 베팅 아이디
-     * TODO: Schedule 종료 시 해당 메소드 실행
+     * 스케줄 종료시 레이싱 결과 생성 로직
+     * @param scheduleId 도착한 유저가 속한 스케줄
+     * @return 유저 아이디
+     * TODO: 유저 도착 시 해당 메소드 실행
      */
-    public Long setBettingResult(Long bettingId) {
-        Betting betting = findBettingById(bettingId);
+    public Long userRacingArrival(Long scheduleId, Long userId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));
+
+        List<Betting> racings = schedule.getRacings();
+
+        for (Betting racing : racings) {
+            // 도착 유저에 대해서 아직 종료되지 않은 레이싱만 실행
+            if (racing.getBettor().getId() == userId && racing.getBettingStatus().equals(BettingStatus.ACCEPT)) {
+                setRacingResult(racing);
+            }
+        }
+
+        return userId;
+    }
+    public void setRacingResult(Betting betting) {
         Users bettor = betting.getBettor();
         Users targetUser = betting.getTargetUser();
-
-        Schedule schedule = betting.getSchedule();
-        List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
-        UserArrivalData bettorArrivalData = userArrivalDatas.stream().filter(u -> u.getUser().getId() == bettor.getId())
-                .findAny().orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
-        UserArrivalData targetArrivalDate = userArrivalDatas.stream().filter(u -> u.getUser().getId() == targetUser.getId())
-                .findAny().orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
-
-        LocalDateTime bettorTime = bettorArrivalData.getArrivalTime();
-        LocalDateTime targetTime = targetArrivalDate.getArrivalTime();
 
         ResultType resultType;
         int point = betting.getPoint();
@@ -165,32 +191,98 @@ public class BettingService {
         // 플러스 포인트 : 베팅 걸린 시점에서 베팅 포인트 가져갔기 때문에 2배로 더해준다.
         int plusPoint = point * 2;
 
-        if (bettorTime.isBefore(targetTime)) {
+        // 베팅 건 사람 플러스 포인트
+        bettor.plusPoint(plusPoint);
+
+        userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+
+        betting.updateBettingResult(ResultType.WIN);
+        betting.setBettingStatus(BettingStatus.DONE);
+    }
+
+    /**
+     * 이벤트 발생 메서드
+     * 스케줄 종료시 베팅 & 레이싱 결과 생성 로직
+     * @return 해당 스케줄 아이디
+     * TODO: Schedule 종료 시 해당 메소드 실행
+     */
+    public Long setAllBettings(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));
+
+        List<Betting> bettings = schedule.getBettings();
+        // 베팅 결과 설정
+        for (Betting betting : bettings) {
+            setBettingResult(betting);
+        }
+        // 베팅 전체 결과에 따른 포인트 분배
+        bettingPointCalculate(bettings);
+
+        // 둘 다 지각한 경우에 대한 레이싱 로직
+        List<Betting> racings = schedule.getRacings();
+        for (Betting racing : racings) {
+            // 아직 레이싱이 종료되지 않은 레이싱에 대해 실행
+            if (racing.getBettingStatus().equals(BettingStatus.ACCEPT)) {
+                setDrawRacing(racing);
+            }
+        }
+        return scheduleId;
+    }
+
+    public void setBettingResult(Betting betting) {
+        Users targetUser = betting.getTargetUser();
+
+        Schedule schedule = betting.getSchedule();
+        // 유저 도착 정보 정렬
+        List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
+        userArrivalDatas.sort(Comparator.comparing(UserArrivalData::getArrivalTime));
+        UserArrivalData lastArrivalData = userArrivalDatas.get(userArrivalDatas.size() - 1);
+
+        ResultType resultType;
+
+        if (lastArrivalData.getUser().getId() == targetUser.getId()) {
+            // 베팅 성공!
             resultType = ResultType.WIN;
-            // 베팅 건 사람 플러스 포인트
-            bettor.plusPoint(plusPoint);
-
-            userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
-        } else if (bettorTime.isAfter(targetTime)) {
-            resultType = ResultType.LOSE;
-            // 베팅 걸린 사람 플러스 포인트
-            targetUser.plusPoint(plusPoint);
-
-            userPointEventPublisher.userPointChangeEvent(targetUser, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
         } else {
-            resultType = ResultType.DRAW;
-            // 베팅 건 금액 돌려주기
-            bettor.plusPoint(point);
-            targetUser.plusPoint(point);
-
-            userPointEventPublisher.userPointChangeEvent(bettor, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
-            userPointEventPublisher.userPointChangeEvent(targetUser, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
-
+            // 베팅 실패..
+            resultType = ResultType.LOSE;
         }
 
         betting.updateBettingResult(resultType);
         betting.setBettingStatus(BettingStatus.DONE);
 
-        return betting.getId();
+    }
+
+    public void bettingPointCalculate(List<Betting> bettings) {
+        int bettingPoints = 0;
+        int winners = 0;
+        for (Betting betting : bettings) {
+            bettingPoints += betting.getPoint();
+            if (betting.getResultType().equals(ResultType.WIN)) {
+                winners += 1;
+            }
+        }
+        int reward = bettingPoints / winners;
+
+        for (Betting betting : bettings) {
+            if (betting.getResultType().equals(ResultType.WIN)) {
+                betting.getBettor().plusPoint(reward);
+            }
+        }
+
+    }
+
+    public void setDrawRacing(Betting betting) {
+        int point = betting.getPoint();
+        betting.setResultType(ResultType.DRAW);
+        // 베팅 건 금액 돌려주기
+        Users bettor = betting.getBettor();
+        Users targetUser = betting.getTargetUser();
+
+        bettor.plusPoint(point);
+        targetUser.plusPoint(point);
+
+        userPointEventPublisher.userPointChangeEvent(bettor, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        userPointEventPublisher.userPointChangeEvent(targetUser, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+
     }
 }
