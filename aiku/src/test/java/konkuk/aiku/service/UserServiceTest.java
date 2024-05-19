@@ -77,7 +77,7 @@ class UserServiceTest {
         byId.setRefreshToken("abcd");
         log.info("refreshToken before = {}", byId.getRefreshToken());
 
-        userService.logout(saveId);
+        userService.logout(byId);
         log.info("refreshToken after = {}", byId.getRefreshToken());
 
         byId = userService.findById(saveId);

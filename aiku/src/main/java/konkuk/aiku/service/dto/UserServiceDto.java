@@ -81,7 +81,7 @@ public class UserServiceDto {
                 .userTitles(userTitleList)
                 .mainTitle(mainTitleEntity)
                 .point(point)
-                .role(role)
+                .role(UserRole.USER)
                 .fcmToken(fcmToken)
                 .fcmTokenCreateAt(fcmTokenCreateAt)
                 .refreshToken(refreshToken)

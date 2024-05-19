@@ -122,8 +122,8 @@ public class UserController {
 
     @PostMapping("/logout")
     public ResponseEntity<SuccessResponseDto> logout(@AuthenticationPrincipal UserAdaptor userAdaptor) {
-        String kakaoId = userAdaptor.getUsername();
-        Long userId = userService.logout(Long.valueOf(kakaoId));
+        Users users = userAdaptor.getUsers();
+        Long userId = userService.logout(users);
 
         return SuccessResponseDto.getResponseEntity(userId, LOGOUT_SUCCESS, HttpStatus.OK);
     }

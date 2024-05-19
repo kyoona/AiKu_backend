@@ -45,10 +45,9 @@ public class UserService {
         return usersRepository.findByKakaoId(kakaoId).orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
     }
 
-    public Long logout(Long userId) {
-        Users user = findById(userId);
-        user.setRefreshToken(null);
-        return user.getId();
+    public Long logout(Users users) {
+        users.setRefreshToken(null);
+        return users.getId();
     }
 
     public Long updateUser(Users users, UserServiceDto userServiceDto) {
