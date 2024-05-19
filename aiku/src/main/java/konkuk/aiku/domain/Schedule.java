@@ -81,4 +81,12 @@ public class Schedule extends TimeEntity{
     protected void setGroup(Groups group) {
         this.group = group;
     }
+
+    public void addBetting(Betting betting) {
+        this.bettings.add(betting);
+    }
+
+    public void addRacing(Betting betting) {
+        this.racings.add(betting);
+    }
 }
