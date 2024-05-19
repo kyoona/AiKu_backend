@@ -3,6 +3,7 @@ package konkuk.aiku.service;
 import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.domain.*;
+import konkuk.aiku.event.BettingEventPublisher;
 import konkuk.aiku.event.ScheduleEventPublisher;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
@@ -11,10 +12,7 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.firebase.FcmToken;
 import konkuk.aiku.firebase.FcmTokenProvider;
 import konkuk.aiku.firebase.MessageSender;
-import konkuk.aiku.firebase.dto.MessageTitle;
-import konkuk.aiku.firebase.dto.RealTimeLocationMessage;
-import konkuk.aiku.firebase.dto.SendingEmojiMessage;
-import konkuk.aiku.firebase.dto.ScheduleAlarmMessage;
+import konkuk.aiku.firebase.dto.*;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +36,8 @@ public class AlarmService {
     private final MessageSender messageSender;
 
     private final ScheduleEventPublisher scheduleEventPublisher;
+    private final BettingEventPublisher bettingEventPublisher;
+
 
     @Transactional
     public void saveToken(Users user, FcmToken fcmToken){
@@ -59,7 +59,7 @@ public class AlarmService {
         user.setFcmToken(token);
     }
 
-    public void sendLocationInSchedule(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
+    public void receiveRealTimeLocation(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
 
@@ -70,14 +70,34 @@ public class AlarmService {
         List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
 
         Map<String, String> messageDataMap = RealTimeLocationMessage
-                .createMessage(user, locationDto.getLatitude(), locationDto.getLongitude())
+                .createMessage(user, scheduleId, locationDto.getLatitude(), locationDto.getLongitude())
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
+    }
+
+    public void receiveUserArrival(Users user, Long scheduleId, LocalDateTime arrivalTime){
+        Schedule schedule = findScheduleById(scheduleId);
+        List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+
+        checkUserInSchedule(user.getId(), scheduleId);
+        checkIsScheduleRun(schedule);
+        if (scheduleUsers.size() == 0) return;
+
+        List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
+
+        Map<String, String> messageDataMap = UserArrivalMessage
+                .createMessage(user, schedule, arrivalTime)
                 .toStringMap();
         messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
 
-        checkUserArrival(user, schedule, locationDto);
+        //유저가 도착했을 때 실행되어야 될 것들
+        scheduleEventPublisher.userArriveInScheduleEvent(user, schedule, arrivalTime);
+        bettingEventPublisher.userArriveInBettingEvent(user, schedule);
+
     }
 
     //==이벤트 서비스==
+
     public Runnable sendStartScheduleRunnable(Long scheduleId){
         return () -> {
             Schedule schedule = findScheduleById(scheduleId);
@@ -112,20 +132,13 @@ public class AlarmService {
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
-        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, receiver, emojiMessageDto.getEmojiType())
+        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, scheduleId, receiver, emojiMessageDto.getEmojiType())
                 .toStringMap();
 
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
     }
 
     //==유저 검증 메서드==
-    private void checkUserArrival(Users user, Schedule schedule, RealTimeLocationDto locationDto){
-        Double distance = locationDto.distance(schedule.getLocation().getLatitude(), schedule.getLocation().getLongitude());
-        if(distance < 0.001){
-            scheduleEventPublisher.userArriveInScheduleEvent(user, schedule);
-        }
-    }
-
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
         UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId).orElse(null);
         if (userSchedule == null) {

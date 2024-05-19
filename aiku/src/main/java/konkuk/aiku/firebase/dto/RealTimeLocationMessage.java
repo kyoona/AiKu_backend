@@ -1,27 +1,34 @@
 package konkuk.aiku.firebase.dto;
 
+import konkuk.aiku.domain.UserImgData.ImgType;
 import konkuk.aiku.domain.Users;
-import lombok.Getter;
+import lombok.AccessLevel;
+import lombok.Builder;
 
+@Builder(access = AccessLevel.PROTECTED)
 public class RealTimeLocationMessage extends Message{
     protected String title;
+    protected Long scheduleId;
     protected Long userId;
     protected String userName;
     protected String userImg;
+    private ImgType imgData;
+    private String colorCode;
     protected Double latitude;
     protected Double longitude;
 
-    protected RealTimeLocationMessage(Long userId, String userName, String userImg, Double latitude, Double longitude) {
-        this.title = MessageTitle.USER_REAL_TIME_LOCATION.getTitle();
-        this.userId = userId;
-        this.userName = userName;
-        this.userImg = userImg;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public static RealTimeLocationMessage createMessage(Users user, Double latitude, Double longitude) {
-        return new RealTimeLocationMessage(user.getId(), user.getUsername(), user.getUserImg(), latitude, longitude);
+    public static RealTimeLocationMessage createMessage(Users user, Long scheduleId, Double latitude, Double longitude) {
+        return RealTimeLocationMessage.builder()
+                .title(MessageTitle.USER_REAL_TIME_LOCATION.getTitle())
+                .scheduleId(scheduleId)
+                .userId(user.getId())
+                .userName(user.getUsername())
+                .userImg(user.getUserImg())
+                .imgData(user.getUserImgData().getImgData())
+                .colorCode(user.getUserImgData().getColorCode())
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
     }
 
 }

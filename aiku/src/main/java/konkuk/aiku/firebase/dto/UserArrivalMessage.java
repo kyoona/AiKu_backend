@@ -1,43 +1,38 @@
 package konkuk.aiku.firebase.dto;
 
 import konkuk.aiku.domain.Schedule;
+import konkuk.aiku.domain.UserImgData.ImgType;
 import konkuk.aiku.domain.Users;
 import lombok.AccessLevel;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 
+@Builder(access = AccessLevel.PROTECTED)
 public class UserArrivalMessage extends Message{
     protected String title;
+    protected Long scheduleId;
+    protected String scheduleName;
 
     protected Long userId;
     protected String userName;
     protected String userImg;
-
-    protected Long scheduleId;
-    protected String scheduleName;
+    private ImgType imgData;
+    private String colorCode;
 
     protected LocalDateTime arrivalTime;
 
-
-    @Builder(access = AccessLevel.PRIVATE)
-    protected UserArrivalMessage(Long userId, String userName, String userImg, Long scheduleId, String scheduleName, LocalDateTime arrivalTime) {
-        this.title = MessageTitle.USER_SCHEDULE_ARRIVAL.getTitle();
-        this.userId = userId;
-        this.userName = userName;
-        this.userImg = userImg;
-        this.scheduleId = scheduleId;
-        this.scheduleName = scheduleName;
-        this.arrivalTime = arrivalTime;
-    }
-
     public static UserArrivalMessage createMessage(Users user, Schedule schedule, LocalDateTime arrivalTime) {
         return UserArrivalMessage.builder()
+                .title(MessageTitle.USER_SCHEDULE_ARRIVAL.getTitle())
+                .scheduleId(schedule.getId())
+                .scheduleName(schedule.getScheduleName())
                 .userId(user.getId())
                 .userName(user.getUsername())
                 .userImg(user.getUserImg())
-                .scheduleId(schedule.getId())
-                .scheduleName(schedule.getScheduleName())
+                .imgData(user.getUserImgData().getImgData())
+                .colorCode(user.getUserImgData().getColorCode())
+                .arrivalTime(arrivalTime)
                 .build();
     }
 }

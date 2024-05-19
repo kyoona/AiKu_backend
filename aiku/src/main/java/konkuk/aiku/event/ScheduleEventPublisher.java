@@ -14,8 +14,8 @@ public class ScheduleEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 
-    public void userArriveInScheduleEvent(Users user, Schedule schedule){
-        publisher.publishEvent(new UserArriveInScheduleEvent(user, schedule, LocalDateTime.now()));
+    public void userArriveInScheduleEvent(Users user, Schedule schedule, LocalDateTime arrivalTime){
+        publisher.publishEvent(new UserArriveInScheduleEvent(user, schedule, arrivalTime));
     }
 
     public void scheduleAlarmEvent(Long scheduleId){

@@ -1,7 +1,7 @@
 package konkuk.aiku.controller.dto;
 
 import jakarta.validation.constraints.NotNull;
-import konkuk.aiku.domain.Emoji;
+import konkuk.aiku.domain.EmojiType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +13,5 @@ public class EmojiMessageDto {
     @NotNull
     private Long receiverId;
     @NotNull
-    private Emoji emojiType;
+    private EmojiType emojiType;
 }

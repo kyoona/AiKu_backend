@@ -1,15 +1,14 @@
 package konkuk.aiku.controller.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class RealTimeLocationDto {
-    @Setter
-    private Long id;
     @NotNull
     private Double latitude;
     @NotNull
@@ -20,7 +19,7 @@ public class RealTimeLocationDto {
         this.longitude = longitude;
     }
 
-    public Double distance(double scheLat, double scheLon){
+/*    public Double distance(double scheLat, double scheLon){
         double theta = longitude - scheLon;
         double dist = Math.sin(deg2rad(latitude))* Math.sin(deg2rad(scheLat)) + Math.cos(deg2rad(latitude))*Math.cos(deg2rad(scheLat))*Math.cos(deg2rad(theta));
         dist = Math.acos(dist);
@@ -37,5 +36,5 @@ public class RealTimeLocationDto {
     //radian(라디안)을 10진수로 변환
     private double rad2deg(double rad){
         return (rad * 180 / Math.PI);
-    }
+    }*/
 }

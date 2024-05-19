@@ -1,37 +1,36 @@
 package konkuk.aiku.firebase.dto;
 
-import konkuk.aiku.domain.Emoji;
+import konkuk.aiku.domain.EmojiType;
+import konkuk.aiku.domain.UserImgData;
+import konkuk.aiku.domain.UserImgData.ImgType;
 import konkuk.aiku.domain.Users;
 import lombok.AccessLevel;
 import lombok.Builder;
 
+@Builder(access = AccessLevel.PROTECTED)
 public class SendingEmojiMessage extends Message{
     protected String title;
+    protected Long scheduleId;
 
     protected Long senderId;
     protected String senderName;
     protected String senderImg;
+    private ImgType senderImgData;
+    private String senderColorCode;
 
     protected Long receiverId;
     protected String receiverName;
     protected String receiverImg;
+    private ImgType receiverImgData;
+    private String receiverColorCode;
 
-    protected Emoji emojiType;
+    protected EmojiType emojiType;
 
-    @Builder(access = AccessLevel.PROTECTED)
-    protected SendingEmojiMessage(Long senderId, String senderName, String senderImg, Long receiverId, String receiverName, String receiverImg, Emoji emojiType) {
-        this.title = MessageTitle.EMOJI_TO_USER.getTitle();
-        this.senderId = senderId;
-        this.senderName = senderName;
-        this.senderImg = senderImg;
-        this.receiverId = receiverId;
-        this.receiverName = receiverName;
-        this.receiverImg = receiverImg;
-        this.emojiType = emojiType;
-    }
 
-    public static SendingEmojiMessage createMessage(Users sender, Users receiver, Emoji emojiType){
+    public static SendingEmojiMessage createMessage(Users sender, Long scheduleId, Users receiver, EmojiType emojiType){
         return SendingEmojiMessage.builder()
+                .title(MessageTitle.EMOJI_TO_USER.getTitle())
+                .scheduleId(scheduleId)
                 .senderId(sender.getId())
                 .senderName(sender.getUsername())
                 .senderImg(sender.getUserImg())
