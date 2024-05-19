@@ -40,6 +40,7 @@ public class ScheduleService {
                 .scheduleName(scheduleServiceDTO.getScheduleName())
                 .location(createLocation(scheduleServiceDTO.getLocation()))
                 .scheduleTime(scheduleServiceDTO.getScheduleTime())
+                .status(scheduleServiceDTO.getStatus())
                 .build();
 
         group.addSchedule(schedule);
@@ -90,33 +91,18 @@ public class ScheduleService {
 
         List<Schedule> schedules = scheduleRepository.findScheduleByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
 
-        Integer runSchedule = 0;
-        Integer waitSchedule = 0;
-        Integer termSchedule = 0;
-        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, runSchedule, waitSchedule, termSchedule);
-        return GroupScheduleListServiceDto.toDto(group, runSchedule, waitSchedule, termSchedule, dataDto);
-    }
-
-    private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(List<Schedule> schedules, Integer runSchedule, Integer waitSchedule, Integer termSchedule) {
-        List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
-        for (Schedule schedule : schedules) {
-            dtos.add(ScheduleSimpleServiceDto.toDto(schedule));
-
-            if (schedule.getStatus() == ScheduleStatus.RUN) runSchedule++;
-            else if(schedule.getStatus() == ScheduleStatus.WAIT) waitSchedule++;
-            else if(schedule.getStatus() == ScheduleStatus.TERM) termSchedule++;
-        }
-        return dtos;
+        int[] scheduleStatus = new int[3]; //RUN, WAIT, TERM순서
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(user.getId(), schedules, scheduleStatus);
+        return GroupScheduleListServiceDto.toDto(group, scheduleStatus[0], scheduleStatus[1], scheduleStatus[2], dataDto);
     }
 
     public UserScheduleListServiceDto findUserScheduleList(Users user, ScheduleCond cond){
-        List<Schedule> schedules = scheduleRepository.findScheduleByUserId(user.getId(), cond.getStartDate(), cond.getEndDate(), cond.getStatus());
+        List<Schedule> schedules = scheduleRepository.findUserScheduleByUserId(user.getId(), cond.getStartDate(), cond.getEndDate(), cond.getStatus())
+                .stream().map(UserSchedule::getSchedule).toList();
 
-        Integer runSchedule = 0;
-        Integer waitSchedule = 0;
-        Integer termSchedule = 0;
-        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, runSchedule, waitSchedule, termSchedule);
-        return UserScheduleListServiceDto.toDto(user, runSchedule, waitSchedule, termSchedule, dataDto);
+        int[] scheduleStatus = new int[3]; //RUN, WAIT, TERM순서
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, scheduleStatus);
+        return UserScheduleListServiceDto.toDto(user, scheduleStatus[0], scheduleStatus[1], scheduleStatus[2], dataDto);
     }
 
     @Transactional
@@ -211,5 +197,37 @@ public class ScheduleService {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
         }
         return schedule;
+    }
+
+    //==편의 메서드==
+    // 그룹의 스케줄 (유저 참석/불참석 구분)
+    private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(Long userId, List<Schedule> schedules, int[] scheduleStatus) {
+        List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
+        for (Schedule schedule : schedules) {
+            ScheduleSimpleServiceDto dto = ScheduleSimpleServiceDto.toDto(schedule);
+
+            UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, schedule.getId()).orElse(null);
+            if(userSchedule == null) dto.setAccept(false);
+
+            dtos.add(dto);
+
+            if (schedule.getStatus() == ScheduleStatus.RUN) scheduleStatus[0]++;
+            else if(schedule.getStatus() == ScheduleStatus.WAIT) scheduleStatus[1]++;
+            else if(schedule.getStatus() == ScheduleStatus.TERM) scheduleStatus[2]++;
+        }
+        return dtos;
+    }
+
+    //유저가 참가중인 스케줄
+    private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(List<Schedule> schedules, int[] scheduleStatus) {
+        List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
+        for (Schedule schedule : schedules) {
+            dtos.add(ScheduleSimpleServiceDto.toDto(schedule));
+
+            if (schedule.getStatus() == ScheduleStatus.RUN) scheduleStatus[0]++;
+            else if(schedule.getStatus() == ScheduleStatus.WAIT) scheduleStatus[1]++;
+            else if(schedule.getStatus() == ScheduleStatus.TERM) scheduleStatus[2]++;
+        }
+        return dtos;
     }
 }

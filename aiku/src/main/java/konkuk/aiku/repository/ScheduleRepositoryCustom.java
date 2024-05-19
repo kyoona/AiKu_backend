@@ -10,5 +10,5 @@ public interface ScheduleRepositoryCustom {
     List<Users> findWaitUsersInSchedule(Long groupId, List<UserSchedule> acceptUsers);
     Optional<UserArrivalData> findUserArrivalDataByUserIdAndScheduleId(Long userId, Long scheduleId);
     List<Schedule> findScheduleByGroupId(Long GroupId, String startTime, String endTime, ScheduleStatus status);
-    List<Schedule> findScheduleByUserId(Long userId, String startTime, String endTime, ScheduleStatus status);
+    List<UserSchedule> findUserScheduleByUserId(Long userId, String startTime, String endTime, ScheduleStatus status);
 }

@@ -1,15 +1,14 @@
 package konkuk.aiku.service;
 
 import jakarta.persistence.EntityManager;
+import konkuk.aiku.controller.dto.ScheduleCond;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
-import konkuk.aiku.service.dto.LocationServiceDto;
-import konkuk.aiku.service.dto.ScheduleDetailServiceDto;
-import konkuk.aiku.service.dto.ScheduleServiceDto;
+import konkuk.aiku.service.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +20,7 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -49,6 +49,7 @@ class ScheduleServiceTest {
     Users userB;
 
     Groups groupA;
+    Groups groupB;
 
     @BeforeEach
     void beforeEach(){
@@ -84,6 +85,9 @@ class ScheduleServiceTest {
 
         groupA = Groups.createGroups(userA1, "groupA", "groupA입니다.");
         groupsRepository.save(groupA);
+
+        groupB = Groups.createGroups(userB, "groupB", "groupB입니다.");
+        groupsRepository.save(groupB);
 
         groupService.enterGroup(userA2, groupA.getId());
     }
@@ -224,6 +228,86 @@ class ScheduleServiceTest {
 
         assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUsername()).isEqualTo(userA2.getUsername());
         assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserId()).isEqualTo(userA2.getId());
+    }
+
+    @Test
+    @DisplayName("그룹 스케줄 목록 조회")
+    public void findGroupScheduleList() {
+        //given
+        ScheduleServiceDto scheduleServiceDTO1 = ScheduleServiceDto.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .status(ScheduleStatus.WAIT)
+                .build();
+        Long scheduleId1 = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO1);
+
+        ScheduleServiceDto scheduleServiceDTO2 = ScheduleServiceDto.builder()
+                .scheduleName("schedule2")
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .status(ScheduleStatus.WAIT)
+                .build();
+        Long scheduleId2 = scheduleService.addSchedule(userA2, groupA.getId(), scheduleServiceDTO2);
+
+        scheduleService.enterSchedule(userA2, groupA.getId(), scheduleId1);
+
+        em.flush();
+        em.clear();
+
+        //when
+        GroupScheduleListServiceDto serviceDto = scheduleService.findGroupScheduleList(userA1, groupA.getId(), new ScheduleCond(null, null, null));
+
+        //then
+        assertThat(serviceDto.getGroupId()).isEqualTo(groupA.getId());
+        assertThat(serviceDto.getGroupName()).isEqualTo(groupA.getGroupName());
+        assertThat(serviceDto.getWaitSchedule()).isEqualTo(2);
+
+        List<ScheduleSimpleServiceDto> dtoData = serviceDto.getData();
+        assertThat(dtoData.size()).isEqualTo(2);
+        assertThat(dtoData.stream().map(ScheduleSimpleServiceDto::getScheduleId)).contains(scheduleId1, scheduleId2);
+        assertThat(dtoData.stream().map(ScheduleSimpleServiceDto::getUserCount)).contains(2, 1);
+        assertThat(dtoData.stream().map(ScheduleSimpleServiceDto::isAccept)).contains(true, false);
+    }
+
+    @Test
+    @DisplayName("유저 스케줄 목록 조회")
+    public void findUserScheduleList() {
+        //given
+        ScheduleServiceDto scheduleServiceDTO1 = ScheduleServiceDto.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .status(ScheduleStatus.WAIT)
+                .build();
+        Long scheduleId1 = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO1);
+        scheduleService.enterSchedule(userA2, groupA.getId(), scheduleId1);
+
+        groupService.enterGroup(userA1, groupB.getId());
+        ScheduleServiceDto scheduleServiceDTO2 = ScheduleServiceDto.builder()
+                .scheduleName("schedule2")
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .status(ScheduleStatus.RUN)
+                .build();
+        Long scheduleId2 = scheduleService.addSchedule(userA1, groupB.getId(), scheduleServiceDTO2);
+        em.flush();
+        em.clear();
+
+        //when
+        UserScheduleListServiceDto serviceDto = scheduleService.findUserScheduleList(userA1, new ScheduleCond(null, null, null));
+
+        //then
+        assertThat(serviceDto.getUserId()).isEqualTo(userA1.getId());
+        assertThat(serviceDto.getUsername()).isEqualTo(userA1.getUsername());
+        assertThat(serviceDto.getWaitSchedule()).isEqualTo(1);
+        assertThat(serviceDto.getRunSchedule()).isEqualTo(1);
+        assertThat(serviceDto.getTermSchedule()).isEqualTo(0);
+
+        List<ScheduleSimpleServiceDto> dtoData = serviceDto.getData();
+        assertThat(dtoData.size()).isEqualTo(2);
+        assertThat(dtoData.stream().map(ScheduleSimpleServiceDto::getScheduleId)).contains(scheduleId1, scheduleId2);
+        assertThat(dtoData.stream().map(ScheduleSimpleServiceDto::getUserCount)).contains(1, 2);
     }
 
     @Test
