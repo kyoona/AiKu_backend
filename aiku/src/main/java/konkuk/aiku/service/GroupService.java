@@ -76,10 +76,18 @@ public class GroupService {
         List<GroupSimpleServiceDto> dto = new ArrayList<>();
         for (UserGroup userGroup : userGroups) {
             Groups group = userGroup.getGroup();
-            LocalDateTime lastScheduleTime = scheduleRepository.findLatestScheduleTimeByGroupId(group.getId()).orElse(null);
-            dto.add(GroupSimpleServiceDto.toDto(group, lastScheduleTime));
+            LocalDateTime groupLatestScheduleTime = findGroupLatestScheduleTime(group.getId());
+            dto.add(GroupSimpleServiceDto.toDto(group, groupLatestScheduleTime));
         }
         return dto;
+    }
+
+    private LocalDateTime findGroupLatestScheduleTime(Long groupId) {
+        List<LocalDateTime> scheduleTimeList = scheduleRepository.findLatestScheduleTimeByGroupId(groupId);
+        if(scheduleTimeList.size() != 0) {
+            return scheduleTimeList.get(0);
+        }
+        return null;
     }
 
     @Transactional

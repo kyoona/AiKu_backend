@@ -40,7 +40,7 @@ public class ScheduleService {
                 .scheduleName(scheduleServiceDTO.getScheduleName())
                 .location(createLocation(scheduleServiceDTO.getLocation()))
                 .scheduleTime(scheduleServiceDTO.getScheduleTime())
-                .status(scheduleServiceDTO.getStatus())
+                .status(ScheduleStatus.WAIT)
                 .build();
 
         group.addSchedule(schedule);
