@@ -14,6 +14,7 @@ public class GroupScheduleListServiceDto {
     private Long groupId;
     private String groupName;
     private String description;
+    private int userCount;
     private int runSchedule;
     private int waitSchedule;
     private int termSchedule;
@@ -24,6 +25,7 @@ public class GroupScheduleListServiceDto {
                 .groupId(group.getId())
                 .groupName(group.getGroupName())
                 .description(group.getDescription())
+                .userCount(group.getUserCount())
                 .runSchedule(runSchedule)
                 .waitSchedule(waitSchedule)
                 .termSchedule(termSchedule)

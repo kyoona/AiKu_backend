@@ -12,17 +12,17 @@ public class GroupSimpleServiceDto {
     private Long groupId;
     private String groupName;
     private String description;
-    private int memberSize;
+    private int userCount;
     private LocalDateTime lastScheduleTime;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public static GroupSimpleServiceDto toDto(Groups group, int memberSize, LocalDateTime lastScheduleTime){
+    public static GroupSimpleServiceDto toDto(Groups group, LocalDateTime lastScheduleTime){
         return GroupSimpleServiceDto.builder()
                 .groupId(group.getId())
                 .groupName(group.getGroupName())
                 .description(group.getDescription())
-                .memberSize(memberSize)
+                .userCount(group.getUserCount())
                 .lastScheduleTime(lastScheduleTime)
                 .createdAt(group.getCreatedAt())
                 .modifiedAt(group.getModifiedAt())

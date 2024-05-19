@@ -1,6 +1,7 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.domain.*;
+import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
@@ -75,17 +76,28 @@ public class GroupService {
         List<GroupSimpleServiceDto> dto = new ArrayList<>();
         for (UserGroup userGroup : userGroups) {
             Groups group = userGroup.getGroup();
-            int groupMemberSize = groupsRepository.countOfGroupUsers(group.getId());
-            LocalDateTime lastScheduleTime = scheduleRepository.findLatestScheduleTimeByGroupId(group.getId()).orElse(null);
-            dto.add(GroupSimpleServiceDto.toDto(group, groupMemberSize, lastScheduleTime));
+            LocalDateTime groupLatestScheduleTime = findGroupLatestScheduleTime(group.getId());
+            dto.add(GroupSimpleServiceDto.toDto(group, groupLatestScheduleTime));
         }
         return dto;
+    }
+
+    private LocalDateTime findGroupLatestScheduleTime(Long groupId) {
+        List<LocalDateTime> scheduleTimeList = scheduleRepository.findLatestScheduleTimeByGroupId(groupId);
+        if(scheduleTimeList.size() != 0) {
+            return scheduleTimeList.get(0);
+        }
+        return null;
     }
 
     @Transactional
     public Long enterGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);
+
+        checkUserAlreadyInGroup(user, group);
+
         group.addUser(user);
+        groupsRepository.upGroupUserCount(groupId);
         return groupId;
     }
 
@@ -95,7 +107,7 @@ public class GroupService {
 
         UserGroup userGroup = checkUserInGroup(user, group);
         group.deleteUser(userGroup);
-
+        groupsRepository.downGroupUserCount(groupId);
         return groupId;
     }
 
@@ -104,6 +116,14 @@ public class GroupService {
         UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
         if(userGroup == null){
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
+        return userGroup;
+    }
+
+    private UserGroup checkUserAlreadyInGroup(Users user, Groups groups){
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
+        if(userGroup != null){
+            throw new AlreadyInException(ErrorCode.ALREADY_IN_GROUP);
         }
         return userGroup;
     }

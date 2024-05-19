@@ -40,7 +40,7 @@ public class ScheduleService {
                 .scheduleName(scheduleServiceDTO.getScheduleName())
                 .location(createLocation(scheduleServiceDTO.getLocation()))
                 .scheduleTime(scheduleServiceDTO.getScheduleTime())
-                .status(scheduleServiceDTO.getStatus())
+                .status(ScheduleStatus.WAIT)
                 .build();
 
         group.addSchedule(schedule);
@@ -121,9 +121,12 @@ public class ScheduleService {
     @Transactional
     public Long exitSchedule(Users user, Long groupId, Long scheduleId) {
         Long userId = user.getId();
+
         UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
+
         Schedule schedule = userSchedule.getSchedule();
         schedule.deleteUser(user, userSchedule);
+        scheduleRepository.downScheduleUserCount(scheduleId);
         return schedule.getId();
     }
 

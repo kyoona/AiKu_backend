@@ -10,9 +10,33 @@ import static konkuk.aiku.exception.ErrorCode.*;
 @RestControllerAdvice
 public class ExceptionHandlers  {
 
+    @ExceptionHandler({AlreadyInException.class})
+    public ResponseEntity<ErrorDTO> handleAlreadyInException(AlreadyInException e){
+        e.printStackTrace();
+        return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({NoSuchEntityException.class})
+    public ResponseEntity<ErrorDTO> handleNoSuchEntityException(NoSuchEntityException e){
+        e.printStackTrace();
+        return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({NoAthorityToAccessException.class})
+    public ResponseEntity<ErrorDTO> handleNoAthorityToAccessException(NoAthorityToAccessException e){
+        e.printStackTrace();
+        return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({MessagingException.class})
+    public ResponseEntity<ErrorDTO> handleMessagingException(MessagingException e){
+        e.printStackTrace();
+        return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<ErrorDTO> handleExampleException(Exception ex){
-        ex.printStackTrace();
+    public ResponseEntity<ErrorDTO> handleException(Exception e){
+        e.printStackTrace();
         return new ResponseEntity<>(new ErrorDTO(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

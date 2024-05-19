@@ -32,7 +32,7 @@ public class Schedule extends TimeEntity{
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
     private List<UserSchedule> users = new ArrayList<>();
-    private int userCount = 1;
+    private int userCount = 1; //스케줄 생성한 사람
 
     @OneToMany(mappedBy = "schedule")
     private List<Betting> bettings = new ArrayList<>();

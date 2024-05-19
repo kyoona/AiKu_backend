@@ -3,6 +3,7 @@ package konkuk.aiku.repository;
 import konkuk.aiku.domain.Groups;
 import konkuk.aiku.domain.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,4 +16,10 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> , GroupsRe
     List<UserGroup> findUserGroupWithGroup(@Param("userId") Long userId);
     @Query("SELECT COUNT(ug) FROM UserGroup ug WHERE ug.group.id = :groupId")
     int countOfGroupUsers(@Param("groupId") Long groupId);
+    @Modifying
+    @Query("UPDATE Groups g SET g.userCount = g.userCount + 1 WHERE g.id = :groupId")
+    void upGroupUserCount(@Param("groupId") Long groupId);
+    @Modifying
+    @Query("UPDATE Groups g SET g.userCount = g.userCount - 1 WHERE g.id = :groupId")
+    void downGroupUserCount(@Param("groupId") Long groupId);
 }
