@@ -9,6 +9,7 @@ import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
+import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final GroupsRepository groupsRepository;
+    private final UsersRepository usersRepository;
     private final ScheduleEventPublisher eventPublisher;
 
     @Transactional
@@ -142,8 +144,10 @@ public class ScheduleService {
 
     //==유저 도착 이벤트==
     @Transactional
-    public boolean arriveUser(Users user, Long scheduleId, LocalDateTime arriveTime){
-        if(checkUserAlreadyArrive(user, scheduleId)) return false;
+    public boolean createUserArrivalData(Long userId, Long scheduleId, LocalDateTime arriveTime){
+        Users user = findUserById(userId);
+
+        if(checkUserAlreadyArrive(userId, scheduleId)) return false;
 
         Schedule schedule = findScheduleById(scheduleId);
         schedule.addUserArrivalData(user, arriveTime);
@@ -176,9 +180,9 @@ public class ScheduleService {
         }
     }
 
-    private boolean checkUserAlreadyArrive(Users user, Long scheduleId){
+    private boolean checkUserAlreadyArrive(Long userId, Long scheduleId){
         UserArrivalData userArrivalData = scheduleRepository
-                .findUserArrivalDataByUserIdAndScheduleId(user.getId(), scheduleId).orElse(null);
+                .findUserArrivalDataByUserIdAndScheduleId(userId, scheduleId).orElse(null);
         if (userArrivalData == null) {
             return false;
         }
@@ -200,6 +204,14 @@ public class ScheduleService {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
         }
         return schedule;
+    }
+
+    private Users findUserById(Long userId){
+        Users user = usersRepository.findById(userId).orElse(null);
+        if(user == null){
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_USER);
+        }
+        return user;
     }
 
     //==편의 메서드==

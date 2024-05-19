@@ -3,6 +3,7 @@ package konkuk.aiku.service;
 import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
 import konkuk.aiku.domain.*;
+import konkuk.aiku.event.BettingEventPublisher;
 import konkuk.aiku.event.ScheduleEventPublisher;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
@@ -11,10 +12,7 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.firebase.FcmToken;
 import konkuk.aiku.firebase.FcmTokenProvider;
 import konkuk.aiku.firebase.MessageSender;
-import konkuk.aiku.firebase.dto.MessageTitle;
-import konkuk.aiku.firebase.dto.RealTimeLocationMessage;
-import konkuk.aiku.firebase.dto.SendingEmojiMessage;
-import konkuk.aiku.firebase.dto.ScheduleAlarmMessage;
+import konkuk.aiku.firebase.dto.*;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +36,8 @@ public class AlarmService {
     private final MessageSender messageSender;
 
     private final ScheduleEventPublisher scheduleEventPublisher;
+    private final BettingEventPublisher bettingEventPublisher;
+
 
     @Transactional
     public void saveToken(Users user, FcmToken fcmToken){
@@ -59,7 +59,7 @@ public class AlarmService {
         user.setFcmToken(token);
     }
 
-    public void sendRealTimeLocation(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
+    public void receiveRealTimeLocation(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
 
@@ -75,7 +75,40 @@ public class AlarmService {
         messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
     }
 
+    public void receiveUserArrival(Users user, Long scheduleId, LocalDateTime arrivalTime){
+        Schedule schedule = findScheduleById(scheduleId);
+        List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+
+        checkUserInSchedule(user.getId(), scheduleId);
+        checkIsScheduleRun(schedule);
+        if (scheduleUsers.size() == 0) return;
+
+        List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
+
+        Map<String, String> messageDataMap = UserArrivalMessage
+                .createMessage(user, schedule, arrivalTime)
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
+
+        //유저가 도착했을 때 실행되어야 될 것들
+        scheduleEventPublisher.userArriveInScheduleEvent(user, schedule, arrivalTime);
+        bettingEventPublisher.userArriveInBettingEvent(user, schedule);
+
+    }
+
     //==이벤트 서비스==
+    public void sendUserArrival(Long userId, Long scheduleId, LocalDateTime arrivalTime){
+        Users user = findUserById(userId);
+        Schedule schedule = findScheduleById(scheduleId);
+
+        List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+        List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
+
+        Map<String, String> messageDataMap = UserArrivalMessage.createMessage(user, schedule, arrivalTime)
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
+    }
+
     public Runnable sendStartScheduleRunnable(Long scheduleId){
         return () -> {
             Schedule schedule = findScheduleById(scheduleId);

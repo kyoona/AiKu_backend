@@ -72,8 +72,8 @@ public class Schedule extends TimeEntity{
         userSchedule.setUser(null);
     }
 
-    public void addUserArrivalData(Users user, LocalDateTime arriavalTime){
-        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arriavalTime);
+    public void addUserArrivalData(Users user, LocalDateTime arrivalTime){
+        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arrivalTime);
         userArrivalDatas.add(userArrivalData);
     }
 
