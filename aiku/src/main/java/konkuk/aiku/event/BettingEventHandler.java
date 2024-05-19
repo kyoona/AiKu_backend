@@ -33,10 +33,10 @@ public class BettingEventHandler {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userArriveInBetting(UserArriveInScheduleEvent event) {
-        Users user = event.getUser();
-        Schedule schedule = event.getSchedule();
+//        Users user = event.getUser();
+//        Schedule schedule = event.getSchedule();
 
-        bettingService.userRacingArrival(schedule.getId(), user.getId());
+//        bettingService.userRacingArrival(schedule.getId(), user.getId());
 
         // TODO: 베팅 완료 알림 메시지
 

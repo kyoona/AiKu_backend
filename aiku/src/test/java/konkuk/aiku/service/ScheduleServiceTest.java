@@ -278,7 +278,6 @@ class ScheduleServiceTest {
                 .scheduleName("schedule1")
                 .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
-                .status(ScheduleStatus.WAIT)
                 .build();
         Long scheduleId1 = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO1);
         scheduleService.enterSchedule(userA2, groupA.getId(), scheduleId1);
@@ -288,7 +287,6 @@ class ScheduleServiceTest {
                 .scheduleName("schedule2")
                 .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
-                .status(ScheduleStatus.RUN)
                 .build();
         Long scheduleId2 = scheduleService.addSchedule(userA1, groupB.getId(), scheduleServiceDTO2);
         em.flush();
@@ -300,8 +298,8 @@ class ScheduleServiceTest {
         //then
         assertThat(serviceDto.getUserId()).isEqualTo(userA1.getId());
         assertThat(serviceDto.getUsername()).isEqualTo(userA1.getUsername());
-        assertThat(serviceDto.getWaitSchedule()).isEqualTo(1);
-        assertThat(serviceDto.getRunSchedule()).isEqualTo(1);
+        assertThat(serviceDto.getWaitSchedule()).isEqualTo(2);
+        assertThat(serviceDto.getRunSchedule()).isEqualTo(0);
         assertThat(serviceDto.getTermSchedule()).isEqualTo(0);
 
         List<ScheduleSimpleServiceDto> dtoData = serviceDto.getData();

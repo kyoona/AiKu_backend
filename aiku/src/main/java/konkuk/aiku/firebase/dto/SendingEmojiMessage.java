@@ -15,14 +15,14 @@ public class SendingEmojiMessage extends Message{
     protected Long senderId;
     protected String senderName;
     protected String senderImg;
-    private ImgType senderImgData;
-    private String senderColorCode;
+    protected ImgType senderImgData;
+    protected String senderColorCode;
 
     protected Long receiverId;
     protected String receiverName;
     protected String receiverImg;
-    private ImgType receiverImgData;
-    private String receiverColorCode;
+    protected ImgType receiverImgData;
+    protected String receiverColorCode;
 
     protected EmojiType emojiType;
 
