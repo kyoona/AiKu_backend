@@ -22,6 +22,10 @@ public class ScheduleEventHandler {
     private final ScheduleService scheduleService;
     private final AlarmService alarmService;
 
+    /**
+     * 유저가 목적지에 도착 시 발생
+     *  유저 도착 정보 생성
+     */
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userArriveInSchedule(UserArriveInScheduleEvent event) {
@@ -29,14 +33,12 @@ public class ScheduleEventHandler {
         Long scheduleId = event.getScheduleId();
         LocalDateTime arrivalTime = event.getArrivalTime();
 
-        boolean isUserFirstArrival = scheduleService.createUserArrivalData(userId, scheduleId, arrivalTime);
-        if (isUserFirstArrival) {
-            alarmService.sendUserArrival(userId, scheduleId, arrivalTime);
-        }
+        scheduleService.createUserArrivalData(userId, scheduleId, arrivalTime);
     }
 
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void RegisterScheduleAlarmEvent(ScheduleAlarmEvent event){
+    public void registerScheduleAlarmEvent(ScheduleAlarmEvent event){
         Long scheduleId = event.getScheduleId();
 
 

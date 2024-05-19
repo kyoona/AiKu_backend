@@ -97,17 +97,6 @@ public class AlarmService {
     }
 
     //==이벤트 서비스==
-    public void sendUserArrival(Long userId, Long scheduleId, LocalDateTime arrivalTime){
-        Users user = findUserById(userId);
-        Schedule schedule = findScheduleById(scheduleId);
-
-        List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
-        List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
-
-        Map<String, String> messageDataMap = UserArrivalMessage.createMessage(user, schedule, arrivalTime)
-                .toStringMap();
-        messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
-    }
 
     public Runnable sendStartScheduleRunnable(Long scheduleId){
         return () -> {
