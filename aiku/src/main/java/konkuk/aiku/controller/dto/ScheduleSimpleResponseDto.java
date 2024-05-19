@@ -19,6 +19,7 @@ public class ScheduleSimpleResponseDto {
     private LocalDateTime scheduleTime;
     private ScheduleStatus status;
     private int userCount;
+    private boolean accept;
 
     public static List<ScheduleSimpleResponseDto> toDtos(List<ScheduleSimpleServiceDto> serviceDtos) {
         List<ScheduleSimpleResponseDto> dtos = new ArrayList<>();
@@ -34,6 +35,7 @@ public class ScheduleSimpleResponseDto {
                 .scheduleTime(serviceDto.getScheduleTime())
                 .status(serviceDto.getStatus())
                 .userCount(serviceDto.getUserCount())
+                .accept(serviceDto.isAccept())
                 .build();
     }
 
