@@ -13,7 +13,7 @@ import java.util.List;
 public class GroupSimpleResponseDto {
     private Long groupId;
     private String groupName;
-    private int memberSize;
+    private int userCount;
     private LocalDateTime lastScheduleTime;
 
     public static List<GroupSimpleResponseDto> toDtos(List<GroupSimpleServiceDto> serviceDtos){
@@ -26,7 +26,7 @@ public class GroupSimpleResponseDto {
         return GroupSimpleResponseDto.builder()
                 .groupId(serviceDto.getGroupId())
                 .groupName(serviceDto.getGroupName())
-                .memberSize(serviceDto.getMemberSize())
+                .userCount(serviceDto.getUserCount())
                 .lastScheduleTime(serviceDto.getLastScheduleTime())
                 .build();
     }

@@ -15,6 +15,7 @@ public class GroupDetailServiceDto {
     private String groupName;
     private String description;
     @Builder.Default private List<UserSimpleServiceDto> users = new ArrayList<>();
+    private int userCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -24,6 +25,7 @@ public class GroupDetailServiceDto {
                 .groupName(group.getGroupName())
                 .description(group.getDescription())
                 .users(userSimpleServiceDtos)
+                .userCount(group.getUserCount())
                 .createdAt(group.getCreatedAt())
                 .modifiedAt(group.getModifiedAt())
                 .build();

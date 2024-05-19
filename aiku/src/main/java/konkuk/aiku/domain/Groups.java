@@ -18,6 +18,7 @@ public class Groups extends TimeEntity{
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserGroup> userGroups = new ArrayList<>();
+    private int userCount = 1; //그룹 생성한 사람 기본 참여
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<Schedule> schedules = new ArrayList<>();
