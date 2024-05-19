@@ -12,8 +12,8 @@ public class RealTimeLocationMessage extends Message{
     protected Long userId;
     protected String userName;
     protected String userImg;
-    private ImgType imgData;
-    private String colorCode;
+    protected ImgType imgData;
+    protected String colorCode;
     protected Double latitude;
     protected Double longitude;
 

@@ -19,6 +19,7 @@ public abstract class Message {
                     try {
                         map.put(field.getName(), String.valueOf(field.get(this)));
                     } catch (IllegalAccessException e) {
+                        e.printStackTrace();
                         throw new MessagingException(ErrorCode.FAIL_TO_CONVERT_MESSAGE);
                     }
                 });

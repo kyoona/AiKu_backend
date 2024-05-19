@@ -30,7 +30,7 @@ class MessageTest {
         Users user = createUser(userId, userName);
 
         //when
-        Map<String, String> stringMap = RealTimeLocationMessage.createMessage(user, latitude, longitude)
+        Map<String, String> stringMap = RealTimeLocationMessage.createMessage(user, 1l, latitude, longitude)
                 .toStringMap();
 
         //then
@@ -55,7 +55,7 @@ class MessageTest {
         EmojiType emojiType = EmojiType.HEART;
 
         //when
-        Map<String, String> stringMap = SendingEmojiMessage.createMessage(sender, receiver, emojiType)
+        Map<String, String> stringMap = SendingEmojiMessage.createMessage(sender, 1l, receiver, emojiType)
                 .toStringMap();
 
         //then

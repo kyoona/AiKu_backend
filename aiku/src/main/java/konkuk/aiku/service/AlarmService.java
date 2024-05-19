@@ -91,7 +91,7 @@ public class AlarmService {
         messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
 
         //유저가 도착했을 때 실행되어야 될 것들
-        scheduleEventPublisher.userArriveInScheduleEvent(user, schedule, arrivalTime);
+        scheduleEventPublisher.userArriveInScheduleEvent(user.getId(), scheduleId, arrivalTime);
         bettingEventPublisher.userArriveInBettingEvent(user, schedule);
 
     }
