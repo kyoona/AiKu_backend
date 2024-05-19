@@ -75,9 +75,9 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     }
 
     @Override
-    public List<Schedule> findScheduleByUserId(Long userId, String startTime, String endTime, ScheduleStatus status) {
+    public List<UserSchedule> findUserScheduleByUserId(Long userId, String startTime, String endTime, ScheduleStatus status) {
         return jpaQueryFactory
-                .select(qUserSchedule.schedule)
+                .select(qUserSchedule)
                 .from(qUserSchedule)
                 .leftJoin(qUserSchedule.schedule, qSchedule).fetchJoin()
                 .where(
