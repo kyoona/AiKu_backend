@@ -2,17 +2,14 @@ package konkuk.aiku.firebase.dto;
 
 import konkuk.aiku.domain.*;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -55,7 +52,7 @@ class MessageTest {
         String receiverName = "userB";
         Users receiver = createUser(receiverId, receiverName);
 
-        Emoji emojiType = Emoji.HEART;
+        EmojiType emojiType = EmojiType.HEART;
 
         //when
         Map<String, String> stringMap = SendingEmojiMessage.createMessage(sender, receiver, emojiType)

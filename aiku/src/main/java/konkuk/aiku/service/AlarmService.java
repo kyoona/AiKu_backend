@@ -59,7 +59,7 @@ public class AlarmService {
         user.setFcmToken(token);
     }
 
-    public void sendLocationInSchedule(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
+    public void sendRealTimeLocation(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
 
@@ -70,11 +70,9 @@ public class AlarmService {
         List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
 
         Map<String, String> messageDataMap = RealTimeLocationMessage
-                .createMessage(user, locationDto.getLatitude(), locationDto.getLongitude())
+                .createMessage(user, scheduleId, locationDto.getLatitude(), locationDto.getLongitude())
                 .toStringMap();
         messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
-
-        checkUserArrival(user, schedule, locationDto);
     }
 
     //==이벤트 서비스==
@@ -112,20 +110,13 @@ public class AlarmService {
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
-        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, receiver, emojiMessageDto.getEmojiType())
+        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, scheduleId, receiver, emojiMessageDto.getEmojiType())
                 .toStringMap();
 
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
     }
 
     //==유저 검증 메서드==
-    private void checkUserArrival(Users user, Schedule schedule, RealTimeLocationDto locationDto){
-        Double distance = locationDto.distance(schedule.getLocation().getLatitude(), schedule.getLocation().getLongitude());
-        if(distance < 0.001){
-            scheduleEventPublisher.userArriveInScheduleEvent(user, schedule);
-        }
-    }
-
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
         UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId).orElse(null);
         if (userSchedule == null) {

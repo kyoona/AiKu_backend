@@ -1,5 +1,5 @@
 package konkuk.aiku.domain;
 
-public enum Emoji {
+public enum EmojiType {
     HEART, APPLE, FIRE
 }

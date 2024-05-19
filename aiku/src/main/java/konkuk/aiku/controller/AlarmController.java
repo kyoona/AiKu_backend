@@ -47,9 +47,8 @@ public class AlarmController {
                                  @RequestBody @Valid RealTimeLocationDto realTimeLocationDto,
                                  @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        realTimeLocationDto.setId(user.getId());
 
-        alarmService.sendLocationInSchedule(user, scheduleId, realTimeLocationDto);
+        alarmService.sendRealTimeLocation(user, scheduleId, realTimeLocationDto);
     }
 
     @PostMapping("/schedules/{scheduleId}/emoji")
