@@ -3,6 +3,7 @@ package konkuk.aiku.service;
 import konkuk.aiku.controller.dto.ScheduleCond;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.event.ScheduleEventPublisher;
+import konkuk.aiku.event.UserPointEventPublisher;
 import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
@@ -31,7 +32,9 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final GroupsRepository groupsRepository;
     private final UsersRepository usersRepository;
-    private final ScheduleEventPublisher eventPublisher;
+
+    private final ScheduleEventPublisher scheduleEventPublisher;
+    private final UserPointEventPublisher userPointEventPublisher;
 
     @Transactional
     public Long addSchedule(Users user, Long groupId, ScheduleServiceDto scheduleServiceDTO){
@@ -50,7 +53,8 @@ public class ScheduleService {
 
         scheduleRepository.save(schedule);
 
-        eventPublisher.scheduleAlarmEvent(schedule.getId());
+        scheduleEventPublisher.scheduleAlarmEvent(schedule.getId());
+        userPointEventPublisher.userPointChangeEvent(user, 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt());
         return schedule.getId();
     }
 
