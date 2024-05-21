@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
 
@@ -84,6 +85,7 @@ public class ScheduleService {
         Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
+        checkScheduleInGroup(scheduleId, groupId);
 
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
@@ -173,6 +175,13 @@ public class ScheduleService {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userSchedule;
+    }
+
+    private void checkScheduleInGroup(Long groupId, Long scheduleId){
+        Schedule schedule = scheduleRepository.findScheduleByGroupIdAndScheduleId(groupId, scheduleId).orElse(null);
+        if (schedule == null) {
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
     }
 
     private boolean checkUserAlreadyInSchedule(Long userId, Long scheduleId){
