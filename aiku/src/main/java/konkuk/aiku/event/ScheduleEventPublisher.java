@@ -19,4 +19,8 @@ public class ScheduleEventPublisher {
     public void scheduleAlarmEvent(Long scheduleId){
         publisher.publishEvent(new ScheduleAlarmEvent(scheduleId));
     }
+
+    public void scheduleDeleteEvent(Long scheduleId){
+        publisher.publishEvent(new ScheduleDeleteEvent(scheduleId));
+    }
 }

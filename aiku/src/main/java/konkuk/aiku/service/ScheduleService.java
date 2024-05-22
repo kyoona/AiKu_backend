@@ -55,7 +55,7 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
 
         scheduleEventPublisher.scheduleAlarmEvent(schedule.getId());
-        userPointEventPublisher.userPointChangeEvent(user, 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt());
+        userPointEventPublisher.userPointChangeEvent(user, 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt()); //스케줄 등록 시 보상으로 100아쿠 적립
         return schedule.getId();
     }
 
@@ -75,9 +75,15 @@ public class ScheduleService {
 
     @Transactional
     public Long deleteSchedule(Users user, Long groupId, Long scheduleId) {
-        checkUserInSchedule(user.getId(), scheduleId);
+        Schedule schedule = findScheduleById(scheduleId);
 
+        checkUserInSchedule(user.getId(), scheduleId);
         scheduleRepository.deleteById(scheduleId);
+
+        if(schedule.getStatus() == ScheduleStatus.WAIT){
+            scheduleEventPublisher.scheduleDeleteEvent(scheduleId);
+//            userPointEventPublisher.userPointChangeEvent(); //여러명도 가능하게끔
+        }
         return scheduleId;
     }
 
