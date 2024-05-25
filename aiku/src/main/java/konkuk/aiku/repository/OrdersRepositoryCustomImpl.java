@@ -7,12 +7,16 @@ import konkuk.aiku.domain.ItemCategory;
 import konkuk.aiku.domain.QOrders;
 import konkuk.aiku.service.dto.OrderFindServiceDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Repository
+@Slf4j
 @RequiredArgsConstructor
 public class OrdersRepositoryCustomImpl implements OrdersRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
@@ -41,14 +45,16 @@ public class OrdersRepositoryCustomImpl implements OrdersRepositoryCustom {
         if (startDate == null) {
             return null;
         }
-        return qOrders.createdAt.after(LocalDateTime.parse(startDate));
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyMMdd");
+        return qOrders.createdAt.after(LocalDate.parse(startDate, df).atStartOfDay());
     }
 
     private BooleanExpression dateBefore(String endDate) {
         if (endDate == null) {
             return null;
         }
-        return qOrders.createdAt.before(LocalDateTime.parse(endDate));
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyMMdd");
+        return qOrders.createdAt.before(LocalDate.parse(endDate, df).atStartOfDay());
     }
 
     private BooleanExpression priceGoe(Integer minPrice) {
