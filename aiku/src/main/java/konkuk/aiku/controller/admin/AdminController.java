@@ -7,12 +7,14 @@ import konkuk.aiku.service.AdminService;
 import konkuk.aiku.service.dto.ItemServiceDto;
 import konkuk.aiku.service.dto.TitleServiceDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
@@ -21,7 +23,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/items")
-    public ResponseEntity<SuccessResponseDto> addItem(ItemDto itemDto){
+    public ResponseEntity<SuccessResponseDto> addItem(@RequestBody ItemDto itemDto){
         ItemServiceDto itemServiceDto = itemDto.toServiceDto();
 
         Long itemId = adminService.addItem(itemServiceDto);
@@ -30,7 +32,7 @@ public class AdminController {
     }
 
     @PatchMapping("/items/{itemId}")
-    public ResponseEntity<SuccessResponseDto> updateItem(@PathVariable Long itemId, ItemDto itemDto){
+    public ResponseEntity<SuccessResponseDto> updateItem(@PathVariable Long itemId, @RequestBody ItemDto itemDto){
         ItemServiceDto itemServiceDto = itemDto.toServiceDto();
         Long updateItemId = adminService.updateItem(itemId, itemServiceDto);
 
@@ -45,7 +47,7 @@ public class AdminController {
     }
 
     @PostMapping("/titles")
-    public ResponseEntity<SuccessResponseDto> addTitle(TitleDto titleDto){
+    public ResponseEntity<SuccessResponseDto> addTitle(@RequestBody TitleDto titleDto){
         TitleServiceDto titleServiceDto = titleDto.toServiceDto();
         Long titleId = adminService.addTitle(titleServiceDto);
 
@@ -53,7 +55,7 @@ public class AdminController {
     }
 
     @PatchMapping("/titles/{titleId}")
-    public ResponseEntity<SuccessResponseDto> updateTitle(@PathVariable Long titleId, TitleDto titleDto){
+    public ResponseEntity<SuccessResponseDto> updateTitle(@PathVariable Long titleId, @RequestBody TitleDto titleDto){
         TitleServiceDto titleServiceDto = titleDto.toServiceDto();
         Long updateTitleId = adminService.updateTitle(titleId, titleServiceDto);
 
@@ -67,6 +69,12 @@ public class AdminController {
         return SuccessResponseDto.getResponseEntity(deleteTitleId, DELETE_SUCCESS, HttpStatus.OK);
     }
 
+    @PatchMapping("/users/{userId}/titles/{titleId}")
+    public ResponseEntity<SuccessResponseDto> deleteTitle(@PathVariable Long userId, @PathVariable Long titleId){
+        Long deleteTitleId = adminService.deleteTitle(titleId);
+
+        return SuccessResponseDto.getResponseEntity(deleteTitleId, DELETE_SUCCESS, HttpStatus.OK);
+    }
 
 
 

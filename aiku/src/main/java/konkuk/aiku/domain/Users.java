@@ -38,7 +38,7 @@ public class Users extends TimeEntity {
     @Embedded
     private Setting setting;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserTitle> userTitles;
 
     @OneToOne

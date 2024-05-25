@@ -40,7 +40,7 @@ public class BettingController {
     public ResponseEntity<SuccessResponseDto> acceptBetting(@PathVariable Long bettingId) {
         Long updateBettingId = bettingService.acceptBetting(bettingId);
 
-        return SuccessResponseDto.getResponseEntity(updateBettingId, SuccessMessage.ADD_SUCCESS, HttpStatus.OK);
+        return SuccessResponseDto.getResponseEntity(updateBettingId, SuccessMessage.MODIFY_SUCCESS, HttpStatus.OK);
     }
 
     @GetMapping("/{bettingId}")

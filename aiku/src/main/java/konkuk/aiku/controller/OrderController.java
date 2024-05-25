@@ -1,5 +1,6 @@
 package konkuk.aiku.controller;
 
+import konkuk.aiku.controller.dto.OrderItemSimpleDto;
 import konkuk.aiku.controller.dto.OrderResponseDto;
 import konkuk.aiku.controller.dto.OrdersAddDto;
 import konkuk.aiku.controller.dto.OrdersListResponseDto;
@@ -12,24 +13,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<List<Long>> addOrders(@AuthenticationPrincipal UserAdaptor userAdaptor, OrdersAddDto ordersAddDto) {
+    public ResponseEntity<List<Long>> addOrders(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody List<OrderItemSimpleDto> items) {
         Users users = userAdaptor.getUsers();
-        List<OrderServiceDto> orderServiceDtos = ordersAddDto.toServiceDtos();
+        List<OrderServiceDto> orderServiceDtos = items.stream().map(i -> i.toServiceDto()).collect(Collectors.toList());
         List<Long> orderIds = orderService.addOrders(users, orderServiceDtos);
 
         return new ResponseEntity(orderIds, HttpStatus.OK);

@@ -25,7 +25,10 @@ public class UserResponseDto {
     private TitleResponseDto title;
 
     public static UserResponseDto toDto(Users users) {
-        TitleResponseDto titleDto = TitleResponseDto.toDto(users.getMainTitle());
+        TitleResponseDto titleDto = null;
+        if (users.getMainTitle() != null) {
+            titleDto = TitleResponseDto.toDto(users.getMainTitle());
+        }
 
         return UserResponseDto.builder()
                 .userId(users.getId())

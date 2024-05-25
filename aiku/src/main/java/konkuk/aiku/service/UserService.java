@@ -100,7 +100,7 @@ public class UserService {
     }
 
     public List<TitleResponseDto> getUserTitles(Long userId) {
-        return userTitleRepository.findByUserId(userId).stream()
+        return userTitleRepository.findUserTitlesByUserId(userId).stream()
                 .map(TitleResponseDto::toDto)
                 .collect(Collectors.toList());
     }
