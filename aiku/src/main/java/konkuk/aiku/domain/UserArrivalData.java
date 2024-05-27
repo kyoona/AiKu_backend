@@ -65,6 +65,6 @@ public class UserArrivalData extends TimeEntity{
 
     //==편의 메서드==
     private void setTimeDifference(LocalDateTime scheduleTime){
-        timeDifference = (int) Duration.between(scheduleTime, arrivalTime).toMinutes();
+        timeDifference = (int) Duration.between(arrivalTime, scheduleTime).toMinutes();
     }
 }

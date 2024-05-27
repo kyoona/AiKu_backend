@@ -1,9 +1,6 @@
 package konkuk.aiku.service;
 
-import konkuk.aiku.domain.Groups;
-import konkuk.aiku.domain.Setting;
-import konkuk.aiku.domain.UserGroup;
-import konkuk.aiku.domain.Users;
+import konkuk.aiku.domain.*;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
@@ -203,6 +200,41 @@ class GroupServiceTest {
 
         //when
         assertThatThrownBy(()->groupService.exitGroup(user, group.getId())).isInstanceOf(NoAthorityToAccessException.class);
+    }
+
+    @Test
+    @DisplayName("그룹 분석-누적 시간 조회")
+    void getLateAnalytics(){
+        //given
+        Users user = createUser(1L, "user1");
+        Groups group = Groups.createGroups(user, "group1", "그룹1");
+        UserGroup userGroup = group.getUserGroups().get(0);
+
+        Schedule schedule1 = Schedule.builder()
+                .id(1L)
+                .scheduleName("스케줄1")
+                .scheduleTime(LocalDateTime.of(2024, 5,1, 1, 10))
+                .build();
+        schedule1.addUserArrivalData(user, LocalDateTime.of(2024, 5,1, 1, 20));
+
+        Schedule schedule2 = Schedule.builder()
+                .id(2L)
+                .scheduleName("스케줄2")
+                .scheduleTime(LocalDateTime.of(2024, 5,1, 1, 10))
+                .build();
+        schedule2.addUserArrivalData(user, LocalDateTime.of(2024, 5,1, 1, 20));
+
+
+        when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
+        when(scheduleRepository.findUserArrivalDatasWithUserByGroupId(any())).thenReturn(List.of(schedule1.getUserArrivalDatas().get(0), schedule2.getUserArrivalDatas().get(0)));
+
+        //when
+        AnalyticsLateRatingServiceDto serviceDto = groupService.getLateAnalytics(user, group.getId());
+
+        //then
+        assertThat(serviceDto.getData().stream().map(AnalyticsLateServiceDto::getTotalLateMinute)).contains(-20);
+        assertThat(serviceDto.getData().stream().map((dto)-> dto.getUser().getUserId())).contains(user.getId());
     }
 
     Users createUser(Long id, String userName){
