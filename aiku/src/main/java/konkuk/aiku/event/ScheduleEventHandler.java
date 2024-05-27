@@ -2,6 +2,7 @@ package konkuk.aiku.event;
 
 import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.ScheduleService;
+import konkuk.aiku.service.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -21,6 +22,7 @@ public class ScheduleEventHandler {
 
     private final ScheduleService scheduleService;
     private final AlarmService alarmService;
+    private final SchedulerService schedulerService;
 
     /**
      * 유저가 목적지에 도착 시 발생
@@ -41,14 +43,18 @@ public class ScheduleEventHandler {
     public void registerScheduleAlarmEvent(ScheduleAlarmEvent event){
         Long scheduleId = event.getScheduleId();
 
-
         Long delay = alarmService.getScheduleAlarmTimeDelay(scheduleId);
-        Executors.newScheduledThreadPool(1)
-                .schedule(alarmService.sendStartScheduleRunnable(scheduleId), delay, TimeUnit.MINUTES);
+
+        schedulerService.addCurrentScheduleAlarm(scheduleId, alarmService.sendStartScheduleRunnable(scheduleId), delay);
 
         if(delay > 1440){ //스케줄 예정시간과 등록시간의 차이가 24시간 이상일 경우->24시간 전 알람 발생
-            Executors.newScheduledThreadPool(1)
-                    .schedule(alarmService.sendNextScheduleRunnable(scheduleId), delay - 1440, TimeUnit.MINUTES);
+            schedulerService.addNextScheduleAlarm(scheduleId, alarmService.sendNextScheduleRunnable(scheduleId), delay - 1440);
         }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
+    public void registerScheduleDeleteEvent(ScheduleDeleteEvent event){
+        Long scheduleId = event.getScheduleId();
+        schedulerService.deleteScheduleAlarm(scheduleId);
     }
 }

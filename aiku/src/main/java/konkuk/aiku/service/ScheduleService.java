@@ -3,6 +3,7 @@ package konkuk.aiku.service;
 import konkuk.aiku.controller.dto.ScheduleCond;
 import konkuk.aiku.domain.*;
 import konkuk.aiku.event.ScheduleEventPublisher;
+import konkuk.aiku.event.UserPointEventPublisher;
 import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
 
@@ -31,7 +33,9 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final GroupsRepository groupsRepository;
     private final UsersRepository usersRepository;
-    private final ScheduleEventPublisher eventPublisher;
+
+    private final ScheduleEventPublisher scheduleEventPublisher;
+    private final UserPointEventPublisher userPointEventPublisher;
 
     @Transactional
     public Long addSchedule(Users user, Long groupId, ScheduleServiceDto scheduleServiceDTO){
@@ -50,7 +54,8 @@ public class ScheduleService {
 
         scheduleRepository.save(schedule);
 
-        eventPublisher.scheduleAlarmEvent(schedule.getId());
+        scheduleEventPublisher.scheduleAlarmEvent(schedule.getId());
+        userPointEventPublisher.userPointChangeEvent(user, 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt()); //스케줄 등록 시 보상으로 100아쿠 적립
         return schedule.getId();
     }
 
@@ -70,9 +75,15 @@ public class ScheduleService {
 
     @Transactional
     public Long deleteSchedule(Users user, Long groupId, Long scheduleId) {
-        checkUserInSchedule(user.getId(), scheduleId);
+        Schedule schedule = findScheduleById(scheduleId);
 
+        checkUserInSchedule(user.getId(), scheduleId);
         scheduleRepository.deleteById(scheduleId);
+
+        if(schedule.getStatus() == ScheduleStatus.WAIT){
+            scheduleEventPublisher.scheduleDeleteEvent(scheduleId);
+//            userPointEventPublisher.userPointChangeEvent(); //여러명도 가능하게끔
+        }
         return scheduleId;
     }
 
@@ -80,6 +91,7 @@ public class ScheduleService {
         Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
+        checkScheduleInGroup(groupId, scheduleId);
 
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
@@ -169,6 +181,13 @@ public class ScheduleService {
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userSchedule;
+    }
+
+    private void checkScheduleInGroup(Long groupId, Long scheduleId){
+        Schedule schedule = scheduleRepository.findScheduleByGroupIdAndScheduleId(groupId, scheduleId).orElse(null);
+        if (schedule == null) {
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
     }
 
     private boolean checkUserAlreadyInSchedule(Long userId, Long scheduleId){
