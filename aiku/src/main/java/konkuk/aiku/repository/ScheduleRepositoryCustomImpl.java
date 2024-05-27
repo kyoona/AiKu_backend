@@ -37,21 +37,6 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     }
 
     @Override
-    public List<Users> findWaitUsersInSchedule(Long groupId, List<UserSchedule> acceptUsers) {
-        List<Users> users = entityManager.createQuery(
-                        "SELECT ug.user FROM UserGroup ug " +
-                                "WHERE ug.user.id NOT IN (" +
-                                "    SELECT us.user.id FROM UserSchedule us WHERE us IN :userList" +
-                                ") " +
-                                "AND ug.group.id = :groupId", Users.class)
-                .setParameter("userList", acceptUsers)
-                .setParameter("groupId", groupId)
-                .getResultList();
-
-        return users;
-    }
-
-    @Override
     public Optional<UserArrivalData> findUserArrivalDataByUserIdAndScheduleId(Long userId, Long scheduleId) {
         String jpql = "SELECT uad FROM UserArrivalData uad " +
                 "WHERE uad.user.id = :userId AND uad.schedule.id = :scheduleId";
@@ -71,6 +56,19 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
                 )
                 .setParameter("groupId", groupId)
                 .getResultList();
+    }
+
+    @Override
+    public Optional<Schedule> findScheduleWithUser(Long scheduleId) {
+        return entityManager.createQuery(
+                "SELECT s" +
+                        " From Schedule s" +
+                        " JOIN FETCH s.users us" +
+                        " JOIN FETCH us.user" +
+                        " WHERE s.id = :scheduleId", Schedule.class
+        )
+                .setParameter("scheduleId", scheduleId)
+                .getResultList().stream().findFirst();
     }
 
     @Override

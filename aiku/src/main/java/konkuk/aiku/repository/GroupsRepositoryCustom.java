@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface GroupsRepositoryCustom {
     Optional<UserGroup> findByUserAndGroup(Users user, Groups group);
+    Optional<Groups> findGroupWithUser(Long groupId);
 }
