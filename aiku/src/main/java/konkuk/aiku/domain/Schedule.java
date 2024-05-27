@@ -30,7 +30,7 @@ public class Schedule extends TimeEntity{
     @Enumerated(value = EnumType.STRING)
     private ScheduleStatus status;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSchedule> users = new ArrayList<>();
     private int userCount = 1; //스케줄 생성한 사람
 
