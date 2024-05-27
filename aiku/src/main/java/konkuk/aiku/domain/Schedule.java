@@ -73,7 +73,7 @@ public class Schedule extends TimeEntity{
     }
 
     public void addUserArrivalData(Users user, LocalDateTime arrivalTime){
-        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arrivalTime);
+        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this.group, this, arrivalTime);
         userArrivalDatas.add(userArrivalData);
     }
 

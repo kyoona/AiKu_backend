@@ -96,4 +96,11 @@ public class GroupController {
         Long exitId = groupService.exitGroup(user, groupId);
         return SuccessResponseDto.getResponseEntity(exitId, EXIT_SUCCESS, HttpStatus.OK);
     }
+
+    @GetMapping("/{groupId}/analytics/late")
+    public void analyticsLateRanking(@PathVariable Long groupId,
+                                     @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        
+    }
 }

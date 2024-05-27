@@ -24,6 +24,10 @@ public class UserArrivalData extends TimeEntity{
     private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "groupId")
+    private Groups group;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduleId")
     private Schedule schedule;
     private LocalDateTime arrivalTime;
@@ -45,15 +49,16 @@ public class UserArrivalData extends TimeEntity{
     })
     private Location endLocation;
 
-    private UserArrivalData(Users user, Schedule schedule, LocalDateTime arrivalTime) {
+    public UserArrivalData(Users user, Groups group, Schedule schedule, LocalDateTime arrivalTime) {
         this.user = user;
+        this.group = group;
         this.schedule = schedule;
         this.arrivalTime = arrivalTime;
     }
 
     //==생성 메서드==
-    public static UserArrivalData createUserArrivalData(Users user, Schedule schedule, LocalDateTime arrivalTime){
-        UserArrivalData userArrivalData = new UserArrivalData(user, schedule, arrivalTime);
+    public static UserArrivalData createUserArrivalData(Users user, Groups group, Schedule schedule, LocalDateTime arrivalTime){
+        UserArrivalData userArrivalData = new UserArrivalData(user, group, schedule, arrivalTime);
         userArrivalData.setTimeDifference(schedule.getScheduleTime());
         return userArrivalData;
     }

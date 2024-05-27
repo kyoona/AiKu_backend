@@ -156,7 +156,7 @@ public class ScheduleService {
 
     //==유저 도착 이벤트==
     @Transactional
-    public boolean createUserArrivalData(Long userId, Long scheduleId, LocalDateTime arriveTime){
+    public boolean createUserArrivalData(Long userId, Long groupId, Long scheduleId, LocalDateTime arriveTime){
         Users user = findUserById(userId);
 
         if(checkUserAlreadyArrive(userId, scheduleId)) return false;

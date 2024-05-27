@@ -29,8 +29,8 @@ public class GroupService {
     @Transactional
     public Long addGroup(Users user, GroupServiceDto groupDto){
         Groups group = Groups.createGroups(user, groupDto.getGroupName(), groupDto.getDescription());
-        groupsRepository.save(group);
 
+        groupsRepository.save(group);
         return group.getId();
     }
 
@@ -56,6 +56,7 @@ public class GroupService {
 
     public GroupDetailServiceDto findGroupDetail(Users user, Long groupId) {
         Groups group = findGroupById(groupId);
+
         checkUserInGroup(user, group);
 
         List<UserGroup> userGroups = groupsRepository.findUserGroupWithUser(groupId);
@@ -106,6 +107,7 @@ public class GroupService {
         Groups group = findGroupById(groupId);
 
         UserGroup userGroup = checkUserInGroup(user, group);
+
         group.deleteUser(userGroup);
         groupsRepository.downGroupUserCount(groupId);
         return groupId;
