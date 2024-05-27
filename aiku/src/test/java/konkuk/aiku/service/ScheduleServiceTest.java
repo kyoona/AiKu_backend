@@ -206,6 +206,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 상세 조회")
+    @Commit
     public void findScheduleDetail() {
         //given
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
@@ -214,6 +215,8 @@ class ScheduleServiceTest {
                 .scheduleTime(LocalDateTime.now())
                 .build();
         Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
+        em.flush();
+        em.clear();
 
         //when
         ScheduleDetailServiceDto scheduleDetailServiceDTO = scheduleService.findScheduleDetail(userA1, groupA.getId(), scheduleId);

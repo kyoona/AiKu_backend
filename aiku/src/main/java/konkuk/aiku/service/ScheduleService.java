@@ -91,7 +91,7 @@ public class ScheduleService {
         Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
-        checkScheduleInGroup(scheduleId, groupId);
+        checkScheduleInGroup(groupId, scheduleId);
 
         Schedule schedule = findScheduleById(scheduleId);
         List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
