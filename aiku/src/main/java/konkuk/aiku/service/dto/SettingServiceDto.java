@@ -23,4 +23,9 @@ public class SettingServiceDto {
                 .build();
         return dto;
     }
+
+    @Getter
+    public static class AnalyticsLateRatingServiceDto {
+
+    }
 }

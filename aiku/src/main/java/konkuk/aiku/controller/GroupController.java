@@ -1,13 +1,11 @@
 package konkuk.aiku.controller;
 
 import jakarta.validation.Valid;
-import konkuk.aiku.controller.dto.GroupDto;
-import konkuk.aiku.controller.dto.GroupListResponseDto;
-import konkuk.aiku.controller.dto.GroupResponseDto;
-import konkuk.aiku.controller.dto.SuccessResponseDto;
+import konkuk.aiku.controller.dto.*;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
+import konkuk.aiku.service.dto.AnalyticsLateRatingServiceDto;
 import konkuk.aiku.service.dto.GroupDetailServiceDto;
 import konkuk.aiku.service.dto.GroupListServiceDto;
 import konkuk.aiku.service.dto.GroupServiceDto;
@@ -67,7 +65,7 @@ public class GroupController {
         GroupListServiceDto serviceDto = groupService.findGroupList(user);
 
         GroupListResponseDto responseDto = GroupListResponseDto.toDto(serviceDto);
-        return new ResponseEntity<GroupListResponseDto>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @GetMapping("/{groupId}")
@@ -78,7 +76,7 @@ public class GroupController {
         GroupDetailServiceDto serviceDTO = groupService.findGroupDetail(user, groupId);
 
         GroupResponseDto responseDto = GroupResponseDto.toDto(serviceDTO);
-        return new ResponseEntity<GroupResponseDto>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @PostMapping("/{groupId}/enter")
@@ -98,9 +96,12 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/analytics/late")
-    public void analyticsLateRanking(@PathVariable Long groupId,
+    public ResponseEntity<AnalyticsLateRatingResponseDto> analyticsLateRanking(@PathVariable Long groupId,
                                      @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        
+        AnalyticsLateRatingServiceDto serviceDto = groupService.getLateAnalytics(user, groupId);
+
+        AnalyticsLateRatingResponseDto responseDto = AnalyticsLateRatingResponseDto.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }

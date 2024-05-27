@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -111,6 +113,27 @@ public class GroupService {
         group.deleteUser(userGroup);
         groupsRepository.downGroupUserCount(groupId);
         return groupId;
+    }
+
+    public AnalyticsLateRatingServiceDto getLateAnalytics(Users user, Long groupId){
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
+        List<UserArrivalData> userArrivalDatas = scheduleRepository.findUserArrivalDatasWithUserByGroupId(groupId);
+
+        List<AnalyticsLateServiceDto> lateDto = new ArrayList<>();
+        userArrivalDatas.stream()
+                .collect(Collectors.groupingBy(data -> data.getUser().getId()))
+                .forEach((userId, arrivalList) -> {
+                    Integer totalLateTime = arrivalList.stream().collect(Collectors.summingInt(UserArrivalData::getTimeDifference));
+                    if (arrivalList.size() != 0){
+                        Users arrivalUser = arrivalList.get(0).getUser();
+                        lateDto.add(AnalyticsLateServiceDto.createDto(arrivalUser, totalLateTime));
+                    }
+                });
+
+        return new AnalyticsLateRatingServiceDto(lateDto);
     }
 
     //==검증 메서드==
