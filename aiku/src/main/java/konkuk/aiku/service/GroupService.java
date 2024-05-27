@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,7 +77,10 @@ public class GroupService {
         List<GroupSimpleServiceDto> dto = new ArrayList<>();
         for (UserGroup userGroup : userGroups) {
             Groups group = userGroup.getGroup();
-            LocalDateTime groupLatestScheduleTime = findGroupLatestScheduleTime(group.getId());
+            LocalDateTime groupLatestScheduleTime = group.getSchedules().stream()
+                    .collect(Collectors.maxBy((s1, s2) -> s1.getScheduleTime().compareTo(s2.getScheduleTime())))
+                    .map(Schedule::getScheduleTime)
+                    .orElse(null);
             dto.add(GroupSimpleServiceDto.toDto(group, groupLatestScheduleTime));
         }
         return dto;

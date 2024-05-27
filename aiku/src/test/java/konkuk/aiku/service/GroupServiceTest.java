@@ -137,7 +137,6 @@ class GroupServiceTest {
         List<UserGroup> userGroups = List.of(group1.getUserGroups().get(0), group2.getUserGroups().get(0));
 
         when(groupsRepository.findUserGroupWithGroup(any(Long.class))).thenReturn(userGroups);
-        when(scheduleRepository.findLatestScheduleTimeByGroupId(any())).thenReturn(List.of(LocalDateTime.now()));
 
         //when
         GroupListServiceDto response = groupService.findGroupList(user);

@@ -14,8 +14,6 @@ public interface GroupsRepository extends JpaRepository<Groups, Long> , GroupsRe
     List<UserGroup> findUserGroupWithUser(@Param("groupId") Long groupId);
     @Query("SELECT ug FROM UserGroup ug JOIN FETCH ug.group WHERE ug.user.id = :userId")
     List<UserGroup> findUserGroupWithGroup(@Param("userId") Long userId);
-    @Query("SELECT COUNT(ug) FROM UserGroup ug WHERE ug.group.id = :groupId")
-    int countOfGroupUsers(@Param("groupId") Long groupId);
     @Modifying
     @Query("UPDATE Groups g SET g.userCount = g.userCount + 1 WHERE g.id = :groupId")
     void upGroupUserCount(@Param("groupId") Long groupId);
