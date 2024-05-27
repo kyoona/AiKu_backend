@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
 
-@Controller
+@RestController
 @RequestMapping("/groups")
 @RequiredArgsConstructor
 @Slf4j

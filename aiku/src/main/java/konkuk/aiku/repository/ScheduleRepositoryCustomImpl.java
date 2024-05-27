@@ -64,11 +64,13 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     @Override
     public List<UserArrivalData> findUserArrivalDatasWithUserByGroupId(Long groupId) {
         return entityManager.createQuery(
-                "SELECT uad" +
-                        " FROM UserArrivalData uad" +
-                        " JOIN FETCH uad.user u" +
-                        " WHERE uad.group.id = :groupId", UserArrivalData.class
-        ).getResultList();
+                        "SELECT uad" +
+                                " FROM UserArrivalData uad" +
+                                " JOIN FETCH uad.user u" +
+                                " WHERE uad.group.id = :groupId", UserArrivalData.class
+                )
+                .setParameter("groupId", groupId)
+                .getResultList();
     }
 
     @Override

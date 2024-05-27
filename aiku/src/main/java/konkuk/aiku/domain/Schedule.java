@@ -27,7 +27,7 @@ public class Schedule extends TimeEntity{
     private Location location;
     private LocalDateTime scheduleTime;
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     private ScheduleStatus status;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
