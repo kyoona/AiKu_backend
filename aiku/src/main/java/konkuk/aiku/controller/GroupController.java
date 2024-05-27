@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
@@ -54,6 +53,7 @@ public class GroupController {
     public ResponseEntity<SuccessResponseDto> groupDelete(@PathVariable Long groupId,
                                                           @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
+
         Long deleteId = groupService.deleteGroup(user, groupId);
         return SuccessResponseDto.getResponseEntity(deleteId, DELETE_SUCCESS, HttpStatus.OK);
     }
