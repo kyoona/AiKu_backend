@@ -1,5 +1,6 @@
 package konkuk.aiku.controller;
 
+import com.google.api.client.http.HttpResponse;
 import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
@@ -11,6 +12,7 @@ import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -53,19 +55,21 @@ public class AlarmController {
     }
 
     @PostMapping("/schedules/{scheduleId}/location/arrival")
-    public void userArrival(@PathVariable Long scheduleId,
-                            @RequestBody @Valid UserArrivalDto userArrivalDto,
-                            @AuthenticationPrincipal UserAdaptor userAdaptor){
+    public ResponseEntity userArrival(@PathVariable Long scheduleId,
+                                    @RequestBody @Valid UserArrivalDto userArrivalDto,
+                                    @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
         alarmService.receiveUserArrival(user, scheduleId, userArrivalDto.getArrivalTime());
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping("/schedules/{scheduleId}/emoji")
-    public void emojiSend(@PathVariable Long scheduleId,
+    public ResponseEntity emojiSend(@PathVariable Long scheduleId,
                           @RequestBody @Valid EmojiMessageDto emojiMessageDto,
                           @AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users user = userAdaptor.getUsers();
         alarmService.sendEmojiToUser(user, scheduleId, emojiMessageDto);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }
