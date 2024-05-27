@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,8 +31,8 @@ public class GroupService {
     @Transactional
     public Long addGroup(Users user, GroupServiceDto groupDto){
         Groups group = Groups.createGroups(user, groupDto.getGroupName(), groupDto.getDescription());
-        groupsRepository.save(group);
 
+        groupsRepository.save(group);
         return group.getId();
     }
 
@@ -56,6 +58,7 @@ public class GroupService {
 
     public GroupDetailServiceDto findGroupDetail(Users user, Long groupId) {
         Groups group = findGroupById(groupId);
+
         checkUserInGroup(user, group);
 
         List<UserGroup> userGroups = groupsRepository.findUserGroupWithUser(groupId);
@@ -106,9 +109,31 @@ public class GroupService {
         Groups group = findGroupById(groupId);
 
         UserGroup userGroup = checkUserInGroup(user, group);
+
         group.deleteUser(userGroup);
         groupsRepository.downGroupUserCount(groupId);
         return groupId;
+    }
+
+    public AnalyticsLateRatingServiceDto getLateAnalytics(Users user, Long groupId){
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
+        List<UserArrivalData> userArrivalDatas = scheduleRepository.findUserArrivalDatasWithUserByGroupId(groupId);
+
+        List<AnalyticsLateServiceDto> lateDto = new ArrayList<>();
+        userArrivalDatas.stream()
+                .collect(Collectors.groupingBy(data -> data.getUser().getId()))
+                .forEach((userId, arrivalList) -> {
+                    Integer totalLateTime = arrivalList.stream().collect(Collectors.summingInt(UserArrivalData::getTimeDifference));
+                    if (arrivalList.size() != 0){
+                        Users arrivalUser = arrivalList.get(0).getUser();
+                        lateDto.add(AnalyticsLateServiceDto.createDto(arrivalUser, totalLateTime));
+                    }
+                });
+
+        return new AnalyticsLateRatingServiceDto(lateDto);
     }
 
     //==검증 메서드==

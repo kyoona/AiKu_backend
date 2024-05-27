@@ -27,7 +27,7 @@ public class Schedule extends TimeEntity{
     private Location location;
     private LocalDateTime scheduleTime;
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     private ScheduleStatus status;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
@@ -73,7 +73,7 @@ public class Schedule extends TimeEntity{
     }
 
     public void addUserArrivalData(Users user, LocalDateTime arrivalTime){
-        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this, arrivalTime);
+        UserArrivalData userArrivalData = UserArrivalData.createUserArrivalData(user, this.group, this, arrivalTime);
         userArrivalDatas.add(userArrivalData);
     }
 

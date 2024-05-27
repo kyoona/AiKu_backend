@@ -1,6 +1,7 @@
 package konkuk.aiku.repository;
 
 import konkuk.aiku.domain.Schedule;
+import konkuk.aiku.domain.UserArrivalData;
 import konkuk.aiku.domain.UserSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

@@ -62,6 +62,18 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     }
 
     @Override
+    public List<UserArrivalData> findUserArrivalDatasWithUserByGroupId(Long groupId) {
+        return entityManager.createQuery(
+                        "SELECT uad" +
+                                " FROM UserArrivalData uad" +
+                                " JOIN FETCH uad.user u" +
+                                " WHERE uad.group.id = :groupId", UserArrivalData.class
+                )
+                .setParameter("groupId", groupId)
+                .getResultList();
+    }
+
+    @Override
     public List<Schedule> findScheduleByGroupId(Long groupId, String startTime, String endTime, ScheduleStatus status) {
         return jpaQueryFactory
                 .selectFrom(qSchedule)
@@ -112,4 +124,6 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
         if (type == 0) return qSchedule.status.eq(status);
         else return qUserSchedule.schedule.status.eq(status);
     }
+
+
 }
