@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static konkuk.aiku.service.dto.ServiceDtoUtils.*;
 
@@ -59,7 +58,6 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    //TODO
     @Transactional
     public Long modifySchedule(Users user, Long groupId, Long scheduleId, ScheduleServiceDto scheduleServiceDTO) {
         Long userId = user.getId();
@@ -88,13 +86,14 @@ public class ScheduleService {
     }
 
     public ScheduleDetailServiceDto findScheduleDetail(Users user, Long groupId, Long scheduleId){
-        Groups group = findGroupById(groupId);
+        Groups group = findGroupWithUser(groupId);
 
         checkUserInGroup(user, group);
         checkScheduleInGroup(groupId, scheduleId);
 
-        Schedule schedule = findScheduleById(scheduleId);
-        List<Users> waitUsers = scheduleRepository.findWaitUsersInSchedule(groupId, schedule.getUsers());
+        Schedule schedule = findScheduleWithUser(scheduleId);
+
+        List<Users> waitUsers = getWaitUsers(group, schedule);
         return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
     }
 
@@ -103,10 +102,10 @@ public class ScheduleService {
 
         checkUserInGroup(user, group);
 
-        List<Schedule> schedules = scheduleRepository.findScheduleByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
+        List<Schedule> schedules = scheduleRepository.findScheduleWithUserByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
 
         int[] scheduleStatus = new int[3]; //RUN, WAIT, TERM순서
-        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(user.getId(), schedules, scheduleStatus);
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleDto(user, schedules, scheduleStatus);
         return GroupScheduleListServiceDto.toDto(group, scheduleStatus[0], scheduleStatus[1], scheduleStatus[2], dataDto);
     }
 
@@ -115,7 +114,7 @@ public class ScheduleService {
                 .stream().map(UserSchedule::getSchedule).toList();
 
         int[] scheduleStatus = new int[3]; //RUN, WAIT, TERM순서
-        List<ScheduleSimpleServiceDto> dataDto = createScheduleSimpleServiceDtos(schedules, scheduleStatus);
+        List<ScheduleSimpleServiceDto> dataDto = createScheduleDto(schedules, scheduleStatus);
         return UserScheduleListServiceDto.toDto(user, scheduleStatus[0], scheduleStatus[1], scheduleStatus[2], dataDto);
     }
 
@@ -217,8 +216,24 @@ public class ScheduleService {
         return group;
     }
 
+    private Groups findGroupWithUser(Long groupId){
+        Groups group = groupsRepository.findGroupWithUser(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
+    }
+
     private Schedule findScheduleById(Long scheduleId){
         Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+        if(schedule == null){
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+        return schedule;
+    }
+
+    private Schedule findScheduleWithUser(Long scheduleId){
+        Schedule schedule = scheduleRepository.findScheduleWithUser(scheduleId).orElse(null);
         if(schedule == null){
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
         }
@@ -235,13 +250,16 @@ public class ScheduleService {
 
     //==편의 메서드==
     // 그룹의 스케줄 (유저 참석/불참석 구분)
-    private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(Long userId, List<Schedule> schedules, int[] scheduleStatus) {
+    private List<ScheduleSimpleServiceDto> createScheduleDto(Users user, List<Schedule> schedules, int[] scheduleStatus) {
         List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
         for (Schedule schedule : schedules) {
             ScheduleSimpleServiceDto dto = ScheduleSimpleServiceDto.toDto(schedule);
 
-            UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, schedule.getId()).orElse(null);
-            if(userSchedule == null) dto.setAccept(false);
+            boolean accept = schedule.getUsers().stream()
+                    .map(UserSchedule::getUser)
+                    .toList()
+                    .contains(user);
+            if(!accept) dto.setAccept(false);
 
             dtos.add(dto);
 
@@ -253,7 +271,7 @@ public class ScheduleService {
     }
 
     //유저가 참가중인 스케줄
-    private List<ScheduleSimpleServiceDto> createScheduleSimpleServiceDtos(List<Schedule> schedules, int[] scheduleStatus) {
+    private List<ScheduleSimpleServiceDto> createScheduleDto(List<Schedule> schedules, int[] scheduleStatus) {
         List<ScheduleSimpleServiceDto> dtos = new ArrayList<>();
         for (Schedule schedule : schedules) {
             dtos.add(ScheduleSimpleServiceDto.toDto(schedule));
@@ -263,5 +281,16 @@ public class ScheduleService {
             else if(schedule.getStatus() == ScheduleStatus.TERM) scheduleStatus[2]++;
         }
         return dtos;
+    }
+
+    private List<Users> getWaitUsers(Groups group, Schedule schedule) {
+        List<Users> acceptUsers = schedule.getUsers().stream()
+                .map(UserSchedule::getUser)
+                .toList();
+
+        return group.getUserGroups().stream()
+                .map(UserGroup::getUser)
+                .filter((user) -> !acceptUsers.contains(user))
+                .toList();
     }
 }

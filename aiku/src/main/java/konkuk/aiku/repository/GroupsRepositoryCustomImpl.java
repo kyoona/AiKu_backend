@@ -28,4 +28,18 @@ public class GroupsRepositoryCustomImpl implements GroupsRepositoryCustom{
                 .setParameter("groupId", group.getId());
         return query.getResultList().stream().findFirst();
     }
+
+    @Override
+    public Optional<Groups> findGroupWithUser(Long groupId) {
+        return entityManager.createQuery(
+                "SELECT g" +
+                        " FROM Groups g" +
+                        " JOIN FETCH g.userGroups ug" +
+                        " JOIN FETCH ug.user u" +
+                        " WHERE g.id = :groupId", Groups.class
+        )
+                .setParameter("groupId", groupId)
+                .getResultList().stream().findFirst();
+    }
+
 }

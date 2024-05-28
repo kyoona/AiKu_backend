@@ -13,25 +13,40 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerService {
     private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> schedulerList = new ConcurrentHashMap();
 
-    public void addCurrentScheduleAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
+    public void addScheduleFinishAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
-        SchedulerKey key = new SchedulerKey(SchedulerType.CURRENT_SHCEDULE_ALARM, scheduleId);
+        SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
         schedulerList.put(key, scheduler);
     }
 
     public void addNextScheduleAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
-        SchedulerKey key = new SchedulerKey(SchedulerType.CURRENT_SHCEDULE_ALARM, scheduleId);
+        SchedulerKey key = new SchedulerKey(SchedulerType.NEXT_SCHEDULE_ALARM, scheduleId);
         schedulerList.put(key, scheduler);
     }
 
+    public void addScheduleMapOpenAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
+        ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
+
+        SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_MAP_OPEN_ALARM, scheduleId);
+        schedulerList.put(key, scheduler);
+    }
+
+    public void publishScheduleMapCloseEvent(Long scheduleId, Runnable runnable, Long delayMinutes){
+        ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
+
+        SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE_ALARM, scheduleId);
+        schedulerList.put(key, scheduler);
+    }
+
+    //TODO
     public void deleteScheduleAlarm(Long scheduleId){
-        SchedulerKey currentAlarmKey = new SchedulerKey(SchedulerType.CURRENT_SHCEDULE_ALARM, scheduleId);
+        SchedulerKey finishAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
         SchedulerKey nextAlarmKey = new SchedulerKey(SchedulerType.NEXT_SCHEDULE_ALARM, scheduleId);
 
-        schedulerList.get(currentAlarmKey).cancel(false);
+        schedulerList.get(finishAlarmKey).cancel(false);
         schedulerList.get(nextAlarmKey).cancel(false);
     }
 }
