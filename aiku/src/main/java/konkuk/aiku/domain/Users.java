@@ -42,7 +42,7 @@ public class Users extends TimeEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<UserTitle> userTitles;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @Setter
     private UserTitle mainTitle; // 기본으로 설정한 타이틀
 
@@ -88,5 +88,13 @@ public class Users extends TimeEntity {
 
     public void minusPoint(int point) {
         this.point -= point;
+    }
+
+    public boolean hasTitle(String titleName) {
+        return userTitles.stream()
+                .filter(userTitle ->
+                        userTitle.getTitle().getTitleName().equals(titleName)
+                )
+                .findAny().isPresent();
     }
 }

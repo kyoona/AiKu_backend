@@ -8,6 +8,7 @@ import konkuk.aiku.firebase.dto.UserArrivalMessage;
 import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.BettingService;
 import konkuk.aiku.service.ScheduleService;
+import konkuk.aiku.service.TitleProviderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -28,43 +29,28 @@ import java.util.concurrent.TimeUnit;
 public class BettingEventHandler {
 
     private final BettingService bettingService;
+    private final TitleProviderService titleProviderService;
     private final MessageSender messageSender;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userArriveInBetting(UserArriveInScheduleEvent event) {
-//        Users user = event.getUser();
-//        Schedule schedule = event.getSchedule();
-
-//        bettingService.userRacingArrival(schedule.getId(), user.getId());
 
         // TODO: 베팅 완료 알림 메시지
 
-//        boolean isUserFirstArrival = scheduleService.arriveUser(user, schedule.getId(), event.getArriveTime());
-//        if (isUserFirstArrival) {
-//            List<String> receiverTokens = createReceiverTokens(user, schedule.getUsers());
-//            Map<String, String> messageDataMap = UserArrivalMessage.createMessage(user, schedule, event.getArriveTime())
-//                    .toStringMap();
-//            messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
-//        }
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void scheduleEndEvent(ScheduleEndEvent event) {
-        Schedule schedule = event.getSchedule();
-
-        bettingService.setAllBettings(schedule.getId());
+        bettingService.setAllBettings(event.getScheduleId());
 
         // TODO: 스케줄 완료 알림 메시지
 
-//        boolean isUserFirstArrival = scheduleService.arriveUser(user, schedule.getId(), event.getArriveTime());
-//        if (isUserFirstArrival) {
-//            List<String> receiverTokens = createReceiverTokens(user, schedule.getUsers());
-//            Map<String, String> messageDataMap = UserArrivalMessage.createMessage(user, schedule, event.getArriveTime())
-//                    .toStringMap();
-//            messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
-//        }
+
+        // 칭호 조건 확인
+        titleProviderService.titleProvider(event.getUserId());
+
     }
 
 }
