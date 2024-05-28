@@ -9,5 +9,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ScheduleEndEvent {
-    private Schedule schedule;
+    private Long userId;
+    private Long scheduleId;
 }

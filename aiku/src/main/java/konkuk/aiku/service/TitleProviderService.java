@@ -2,6 +2,7 @@ package konkuk.aiku.service;
 
 
 import konkuk.aiku.domain.*;
+import konkuk.aiku.event.TitleProvideEventPublisher;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.*;
@@ -21,6 +22,8 @@ public class TitleProviderService {
     private final TitleRepository titleRepository;
     private final UserTitleRepository userTitleRepository;
     private final ScheduleRepository scheduleRepository;
+
+    private final TitleProvideEventPublisher titleProvideEventPublisher;
 
     private static final String 베팅_10회_패배 = "기부천사";
     private static final String 베팅_5회_승리 = "정세훈";
@@ -74,6 +77,9 @@ public class TitleProviderService {
 
         userTitleRepository.save(userTitle);
         users.addTitle(userTitle);
+
+        // 칭호 생성 알림
+        titleProvideEventPublisher.titleProvideEvent(users.getId(), title.getId());
 
         return userTitle.getId();
     }

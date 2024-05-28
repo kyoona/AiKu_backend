@@ -19,8 +19,8 @@ public class BettingEventPublisher {
         publisher.publishEvent(new UserArriveInBettingEvent(user, schedule));
     }
 
-    public void scheduleEndBettingEvent(Schedule schedule){
-        publisher.publishEvent(new ScheduleEndEvent(schedule));
+    public void scheduleEndBettingEvent(Long userId, Long scheduleId){
+        publisher.publishEvent(new ScheduleEndEvent(userId, scheduleId));
     }
 
 }
