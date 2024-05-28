@@ -53,7 +53,7 @@ public class ScheduleService {
 
         scheduleRepository.save(schedule);
 
-        scheduleEventPublisher.scheduleAlarmEvent(schedule.getId());
+        scheduleEventPublisher.scheduleAddEvent(schedule.getId(), schedule.getScheduleTime());
         userPointEventPublisher.userPointChangeEvent(user, 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt()); //스케줄 등록 시 보상으로 100아쿠 적립
         return schedule.getId();
     }
@@ -153,7 +153,7 @@ public class ScheduleService {
         return ScheduleResultServiceDto.toDto(schedule, userArrivalDatas);
     }
 
-    //==유저 도착 이벤트==
+    //==이벤트 서비스==
     @Transactional
     public boolean createUserArrivalData(Long userId, Long scheduleId, LocalDateTime arriveTime){
         Users user = findUserById(userId);
@@ -163,6 +163,35 @@ public class ScheduleService {
         Schedule schedule = findScheduleById(scheduleId);
         schedule.addUserArrivalData(user, arriveTime);
         return true;
+    }
+
+    @Transactional
+    public void createAllUserArrivalData(Long scheduleId){
+        Schedule schedule = findScheduleWithUser(scheduleId);
+
+        LocalDateTime autoCloseTime = schedule.getScheduleTime().plusMinutes(30);
+
+
+        List<Users> autoLateUsers = getAutoLateUsers(schedule);
+
+        autoLateUsers.stream().forEach((lateUser) -> schedule.addUserArrivalData(lateUser, autoCloseTime));
+    }
+
+    public boolean checkAllUserArrive(Long scheduleId){
+        Schedule schedule = scheduleRepository.findScheduleWithArrivalData(scheduleId).orElse(null);
+        if (schedule == null){
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+
+        return schedule.getUserArrivalDatas().size() == schedule.getUserCount();
+    }
+
+    public void publishScheduleCloseEvent(Long scheduleId){
+        scheduleEventPublisher.scheduleCloseEvent(scheduleId);
+    }
+
+    public Runnable publishScheduleCloseEventRunnable(Long scheduleId){
+        return () -> scheduleEventPublisher.scheduleCloseEvent(scheduleId);
     }
 
     //==검증 메서드==
@@ -291,6 +320,21 @@ public class ScheduleService {
         return group.getUserGroups().stream()
                 .map(UserGroup::getUser)
                 .filter((user) -> !acceptUsers.contains(user))
+                .toList();
+    }
+
+    private List<Users> getAutoLateUsers(Schedule schedule){
+        List<Users> scheduleUsers = schedule
+                .getUsers().stream()
+                .map(UserSchedule::getUser)
+                .toList();
+
+        List<Users> arrivalUsers = scheduleRepository.findUserArrivalDatasWithUserByScheduleId(schedule.getId()).stream()
+                .map(UserArrivalData::getUser)
+                .toList();
+
+        return scheduleUsers.stream()
+                .filter((scheduleUser) -> !arrivalUsers.contains(scheduleUser))
                 .toList();
     }
 }

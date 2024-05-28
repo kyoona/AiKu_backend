@@ -22,17 +22,13 @@ public class ScheduleEventHandler {
     private final AlarmService alarmService;
     private final SchedulerService schedulerService;
 
-    /**
-     * 스케줄 등록 시 발생
-     *  스케줄 24시간 전 푸시 알림 예약
-     *  스케줄 당일 푸시 알림 예약
-     */
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void registerScheduleAlarmEvent(ScheduleAlarmEvent event){
+    public void scheduleAddAlarmEvent(ScheduleAddEvent event){
         Long scheduleId = event.getScheduleId();
+        LocalDateTime scheduleTime = event.getScheduleTime();
 
-        Long delay = alarmService.getScheduleAlarmTimeDelay(scheduleId);
+        Long delay = schedulerService.getTimeDelay(scheduleTime);
 
         //스케줄 이전
         if(delay > 1440){//24시
@@ -46,21 +42,30 @@ public class ScheduleEventHandler {
         schedulerService.addScheduleFinishAlarm(scheduleId, alarmService.sendScheduleFinishRunnable(scheduleId), delay);
     }
 
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void registerScheduleAutoCloseEvent(ScheduleAddEvent event){
+        Long scheduleId = event.getScheduleId();
+        LocalDateTime scheduleTime = event.getScheduleTime();
+
+        Runnable runnable = scheduleService.publishScheduleCloseEventRunnable(scheduleId);
+
+        Long delay = schedulerService.getTimeDelay(scheduleTime);
+
+        schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 30);
+    }
+
+    //TODO
     /**
      * 스케줄 삭제 시 발생
      *  예약된 알림을 다 삭제해야 됨
      */
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
     public void registerScheduleDeleteEvent(ScheduleDeleteEvent event){
         Long scheduleId = event.getScheduleId();
         schedulerService.deleteScheduleAlarm(scheduleId);
     }
 
-    /**
-     * 유저가 목적지에 도착 시 발생
-     *  유저 도착 정보 생성
-     *  유저 도착 푸시 알림
-     */
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userArriveInSchedule(UserArriveInScheduleEvent event) {
@@ -71,5 +76,28 @@ public class ScheduleEventHandler {
         scheduleService.createUserArrivalData(userId, scheduleId, arrivalTime);
 
         alarmService.sendUserArrival(userId, scheduleId, arrivalTime);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void checkScheduleClose(UserArriveInScheduleEvent event) {
+        Long scheduleId = event.getScheduleId();
+
+        boolean finish = scheduleService.checkAllUserArrive(scheduleId);
+
+        if (finish){
+            scheduleService.publishScheduleCloseEvent(scheduleId);
+        }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void closeSchedule(ScheduleCloseEvent event) {
+        Long scheduleId = event.getScheduleId();
+
+        boolean isAllArrive = scheduleService.checkAllUserArrive(event.getScheduleId());
+        if(!isAllArrive){
+            scheduleService.createAllUserArrivalData(scheduleId);
+        }
+
+        alarmService.sendScheduleMapClose(scheduleId);
     }
 }

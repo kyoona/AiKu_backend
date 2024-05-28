@@ -154,6 +154,16 @@ public class AlarmService {
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
     }
 
+    public void sendScheduleMapClose(Long scheduleId){
+        Schedule schedule = findScheduleWithUser(scheduleId);
+
+        List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
+        Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.SCHEDULE_MAP_CLOSE, schedule)
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
+    }
+
     //==유저 검증 메서드==
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
         UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId).orElse(null);
@@ -197,13 +207,6 @@ public class AlarmService {
     }
 
     //==편의 메서드==
-    public Long getScheduleAlarmTimeDelay(Long scheduleId){
-        Schedule schedule = findScheduleById(scheduleId);
-        LocalDateTime scheduleTime = schedule.getScheduleTime();
-
-        return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();
-    }
-
     private static List<String> getScheduleUsersFcmToken(Schedule schedule) {
         List<String> receiverTokens = schedule.getUsers().stream()
                 .map(UserSchedule::getUser)

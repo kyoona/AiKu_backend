@@ -8,10 +8,12 @@ import java.util.Optional;
 public interface ScheduleRepositoryCustom {
     Optional<Schedule> findScheduleWithUser(Long scheduleId);
     List<Schedule> findScheduleWithUserByGroupId(Long GroupId, String startTime, String endTime, ScheduleStatus status);
+    Optional<Schedule> findScheduleWithArrivalData(Long scheduleId);
 
     Optional<UserSchedule> findUserScheduleByUserIdAndScheduleId(Long userId, Long scheduleId);
     List<UserSchedule> findUserScheduleByUserId(Long userId, String startTime, String endTime, ScheduleStatus status);
 
     Optional<UserArrivalData> findUserArrivalDataByUserIdAndScheduleId(Long userId, Long scheduleId);
     List<UserArrivalData> findUserArrivalDatasWithUserByGroupId(Long groupId);
+    List<UserArrivalData> findUserArrivalDatasWithUserByScheduleId(Long scheduleId);
 }

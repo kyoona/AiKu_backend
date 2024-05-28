@@ -16,11 +16,15 @@ public class ScheduleEventPublisher {
         publisher.publishEvent(new UserArriveInScheduleEvent(userId, scheduleId, arrivalTime));
     }
 
-    public void scheduleAlarmEvent(Long scheduleId){
-        publisher.publishEvent(new ScheduleAlarmEvent(scheduleId));
+    public void scheduleAddEvent(Long scheduleId, LocalDateTime scheduleTime){
+        publisher.publishEvent(new ScheduleAddEvent(scheduleId, scheduleTime));
     }
 
     public void scheduleDeleteEvent(Long scheduleId){
         publisher.publishEvent(new ScheduleDeleteEvent(scheduleId));
+    }
+
+    public void scheduleCloseEvent(Long scheduleId){
+        publisher.publishEvent(new ScheduleCloseEvent(scheduleId));
     }
 }

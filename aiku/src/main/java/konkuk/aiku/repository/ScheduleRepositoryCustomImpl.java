@@ -60,12 +60,36 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
     }
 
     @Override
+    public List<UserArrivalData> findUserArrivalDatasWithUserByScheduleId(Long scheduleId) {
+        return entityManager.createQuery(
+                        "SELECT uad" +
+                                " FROM UserArrivalData uad" +
+                                " JOIN FETCH uad.user u" +
+                                " WHERE uad.schedule.id = :scheduleId", UserArrivalData.class
+                )
+                .setParameter("scheduleId", scheduleId)
+                .getResultList();
+    }
+
+    @Override
     public Optional<Schedule> findScheduleWithUser(Long scheduleId) {
         return entityManager.createQuery(
                 "SELECT s" +
                         " From Schedule s" +
                         " JOIN FETCH s.users us" +
                         " JOIN FETCH us.user" +
+                        " WHERE s.id = :scheduleId", Schedule.class
+        )
+                .setParameter("scheduleId", scheduleId)
+                .getResultList().stream().findFirst();
+    }
+
+    @Override
+    public Optional<Schedule> findScheduleWithArrivalData(Long scheduleId) {
+        return entityManager.createQuery(
+                "SELECT s" +
+                        " FROM Schedule s" +
+                        " JOIN FETCH s.userArrivalDatas uad" +
                         " WHERE s.id = :scheduleId", Schedule.class
         )
                 .setParameter("scheduleId", scheduleId)
