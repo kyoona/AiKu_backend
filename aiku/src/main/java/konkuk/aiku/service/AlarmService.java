@@ -60,14 +60,12 @@ public class AlarmService {
     }
 
     public void receiveRealTimeLocation(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
-        Schedule schedule = findScheduleById(scheduleId);
-        List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+        Schedule schedule = findScheduleWithUser(scheduleId);
 
         checkUserInSchedule(user.getId(), scheduleId);
         checkIsScheduleRun(schedule);
-        if (scheduleUsers.size() == 0) return;
 
-        List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
+        List<String> receiverTokens = getScheduleUsersFcmToken(schedule);
 
         Map<String, String> messageDataMap = RealTimeLocationMessage
                 .createMessage(user, scheduleId, locationDto.getLatitude(), locationDto.getLongitude())
@@ -76,14 +74,12 @@ public class AlarmService {
     }
 
     public void receiveUserArrival(Users user, Long scheduleId, LocalDateTime arrivalTime){
-        Schedule schedule = findScheduleById(scheduleId);
-        List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+        Schedule schedule = findScheduleWithUser(scheduleId);
 
         checkUserInSchedule(user.getId(), scheduleId);
         checkIsScheduleRun(schedule);
-        if (scheduleUsers.size() == 0) return;
 
-        List<String> receiverTokens = getUserFcmTokens(scheduleUsers);
+        List<String> receiverTokens = getScheduleUsersFcmToken(schedule);
 
         Map<String, String> messageDataMap = UserArrivalMessage
                 .createMessage(user, schedule, arrivalTime)
@@ -93,35 +89,35 @@ public class AlarmService {
         //유저가 도착했을 때 실행되어야 될 것들
         scheduleEventPublisher.userArriveInScheduleEvent(user.getId(), scheduleId, arrivalTime);
         bettingEventPublisher.userArriveInBettingEvent(user, schedule);
-
     }
 
     //==이벤트 서비스==
-
     public Runnable sendStartScheduleRunnable(Long scheduleId){
         return () -> {
-            Schedule schedule = findScheduleById(scheduleId);
-            List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+            Schedule schedule = findScheduleWithUser(scheduleId);
 
-            List<String> userTokens = getUserFcmTokens(scheduleUsers);
+            List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
             Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.START_SCHEDULE, schedule)
                     .toStringMap();
-
             messageSender.sendMessageToUsers(messageDataMap, userTokens);
         };
     }
 
     public Runnable sendNextScheduleRunnable(Long scheduleId) {
         return () -> {
-            Schedule schedule = findScheduleById(scheduleId);
-            List<Users> scheduleUsers = findUsersByScheduleIdFetchJoin(scheduleId);
+            Schedule schedule = findScheduleWithUser(scheduleId);
 
-            List<String> userTokens = getUserFcmTokens(scheduleUsers);
+            List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
             Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.NEXT_SCHEDULE, schedule)
                     .toStringMap();
-
             messageSender.sendMessageToUsers(messageDataMap, userTokens);
         };
+    }
+
+    public void sendUserArrival(Long userId, Long scheduleId, LocalDateTime arrivalTime){
+        
     }
 
     public void sendEmojiToUser(Users user, Long scheduleId, EmojiMessageDto emojiMessageDto){
@@ -164,8 +160,12 @@ public class AlarmService {
         return schedule;
     }
 
-    private List<Users> findUsersByScheduleIdFetchJoin(Long scheduleID){
-        return scheduleRepository.findUsersByScheduleId(scheduleID).stream().map(UserSchedule::getUser).toList();
+    private Schedule findScheduleWithUser(Long scheduleID){
+        Schedule schedule = scheduleRepository.findScheduleWithUser(scheduleID).orElse(null);
+        if (schedule == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+        return schedule;
     }
 
     private Users findUserById(Long userId){
@@ -184,7 +184,11 @@ public class AlarmService {
         return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();
     }
 
-    private List<String> getUserFcmTokens(List<Users> users){
-        return users.stream().map((user) -> user.getFcmToken()).toList();
+    private static List<String> getScheduleUsersFcmToken(Schedule schedule) {
+        List<String> receiverTokens = schedule.getUsers().stream()
+                .map(UserSchedule::getUser)
+                .map(Users::getFcmToken)
+                .toList();
+        return receiverTokens;
     }
 }

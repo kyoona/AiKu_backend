@@ -11,8 +11,6 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -36,6 +34,8 @@ public class ScheduleEventHandler {
         LocalDateTime arrivalTime = event.getArrivalTime();
 
         scheduleService.createUserArrivalData(userId, scheduleId, arrivalTime);
+
+        alarmService.sendUserArrival(userId, scheduleId, arrivalTime);
     }
 
     @Async
