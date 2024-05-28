@@ -3,6 +3,8 @@ package konkuk.aiku.service.scheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -34,10 +36,10 @@ public class SchedulerService {
         schedulerList.put(key, scheduler);
     }
 
-    public void publishScheduleMapCloseEvent(Long scheduleId, Runnable runnable, Long delayMinutes){
+    public void scheduleAutoClose(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
-        SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE_ALARM, scheduleId);
+        SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE, scheduleId);
         schedulerList.put(key, scheduler);
     }
 
@@ -48,5 +50,10 @@ public class SchedulerService {
 
         schedulerList.get(finishAlarmKey).cancel(false);
         schedulerList.get(nextAlarmKey).cancel(false);
+    }
+
+    //==편의 메서드==
+    public Long getTimeDelay(LocalDateTime scheduleTime){
+        return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();
     }
 }

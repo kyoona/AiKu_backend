@@ -86,14 +86,6 @@ public class GroupService {
         return dto;
     }
 
-    private LocalDateTime findGroupLatestScheduleTime(Long groupId) {
-        List<LocalDateTime> scheduleTimeList = scheduleRepository.findLatestScheduleTimeByGroupId(groupId);
-        if(scheduleTimeList.size() != 0) {
-            return scheduleTimeList.get(0);
-        }
-        return null;
-    }
-
     @Transactional
     public Long enterGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);
