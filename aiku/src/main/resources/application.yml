@@ -1,9 +1,11 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://172.31.39.61/~/aikuDB
-#    url: jdbc:h2:tcp://localhost/~/Downloads/aikuTest
+#    url: jdbc:h2:tcp://172.31.39.61/~/aikuDB
+    url: jdbc:h2:tcp://localhost/~/Downloads/aikuTest
     username: sa
+#    username: aiku
     password:
+#    password: aiku
     driver-class-name: org.h2.Driver
 
   jpa:
@@ -29,7 +31,9 @@ logging:
   org.hibernate.type: trace
 
 server:
+  port: 443
   ssl:
-    key-store: classpath:keystore.p12
+    key-store: keystore.p12
+#    key-store: /home/ubuntu/aiku_backend/AiKu_backend/aiku/keystore.p12
     key-store-type: PKCS12
     key-store-password: aiku1234
