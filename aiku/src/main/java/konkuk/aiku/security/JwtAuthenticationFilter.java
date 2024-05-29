@@ -30,8 +30,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-        //
-        log.info("request<{}>", ((HttpServletRequest) request).getRequestURI());
         // 다음 필터로 요청 전달
         chain.doFilter(request, response);
     }

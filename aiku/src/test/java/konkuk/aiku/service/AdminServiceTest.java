@@ -54,7 +54,6 @@ class AdminServiceTest {
     @Test
     void addItem() {
         Item itemEntity = adminService.findItemById(itemId);
-        log.info("Item={}",itemEntity.toString());
         Assertions.assertThat(itemEntity.getItemName()).isEqualTo("Item1");
     }
 
@@ -72,7 +71,6 @@ class AdminServiceTest {
         adminService.updateItem(itemId, itemUpdate.toServiceDto());
         Item itemEntity = adminService.findItemById(itemId);
 
-        log.info("Item={}",itemEntity.toString());
         Assertions.assertThat(itemEntity.getItemName()).isEqualTo("Item2");
     }
 
@@ -87,7 +85,6 @@ class AdminServiceTest {
     void addTitle() {
         Title title = adminService.findTitleById(titleId);
 
-        log.info(title.toString());
         Assertions.assertThat(title.getTitleName()).isEqualTo("TitleA");
     }
 
