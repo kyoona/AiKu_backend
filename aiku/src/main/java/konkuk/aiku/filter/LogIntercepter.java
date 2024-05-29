@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -20,7 +19,7 @@ public class LogIntercepter implements HandlerInterceptor {
         MDC.put("request_id", uuid);
         MDC.put("request_URI", requestURI);
 
-        log.info("Handling request ([{}]{})", request.getMethod(), request.getRequestURI());
+        log.info("Handling request [{} {}]", request.getMethod(), request.getRequestURI());
 
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
@@ -32,7 +31,7 @@ public class LogIntercepter implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        log.info("Response {} ([{}]{})", response.getStatus(), request.getMethod(), request.getRequestURI());
+        log.info("Response {} [{} {}]", response.getStatus(), request.getMethod(), request.getRequestURI());
         MDC.clear();
     }
 }
