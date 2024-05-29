@@ -30,13 +30,10 @@ public enum ErrorCode {
     NO_SUCH_TITLE(4047, "존재하지 않는 칭호입니다."),
     NO_SUCH_ITEM(4048, "존재하지 않는 칭호입니다."),
 
-    IO_EXCEPTION_ON_IMAGE_DELETE(5004, "S3 이미지 IO 오류"),
-
     //5XX Server error response
     INTERNAL_SERVER_ERROR(5001, "서버 내부 오류"),
     FAIL_TO_CONVERT_MESSAGE(5002, "Message를 Firebase Data로 변환 실패했습니다."),
     FAIL_TO_SEND_MESSAGE(5003, "Firebase 메세지 전송 실패");
-
 
     private int code;
     private String message;
