@@ -1,6 +1,7 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.domain.*;
+import konkuk.aiku.event.BettingEventPublisher;
 import konkuk.aiku.event.UserPointEventPublisher;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
@@ -30,6 +31,7 @@ public class BettingService {
     private final ScheduleRepository scheduleRepository;
     private final UsersRepository usersRepository;
     private final UserPointEventPublisher userPointEventPublisher;
+    private final BettingEventPublisher bettingEventPublisher;
 
 
     private Optional<UserSchedule> findUserInSchedule(Long userId, Long scheduleId) {
@@ -78,7 +80,8 @@ public class BettingService {
         // 1대1 레이싱인 경우
         if (betting.getBettingType().equals(BettingType.RACING)) {
             // TODO : 스케줄러 로직 (1분)
-            // TODO : 베팅 상대에게 알림 메시지
+            // 베팅 상대에게 알림 메시지
+            bettingEventPublisher.racingApplyEvent(targetUser.getId());
         } else {
             // 베팅인 경우
             // 베팅 금액 지불
@@ -94,8 +97,6 @@ public class BettingService {
         Betting betting = findBettingById(bettingId);
         betting.setBettingStatus(BettingStatus.ACCEPT);
 
-        // TODO : 베팅 주인에게 수락 알림 메시지
-
         Users bettor = betting.getBettor();
         Users targetUser = betting.getTargetUser();
 
@@ -107,6 +108,9 @@ public class BettingService {
 
         // schedule에 레이싱 추가
         betting.getSchedule().addRacing(betting);
+
+        // 베팅 주인에게 수락 알림 메시지
+        bettingEventPublisher.racingAcceptEvent(bettor.getId());
 
         return betting.getId();
     }
@@ -165,7 +169,6 @@ public class BettingService {
      * 스케줄 종료시 레이싱 결과 생성 로직
      * @param scheduleId 도착한 유저가 속한 스케줄
      * @return 유저 아이디
-     * TODO: 유저 도착 시 해당 메소드 실행
      */
     public Long userRacingArrival(Long scheduleId, Long userId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));
@@ -195,6 +198,7 @@ public class BettingService {
         bettor.plusPoint(plusPoint);
 
         userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        bettingEventPublisher.racingEndEvent(bettor.getId(), targetUser.getId());
 
         betting.updateBettingResult(ResultType.WIN);
         betting.setBettingStatus(BettingStatus.DONE);
@@ -204,7 +208,6 @@ public class BettingService {
      * 이벤트 발생 메서드
      * 스케줄 종료시 베팅 & 레이싱 결과 생성 로직
      * @return 해당 스케줄 아이디
-     * TODO: Schedule 종료 시 해당 메소드 실행
      */
     public Long setAllBettings(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));

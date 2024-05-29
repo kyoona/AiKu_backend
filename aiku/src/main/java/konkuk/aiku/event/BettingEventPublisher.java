@@ -1,13 +1,10 @@
 package konkuk.aiku.event;
 
-import konkuk.aiku.domain.Betting;
 import konkuk.aiku.domain.Schedule;
 import konkuk.aiku.domain.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +16,20 @@ public class BettingEventPublisher {
         publisher.publishEvent(new UserArriveInBettingEvent(user, schedule));
     }
 
-    public void scheduleEndBettingEvent(Long userId, Long scheduleId){
-        publisher.publishEvent(new ScheduleEndEvent(userId, scheduleId));
+    public void racingApplyEvent(Long targetId){
+        publisher.publishEvent(new RacingApplyEvent(targetId));
+    }
+
+    public void racingAcceptEvent(Long bettorId){
+        publisher.publishEvent(new RacingAcceptEvent(bettorId));
+    }
+
+    public void racingEndEvent(Long bettorId, Long targetId){
+        publisher.publishEvent(new RacingEndEvent(bettorId, targetId));
+    }
+
+    public void scheduleEndBettingEvent(Schedule schedule){
+        publisher.publishEvent(new ScheduleCloseEvent(schedule.getId()));
     }
 
 }

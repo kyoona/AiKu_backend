@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ScheduleAlarmEvent {
-    private final Long scheduleId;
+public class RacingAcceptEvent {
+    private final Long bettorId;
 }

@@ -13,6 +13,7 @@ import konkuk.aiku.firebase.FcmToken;
 import konkuk.aiku.firebase.FcmTokenProvider;
 import konkuk.aiku.firebase.MessageSender;
 import konkuk.aiku.firebase.dto.*;
+import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +32,7 @@ import java.util.Map;
 public class AlarmService {
     private final ScheduleRepository scheduleRepository;
     private final UsersRepository usersRepository;
+    private final BettingRepository bettingRepository;
     private final FcmTokenProvider fcmTokenProvider;
     private final MessageSender messageSender;
 
@@ -98,7 +99,7 @@ public class AlarmService {
 
             List<String> userTokens = getScheduleUsersFcmToken(schedule);
 
-            Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.SCHEDULE_FINISH, schedule)
+            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_FINISH, schedule)
                     .toStringMap();
             messageSender.sendMessageToUsers(messageDataMap, userTokens);
         };
@@ -110,7 +111,7 @@ public class AlarmService {
 
             List<String> userTokens = getScheduleUsersFcmToken(schedule);
 
-            Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.NEXT_SCHEDULE, schedule)
+            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.NEXT_SCHEDULE, schedule)
                     .toStringMap();
             messageSender.sendMessageToUsers(messageDataMap, userTokens);
         };
@@ -122,7 +123,7 @@ public class AlarmService {
 
             List<String> userTokens = getScheduleUsersFcmToken(schedule);
 
-            Map<String, String> messageDataMap = ScheduleAlarmMessage.createMessage(MessageTitle.SCHEDULE_MAP_OPEN, schedule)
+            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_MAP_OPEN, schedule)
                     .toStringMap();
             messageSender.sendMessageToUsers(messageDataMap, userTokens);
         };
@@ -152,6 +153,39 @@ public class AlarmService {
                 .toStringMap();
 
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
+    }
+
+    public void sendScheduleMapClose(Long scheduleId){
+        Schedule schedule = findScheduleWithUser(scheduleId);
+
+        List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
+        Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_MAP_CLOSE, schedule)
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
+    }
+
+    public void sendBettingStart(Long bettingId){
+        Betting betting = bettingRepository.findBettingWithUserAndSchedule(bettingId).orElse(null);
+
+        List<String> userTokens = getBettingUsersFcmToken(betting);
+
+        Map<String, String> messageDataMap = BettingMessage
+                .createMessage(MessageTitle.BETTING_START, betting.getSchedule(), betting, betting.getBettor(), betting.getTargetUser())
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
+    }
+
+    //TODO 베팅 승리자 추가해야할듯
+    public void sendBettingFinish(Long bettingId){
+        Betting betting = bettingRepository.findBettingWithUserAndSchedule(bettingId).orElse(null);
+
+        List<String> userTokens = getBettingUsersFcmToken(betting);
+
+        Map<String, String> messageDataMap = BettingMessage
+                .createMessage(MessageTitle.BETTING_FINISH, betting.getSchedule(), betting, betting.getBettor(), betting.getTargetUser())
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
     }
 
     //==유저 검증 메서드==
@@ -197,18 +231,15 @@ public class AlarmService {
     }
 
     //==편의 메서드==
-    public Long getScheduleAlarmTimeDelay(Long scheduleId){
-        Schedule schedule = findScheduleById(scheduleId);
-        LocalDateTime scheduleTime = schedule.getScheduleTime();
-
-        return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();
-    }
-
     private static List<String> getScheduleUsersFcmToken(Schedule schedule) {
         List<String> receiverTokens = schedule.getUsers().stream()
                 .map(UserSchedule::getUser)
                 .map(Users::getFcmToken)
                 .toList();
         return receiverTokens;
+    }
+
+    private static List<String> getBettingUsersFcmToken(Betting betting) {
+        return List.of(betting.getBettor().getFcmToken(), betting.getTargetUser().getFcmToken());
     }
 }

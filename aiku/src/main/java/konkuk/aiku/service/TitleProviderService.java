@@ -11,13 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class TitleProviderService {
-    private final UsersRepository usersRepository;
     private final BettingRepository bettingRepository;
     private final TitleRepository titleRepository;
     private final UserTitleRepository userTitleRepository;
@@ -39,9 +37,16 @@ public class TitleProviderService {
     1만 포인트 : 만수르
      */
 
-    public Long titleProvider(Long userId) {
-        Users users = findUsersByUserId(userId);
+    public void scheduleEndTitleProvider(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));
+        List<UserSchedule> users = schedule.getUsers();
+        for (UserSchedule user : users) {
+            titleProvider(user.getUser());
+        }
+    }
 
+    public Long titleProvider(Users users) {
         if (isBettingLoseGoe10(users)) {
             provideTitleToUser(users, 베팅_10회_패배);
         }
@@ -61,9 +66,6 @@ public class TitleProviderService {
         return users.getId();
     }
 
-    private Users findUsersByUserId(Long userId) {
-        return usersRepository.findById(userId).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
-    }
 
     // 타이틀 부여하는 로직
     public Long provideTitleToUser(Users users, String titleName) {
