@@ -3,6 +3,7 @@ package konkuk.aiku.firebase;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,10 +17,10 @@ public class FirebaseInitializer {
     @PostConstruct
     public void initialize(){
         try {
-            FileInputStream serviceAccount = new FileInputStream("src/main/java/konkuk/aiku/firebase/aiku-18cc3-firebase-adminsdk-akm67-c379d3ded3.json");
+            FileInputStream serviceAccount = new FileInputStream("src/main/java/konkuk/aiku/firebase/aiku-379ab-firebase-adminsdk-148e8-8c43f046b6.json");
 
             /*우분투 환경에서 절대 경로*/
-//            FileInputStream serviceAccount = new FileInputStream("/home/ubuntu/aiku_backend/AiKu_backend/aiku/src/main/java/konkuk/aiku/firebase/aiku-18cc3-firebase-adminsdk-akm67-c379d3ded3.json");
+//            FileInputStream serviceAccount = new FileInputStream("/home/ubuntu/aiku_backend/AiKu_backend/aiku/src/main/java/konkuk/aiku/firebase/aiku-379ab-firebase-adminsdk-148e8-8c43f046b6.json");
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
