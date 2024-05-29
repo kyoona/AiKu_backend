@@ -42,22 +42,24 @@ public class AlarmService {
 
     @Transactional
     public void saveToken(Users user, FcmToken fcmToken){
+        Users findUser = findUserById(user.getId());
         String token = fcmToken.getToken();
-        if (user.getFcmToken() != null) {
+        if (findUser.getFcmToken() != null) {
             throw new TokenException(ErrorCode.DUPLICATE_FCM_TOKEN);
         }
         fcmTokenProvider.validateFcmToken(token);
-        user.setFcmToken(token);
+        findUser.setFcmToken(token);
     }
 
     @Transactional
     public void updateToken(Users user, FcmToken fcmToken){
+        Users findUser = findUserById(user.getId());
         String token = fcmToken.getToken();
-        if (user.getFcmToken() == null) {
+        if (findUser.getFcmToken() == null) {
             throw new TokenException(ErrorCode.NO_GENERATED_TOKEN);
         }
         fcmTokenProvider.validateFcmToken(token);
-        user.setFcmToken(token);
+        findUser.setFcmToken(token);
     }
 
     public void receiveRealTimeLocation(Users user, Long scheduleId, RealTimeLocationDto locationDto) {
