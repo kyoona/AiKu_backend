@@ -1,10 +1,7 @@
 package konkuk.aiku.event;
 
-import konkuk.aiku.firebase.MessageSender;
-import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.BettingService;
-import konkuk.aiku.service.ScheduleService;
 import konkuk.aiku.service.TitleProviderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
