@@ -16,6 +16,18 @@ public class BettingEventPublisher {
         publisher.publishEvent(new UserArriveInBettingEvent(user, schedule));
     }
 
+    public void racingApplyEvent(Long targetId){
+        publisher.publishEvent(new RacingApplyEvent(targetId));
+    }
+
+    public void racingAcceptEvent(Long bettorId){
+        publisher.publishEvent(new RacingAcceptEvent(bettorId));
+    }
+
+    public void racingEndEvent(Long bettorId, Long targetId){
+        publisher.publishEvent(new RacingEndEvent(bettorId, targetId));
+    }
+
     public void scheduleEndBettingEvent(Schedule schedule){
         publisher.publishEvent(new ScheduleCloseEvent(schedule.getId()));
     }

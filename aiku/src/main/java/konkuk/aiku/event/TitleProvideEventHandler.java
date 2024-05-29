@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Slf4j
 public class TitleProvideEventHandler {
-
     private final AlarmService alarmService;
 
     @Async

@@ -1,8 +1,7 @@
 package konkuk.aiku.event;
 
-import konkuk.aiku.firebase.MessageSender;
+import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.BettingService;
-import konkuk.aiku.service.ScheduleService;
 import konkuk.aiku.service.TitleProviderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +18,35 @@ public class BettingEventHandler {
 
     private final BettingService bettingService;
     private final TitleProviderService titleProviderService;
-    private final MessageSender messageSender;
+    private final AlarmService alarmService;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userArriveInBetting(UserArriveInScheduleEvent event) {
+        // 유저 도착시 베팅 종료 로직
+        bettingService.userRacingArrival(event.getScheduleId(), event.getUserId());
+    }
 
-        // TODO: 베팅 완료 알림 메시지
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void racingApplyEvent(RacingApplyEvent event) {
+        // 베팅 시작 메시지
+        alarmService.sendBettingStart(event.getTargetId());
+    }
 
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void racingAcceptEvent(RacingAcceptEvent event) {
+        // 베팅이 신청되었다는 메시지
+        alarmService.sendBettingStart(event.getBettorId());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void racingEndEvent(RacingEndEvent event) {
+        // 베팅 완료 알림 메시지
+        alarmService.sendBettingFinish(event.getBettorId());
+        alarmService.sendBettingFinish(event.getTargetId());
     }
 
     @Async
@@ -34,14 +54,11 @@ public class BettingEventHandler {
     public void scheduleEndEvent(ScheduleCloseEvent event) {
         Long scheduleId = event.getScheduleId();
 
+        // 끝난 스케줄의 베팅 정리
         bettingService.setAllBettings(scheduleId);
 
-        // TODO: 스케줄 완료 알림 메시지
-
-
-        // 칭호 조건 확인
-//        titleProviderService.titleProvider(event.getUserId());
-
+        // 칭호 부여 로직 검증
+        titleProviderService.scheduleEndTitleProvider(scheduleId);
     }
 
 }

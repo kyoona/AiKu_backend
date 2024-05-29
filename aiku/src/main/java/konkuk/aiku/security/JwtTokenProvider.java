@@ -77,7 +77,8 @@ public class JwtTokenProvider {
 
         Calendar accessTokenCal = Calendar.getInstance();
         accessTokenCal.setTime(new Date());
-        accessTokenCal.add(Calendar.DATE, 1);
+//        accessTokenCal.add(Calendar.DATE, 1);
+        accessTokenCal.add(Calendar.DATE, 14);
 
         // AccessToken : 1일 후 만료
         Date accessTokenExpiresIn = accessTokenCal.getTime();
