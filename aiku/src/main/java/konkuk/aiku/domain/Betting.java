@@ -6,9 +6,10 @@ import lombok.*;
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Betting extends TimeEntity{
+public class Betting extends TimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bettingId")
     @Setter(value = AccessLevel.NONE)
     private Long id;
