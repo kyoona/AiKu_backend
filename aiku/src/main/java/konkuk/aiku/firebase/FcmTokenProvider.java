@@ -1,7 +1,5 @@
 package konkuk.aiku.firebase;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.TokenException;
 import org.springframework.stereotype.Component;

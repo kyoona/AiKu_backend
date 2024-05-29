@@ -135,7 +135,6 @@ class BettingServiceTest {
         Long updateId = bettingService.updateBetting(userA1, scheduleId, bettingId, bettingModifyDto.toServiceDto());
         BettingServiceDto betting = bettingService.findBetting(updateId);
 
-        log.info("betting={}", betting);
         assertThat(betting.getTargetUser().getUserId()).isEqualTo(userA2.getId());
         assertThat(betting.getPoint()).isEqualTo(70);
 
