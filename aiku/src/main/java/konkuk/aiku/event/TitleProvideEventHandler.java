@@ -18,9 +18,13 @@ import java.time.LocalDateTime;
 @Slf4j
 public class TitleProvideEventHandler {
 
+    private final AlarmService alarmService;
+
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void titleProvideEvent(TitleProvideEvent event){
         // TODO: 타이틀 생성 메시지 전송
+
+
     }
 }
