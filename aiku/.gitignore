@@ -36,4 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
+aiku/src/main/resources/application-aws.yml
+
 aiku-18cc3-firebase-adminsdk-akm67-c379d3ded3.json
