@@ -47,7 +47,6 @@ public class AlarmService {
         if (findUser.getFcmToken() != null) {
             throw new TokenException(ErrorCode.DUPLICATE_FCM_TOKEN);
         }
-        fcmTokenProvider.validateFcmToken(token);
         findUser.setFcmToken(token);
     }
 
@@ -58,7 +57,6 @@ public class AlarmService {
         if (findUser.getFcmToken() == null) {
             throw new TokenException(ErrorCode.NO_GENERATED_TOKEN);
         }
-        fcmTokenProvider.validateFcmToken(token);
         findUser.setFcmToken(token);
     }
 
