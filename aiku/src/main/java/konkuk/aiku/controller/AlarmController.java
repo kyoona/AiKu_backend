@@ -1,6 +1,5 @@
 package konkuk.aiku.controller;
 
-import com.google.api.client.http.HttpResponse;
 import jakarta.validation.Valid;
 import konkuk.aiku.controller.dto.EmojiMessageDto;
 import konkuk.aiku.controller.dto.RealTimeLocationDto;
@@ -12,13 +11,10 @@ import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
@@ -58,16 +54,11 @@ public class AlarmController {
 
     @PostMapping("/schedules/{scheduleId}/location/arrival")
     public ResponseEntity userArrival(@PathVariable Long scheduleId,
-                                    @RequestBody @Valid UserArrivalDto userArrivalDto, BindingResult bindingResult,
+                                    @RequestBody @Valid UserArrivalDto userArrivalDto,
                                     @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        if (bindingResult.hasErrors()){
-            String field = bindingResult.getFieldError().getField();
-            Object value = bindingResult.getFieldValue(field);
-            log.info("localdateTime오류 {}:{}", field, value);
-        }
-//        alarmService.receiveUserArrival(user, scheduleId, userArrivalDto.getArrivalTime());
+        alarmService.receiveUserArrival(user, scheduleId, userArrivalDto.getArrivalTime());
         return new ResponseEntity(HttpStatus.OK);
     }
 
