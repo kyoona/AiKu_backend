@@ -7,5 +7,4 @@ import lombok.Getter;
 public class RacingAcceptEvent {
     private final Long scheduleId;
     private final Long bettingId;
-    private final Long bettorId;
 }

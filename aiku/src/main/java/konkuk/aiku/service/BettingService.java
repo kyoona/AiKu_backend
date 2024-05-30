@@ -81,7 +81,7 @@ public class BettingService {
         if (betting.getBettingType().equals(BettingType.RACING)) {
             // 베팅 상대에게 알림 메시지 (현재는 레이싱 시작 메시지로 보냄)
             // 1분 대기 스케줄러에 추가
-            bettingEventPublisher.racingApplyEvent(scheduleId, betting.getId(), targetUser.getId());
+            bettingEventPublisher.racingApplyEvent(scheduleId, betting.getId());
         } else {
             // 베팅인 경우
             // 베팅 금액 지불
@@ -110,7 +110,7 @@ public class BettingService {
         betting.getSchedule().addRacing(betting);
 
         // 베팅 주인에게 수락 알림 메시지
-        bettingEventPublisher.racingAcceptEvent(betting.getSchedule().getId(), bettingId, bettor.getId());
+        bettingEventPublisher.racingAcceptEvent(betting.getSchedule().getId(), bettingId);
 
         return betting.getId();
     }
@@ -121,6 +121,7 @@ public class BettingService {
             Betting betting = findBettingById(bettingId);
             // 베팅이 수락되지 않은 경우
             if (!betting.getBettingStatus().equals(BettingStatus.ACCEPT)) {
+                bettingEventPublisher.racingDenyEvent(betting.getSchedule().getId(), bettingId);
                 bettingRepository.deleteById(bettingId);
             }
         };
@@ -199,7 +200,7 @@ public class BettingService {
         bettor.plusPoint(plusPoint);
 
         userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
-        bettingEventPublisher.racingEndEvent(betting.getSchedule().getId(), betting.getId(), bettor.getId(), targetUser.getId());
+        bettingEventPublisher.racingEndEvent(betting.getSchedule().getId(), betting.getId());
 
         betting.updateBettingResult(ResultType.WIN);
         betting.setBettingStatus(BettingStatus.DONE);

@@ -10,6 +10,4 @@ import java.time.LocalDateTime;
 public class RacingEndEvent {
     private final Long scheduleId;
     private final Long bettingId;
-    private final Long bettorId;
-    private final Long targetId;
 }

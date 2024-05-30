@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class RacingApplyEvent {
+public class RacingDenyEvent {
     private final Long scheduleId;
     private final Long bettingId;
 }
