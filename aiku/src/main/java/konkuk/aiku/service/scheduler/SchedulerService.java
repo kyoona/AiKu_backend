@@ -43,6 +43,13 @@ public class SchedulerService {
         schedulerList.put(key, scheduler);
     }
 
+    public void bettingAcceptDelay(Long bettingId, Runnable runnable){
+        ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, 10, TimeUnit.SECONDS);
+
+        SchedulerKey key = new SchedulerKey(SchedulerType.BETTING_ACCEPT_DELAY, bettingId);
+        schedulerList.put(key, scheduler);
+    }
+
     //TODO
     public void deleteScheduleAlarm(Long scheduleId){
         SchedulerKey finishAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
