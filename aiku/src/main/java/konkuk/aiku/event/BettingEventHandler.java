@@ -3,6 +3,7 @@ package konkuk.aiku.event;
 import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.BettingService;
 import konkuk.aiku.service.TitleProviderService;
+import konkuk.aiku.service.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +20,7 @@ public class BettingEventHandler {
     private final BettingService bettingService;
     private final TitleProviderService titleProviderService;
     private final AlarmService alarmService;
+    private final SchedulerService schedulerService;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -32,6 +34,10 @@ public class BettingEventHandler {
     public void racingApplyEvent(RacingApplyEvent event) {
         // 베팅 시작 메시지
         alarmService.sendBettingStart(event.getTargetId());
+
+        // 베팅 수락을 기다리는 로직 (1분 후 종료)
+        Runnable deleteBettingRunnable = bettingService.deleteBettingById(event.getBettingId());
+        schedulerService.addBettingWaiting(event.getBettingId(), deleteBettingRunnable, 1L);
     }
 
     @Async

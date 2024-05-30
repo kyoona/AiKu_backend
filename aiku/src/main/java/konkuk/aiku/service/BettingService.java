@@ -79,9 +79,9 @@ public class BettingService {
 
         // 1대1 레이싱인 경우
         if (betting.getBettingType().equals(BettingType.RACING)) {
-            // TODO : 스케줄러 로직 (1분)
-            // 베팅 상대에게 알림 메시지
-            bettingEventPublisher.racingApplyEvent(targetUser.getId());
+            // 베팅 상대에게 알림 메시지 (현재는 레이싱 시작 메시지로 보냄)
+            // 1분 대기 스케줄러에 추가
+            bettingEventPublisher.racingApplyEvent(scheduleId, betting.getId(), targetUser.getId());
         } else {
             // 베팅인 경우
             // 베팅 금액 지불
@@ -110,20 +110,20 @@ public class BettingService {
         betting.getSchedule().addRacing(betting);
 
         // 베팅 주인에게 수락 알림 메시지
-        bettingEventPublisher.racingAcceptEvent(bettor.getId());
+        bettingEventPublisher.racingAcceptEvent(betting.getSchedule().getId(), bettingId, bettor.getId());
 
         return betting.getId();
     }
 
-    // TODO : 레이싱 미수락 시 베팅 삭제 로직
-    public Long deleteBettingById(Long bettingId) {
-        Betting betting = findBettingById(bettingId);
-        // 베팅이 수락되지 않은 경우
-        if (!betting.getBettingStatus().equals(BettingStatus.ACCEPT)) {
-            bettingRepository.deleteById(bettingId);
-        }
-
-        return bettingId;
+    // 레이싱 미수락 시 베팅 삭제 로직
+    public Runnable deleteBettingById(Long bettingId) {
+        return () -> {
+            Betting betting = findBettingById(bettingId);
+            // 베팅이 수락되지 않은 경우
+            if (!betting.getBettingStatus().equals(BettingStatus.ACCEPT)) {
+                bettingRepository.deleteById(bettingId);
+            }
+        };
     }
 
 
@@ -184,6 +184,7 @@ public class BettingService {
 
         return userId;
     }
+
     public void setRacingResult(Betting betting) {
         Users bettor = betting.getBettor();
         Users targetUser = betting.getTargetUser();
@@ -198,7 +199,7 @@ public class BettingService {
         bettor.plusPoint(plusPoint);
 
         userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
-        bettingEventPublisher.racingEndEvent(bettor.getId(), targetUser.getId());
+        bettingEventPublisher.racingEndEvent(betting.getSchedule().getId(), betting.getId(), bettor.getId(), targetUser.getId());
 
         betting.updateBettingResult(ResultType.WIN);
         betting.setBettingStatus(BettingStatus.DONE);
