@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 public class RacingEndEvent {
+    private final Long scheduleId;
+    private final Long bettingId;
     private final Long bettorId;
     private final Long targetId;
 }
