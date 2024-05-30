@@ -16,8 +16,8 @@ public class BettingEventPublisher {
         publisher.publishEvent(new UserArriveInBettingEvent(user, schedule));
     }
 
-    public void racingApplyEvent(Long targetId){
-        publisher.publishEvent(new RacingApplyEvent(targetId));
+    public void racingApplyEvent(Long bettingId, Long targetId){
+        publisher.publishEvent(new RacingApplyEvent(bettingId, targetId));
     }
 
     public void racingAcceptEvent(Long bettorId){

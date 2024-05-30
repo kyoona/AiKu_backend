@@ -52,6 +52,14 @@ public class SchedulerService {
         schedulerList.get(nextAlarmKey).cancel(false);
     }
 
+    public void addBettingWaiting(Long bettingId, Runnable runnable, Long delayMinutes){
+        ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
+
+        // SchedulerType이 다르기 때문에 bettingId를 넣어주어도 구분 가능
+        SchedulerKey key = new SchedulerKey(SchedulerType.BETTING_ACCEPT_WAIT, bettingId);
+        schedulerList.put(key, scheduler);
+    }
+
     //==편의 메서드==
     public Long getTimeDelay(LocalDateTime scheduleTime){
         return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();

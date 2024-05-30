@@ -6,5 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class RacingApplyEvent {
+    private final Long bettingId;
     private final Long targetId;
 }
