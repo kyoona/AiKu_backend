@@ -39,8 +39,11 @@ public class ScheduleEventHandler {
             schedulerService.addScheduleMapOpenAlarm(scheduleId, alarmService.sendScheduleMapOpenRunnable(scheduleId), delay - 30);
         }
 
+        log.info("딜레이 {}", delay);
         //스케줄 시간 완료
         schedulerService.addScheduleFinishAlarm(scheduleId, alarmService.sendScheduleFinishRunnable(scheduleId), delay);
+
+        log.info("Handel ScheduleAddEvent completion");
     }
 
     //스케줄 등록 -> 약속 시간 30분 후 스케줄 자동 종료 이벤트 발생
@@ -55,6 +58,7 @@ public class ScheduleEventHandler {
         Long delay = schedulerService.getTimeDelay(scheduleTime);
 
         schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 30);
+        log.info("Handel ScheduleAddEvent completion");
     }
 
     //스케줄 종료 이벤트 -> 모든 유저가 도착했는지 검증(맵 자동 종료 or 유저 전원 도착), 검증 후 유저 도착 정보 생성, 맵 닫힘 알림
@@ -69,6 +73,7 @@ public class ScheduleEventHandler {
         }
 
         alarmService.sendScheduleMapClose(scheduleId);
+        log.info("Handel ScheduleCloseEvent completion");
     }
 
     //TODO
@@ -94,6 +99,7 @@ public class ScheduleEventHandler {
         scheduleService.createUserArrivalData(userId, scheduleId, arrivalTime);
 
         alarmService.sendUserArrival(userId, scheduleId, arrivalTime);
+        log.info("Handel UserArriveInScheduleEvent completion");
     }
 
     //유저 도착 -> 모든 유저가 도착했는지 검증, 검증 후 스케줄 종료 이벤드 발생
@@ -107,5 +113,6 @@ public class ScheduleEventHandler {
         if (finish){
             scheduleService.publishScheduleCloseEvent(scheduleId);
         }
+        log.info("Handel UserArriveInScheduleEvent completion");
     }
 }
