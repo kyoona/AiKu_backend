@@ -33,26 +33,34 @@ public class BettingEventHandler {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void racingApplyEvent(RacingApplyEvent event) {
         // 베팅 시작 메시지
-        alarmService.sendBettingStart(event.getTargetId());
+        alarmService.sendBettingNew(event.getBettingId());
 
-        // 베팅 수락을 기다리는 로직 (1분 후 종료)
+        // 베팅 수락을 기다리는 로직 (10초 후 종료)
         Runnable deleteBettingRunnable = bettingService.deleteBettingById(event.getBettingId());
-        schedulerService.addBettingWaiting(event.getBettingId(), deleteBettingRunnable, 1L);
+        schedulerService.bettingAcceptDelay(event.getBettingId(), deleteBettingRunnable);
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void racingAcceptEvent(RacingAcceptEvent event) {
-        // 베팅이 신청되었다는 메시지
-        alarmService.sendBettingStart(event.getBettorId());
+        // 레이싱이 성사되었다는 메시지 To Bettor
+        alarmService.sendBettingAcceptOrDeny(event.getBettingId(), true);
+        // 레이싱이 성사되었다는 메시지 To Everyone
+        alarmService.sendBettingStart(event.getBettingId());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void racingDenyEvent(RacingDenyEvent event) {
+        // 레이싱이 거절되었다는 메시지 To Bettor
+        alarmService.sendBettingAcceptOrDeny(event.getBettingId(), false);
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void racingEndEvent(RacingEndEvent event) {
         // 베팅 완료 알림 메시지
-        alarmService.sendBettingFinish(event.getBettorId());
-        alarmService.sendBettingFinish(event.getTargetId());
+        alarmService.sendBettingFinish(event.getBettingId());
     }
 
     @Async

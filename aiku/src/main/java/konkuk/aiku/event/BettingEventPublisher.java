@@ -16,16 +16,20 @@ public class BettingEventPublisher {
         publisher.publishEvent(new UserArriveInBettingEvent(user, schedule));
     }
 
-    public void racingApplyEvent(Long scheduleId, Long bettingId, Long targetId){
-        publisher.publishEvent(new RacingApplyEvent(scheduleId, bettingId, targetId));
+    public void racingApplyEvent(Long scheduleId, Long bettingId){
+        publisher.publishEvent(new RacingApplyEvent(scheduleId, bettingId));
     }
 
-    public void racingAcceptEvent(Long scheduleId, Long bettingId, Long bettorId){
-        publisher.publishEvent(new RacingAcceptEvent(scheduleId, bettingId, bettorId));
+    public void racingAcceptEvent(Long scheduleId, Long bettingId){
+        publisher.publishEvent(new RacingAcceptEvent(scheduleId, bettingId));
     }
 
-    public void racingEndEvent(Long scheduleId, Long bettingId, Long bettorId, Long targetId){
-        publisher.publishEvent(new RacingEndEvent(scheduleId, bettingId, bettorId, targetId));
+    public void racingDenyEvent(Long scheduleId, Long bettingId){
+        publisher.publishEvent(new RacingDenyEvent(scheduleId, bettingId));
+    }
+
+    public void racingEndEvent(Long scheduleId, Long bettingId){
+        publisher.publishEvent(new RacingEndEvent(scheduleId, bettingId));
     }
 
     public void scheduleEndBettingEvent(Schedule schedule){
