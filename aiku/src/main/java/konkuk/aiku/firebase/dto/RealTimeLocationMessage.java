@@ -5,7 +5,8 @@ import konkuk.aiku.domain.Users;
 import lombok.AccessLevel;
 import lombok.Builder;
 
-@Builder(access = AccessLevel.PROTECTED)
+@Builder
+//@Builder(access = AccessLevel.PROTECTED)
 public class RealTimeLocationMessage extends Message{
     protected String title;
     protected Long scheduleId;
