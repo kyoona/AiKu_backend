@@ -15,6 +15,7 @@ public class UserSimpleResponseDto {
     private String username;
     private String userImg;
     private UserImgData userImgData;
+    private String phoneNumber;
     private int point;
 
     public static UserSimpleResponseDto toDto(UserSimpleServiceDto serviceDTO){
@@ -23,6 +24,7 @@ public class UserSimpleResponseDto {
                 .username(serviceDTO.getUsername())
                 .userImg(serviceDTO.getUserImg())
                 .userImgData(serviceDTO.getUserImgData())
+                .phoneNumber(serviceDTO.getPhoneNumber())
                 .point(serviceDTO.getPoint())
                 .build();
         return dto;

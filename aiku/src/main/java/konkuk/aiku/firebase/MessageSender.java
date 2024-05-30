@@ -47,14 +47,17 @@ public class MessageSender {
 
         Map<String, String> stringMap = RealTimeLocationMessage.builder()
                 .title(MessageTitle.USER_REAL_TIME_LOCATION.getTitle())
-                .scheduleId(1L)
-                .userId(1L)
-                .userName("임시사람")
+                .scheduleId(5L)
+                .userId(4L)
+                .userName("정세훈")
                 .userImg("url")
                 .imgData(UserImgData.ImgType.DEFAULT1)
                 .colorCode("#000000")
-                .latitude(127.08278172427)
-                .longitude(37.540957955055)
+//                .latitude(37.548196395087)
+//                .longitude(127.07615567644)
+                //건국
+                .latitude(37.544947955055)
+                .longitude(127.08198172427)
                 .build()
                 .toStringMap();
 
