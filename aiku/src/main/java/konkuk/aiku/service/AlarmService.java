@@ -165,8 +165,39 @@ public class AlarmService {
         messageSender.sendMessageToUsers(messageDataMap, userTokens);
     }
 
+    public void sendBettingNew(Long bettingId){
+        Betting betting = findBettingWithUserAndSchedule(bettingId);
+
+        List<String> userTokens = getBettingUsersFcmToken(betting);
+
+        Map<String, String> messageDataMap = BettingMessage.createMessage(MessageTitle.BETTING_NEW, betting.getSchedule(), betting, betting.getBettor(), betting.getTargetUser())
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
+    }
+
+    public void sendBettingAcceptOrDeny(Long bettingId, boolean isAccept){
+        Betting betting = findBettingWithUserAndSchedule(bettingId);
+        Schedule schedule = betting.getSchedule();
+
+        List<String> userTokens = null;
+        MessageTitle messageTitle = null;
+
+        if (isAccept){
+            userTokens = getScheduleUsersFcmToken(schedule);
+            messageTitle = MessageTitle.BETTING_ACCEPT;
+        }else{
+            userTokens = getBettingUsersFcmToken(betting);
+            messageTitle = MessageTitle.BETTING_DENY;
+        }
+
+        Map<String, String> messageDataMap = BettingAcceptDenyMessage.createMessage(messageTitle, schedule, betting, betting.getBettor(), betting.getTargetUser(), isAccept)
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
+    }
+
+    //TODO 스케줄에 참여한 유저 전원에게 알림
     public void sendBettingStart(Long bettingId){
-        Betting betting = bettingRepository.findBettingWithUserAndSchedule(bettingId).orElse(null);
+        Betting betting = findBettingWithUserAndSchedule(bettingId);
 
         List<String> userTokens = getBettingUsersFcmToken(betting);
 
@@ -176,9 +207,9 @@ public class AlarmService {
         messageSender.sendMessageToUsers(messageDataMap, userTokens);
     }
 
-    //TODO 베팅 승리자 추가해야할듯
+    //TODO 스케줄에 참여한 유저 전원에게 알림
     public void sendBettingFinish(Long bettingId){
-        Betting betting = bettingRepository.findBettingWithUserAndSchedule(bettingId).orElse(null);
+        Betting betting = findBettingWithUserAndSchedule(bettingId);
 
         List<String> userTokens = getBettingUsersFcmToken(betting);
 
@@ -229,6 +260,15 @@ public class AlarmService {
         }
         return user;
     }
+
+    private Betting findBettingWithUserAndSchedule(Long bettingId) {
+        Betting betting = bettingRepository.findBettingWithUserAndSchedule(bettingId).orElse(null);
+        if (betting == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_BETTING);
+        }
+        return betting;
+    }
+
 
     //==편의 메서드==
     private static List<String> getScheduleUsersFcmToken(Schedule schedule) {

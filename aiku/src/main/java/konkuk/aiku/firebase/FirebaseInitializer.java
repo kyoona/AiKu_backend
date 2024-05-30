@@ -17,10 +17,10 @@ public class FirebaseInitializer {
     @PostConstruct
     public void initialize(){
         try {
-            FileInputStream serviceAccount = new FileInputStream("src/main/java/konkuk/aiku/firebase/aiku-379ab-firebase-adminsdk-148e8-8c43f046b6.json");
+//            FileInputStream serviceAccount = new FileInputStream("src/main/java/konkuk/aiku/firebase/aiku-379ab-firebase-adminsdk-148e8-8c43f046b6.json");
 
             /*우분투 환경에서 절대 경로*/
-//            FileInputStream serviceAccount = new FileInputStream("/home/ubuntu/aiku_backend/AiKu_backend/aiku/src/main/java/konkuk/aiku/firebase/aiku-379ab-firebase-adminsdk-148e8-8c43f046b6.json");
+            FileInputStream serviceAccount = new FileInputStream("/home/ubuntu/aiku_backend/AiKu_backend/aiku/src/main/java/konkuk/aiku/firebase/aiku-379ab-firebase-adminsdk-148e8-8c43f046b6.json");
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();

@@ -22,6 +22,7 @@ public class ScheduleEventHandler {
     private final AlarmService alarmService;
     private final SchedulerService schedulerService;
 
+    //스케줄 등록 -> 약속 전날, 약속 시간 30분 전(맵 오픈), 약속 시간 푸시 알림
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void scheduleAddAlarmEvent(ScheduleAddEvent event){
@@ -42,6 +43,8 @@ public class ScheduleEventHandler {
         schedulerService.addScheduleFinishAlarm(scheduleId, alarmService.sendScheduleFinishRunnable(scheduleId), delay);
     }
 
+    //스케줄 등록 -> 약속 시간 30분 후 스케줄 자동 종료 이벤트 발생
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void registerScheduleAutoCloseEvent(ScheduleAddEvent event){
         Long scheduleId = event.getScheduleId();
@@ -52,6 +55,20 @@ public class ScheduleEventHandler {
         Long delay = schedulerService.getTimeDelay(scheduleTime);
 
         schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 30);
+    }
+
+    //스케줄 종료 이벤트 -> 모든 유저가 도착했는지 검증(맵 자동 종료 or 유저 전원 도착), 검증 후 유저 도착 정보 생성, 맵 닫힘 알림
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void closeSchedule(ScheduleCloseEvent event) {
+        Long scheduleId = event.getScheduleId();
+
+        boolean isAllArrive = scheduleService.checkAllUserArrive(event.getScheduleId());
+        if(!isAllArrive){
+            scheduleService.createAllUserArrivalData(scheduleId);
+        }
+
+        alarmService.sendScheduleMapClose(scheduleId);
     }
 
     //TODO
@@ -66,6 +83,7 @@ public class ScheduleEventHandler {
         schedulerService.deleteScheduleAlarm(scheduleId);
     }
 
+    //유저 도착 -> 도착 정보 생성, 도착 알림
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userArriveInSchedule(UserArriveInScheduleEvent event) {
@@ -78,6 +96,8 @@ public class ScheduleEventHandler {
         alarmService.sendUserArrival(userId, scheduleId, arrivalTime);
     }
 
+    //유저 도착 -> 모든 유저가 도착했는지 검증, 검증 후 스케줄 종료 이벤드 발생
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void checkScheduleClose(UserArriveInScheduleEvent event) {
         Long scheduleId = event.getScheduleId();
@@ -87,17 +107,5 @@ public class ScheduleEventHandler {
         if (finish){
             scheduleService.publishScheduleCloseEvent(scheduleId);
         }
-    }
-
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void closeSchedule(ScheduleCloseEvent event) {
-        Long scheduleId = event.getScheduleId();
-
-        boolean isAllArrive = scheduleService.checkAllUserArrive(event.getScheduleId());
-        if(!isAllArrive){
-            scheduleService.createAllUserArrivalData(scheduleId);
-        }
-
-        alarmService.sendScheduleMapClose(scheduleId);
     }
 }
