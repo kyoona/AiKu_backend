@@ -16,7 +16,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
@@ -56,11 +58,16 @@ public class AlarmController {
 
     @PostMapping("/schedules/{scheduleId}/location/arrival")
     public ResponseEntity userArrival(@PathVariable Long scheduleId,
-                                    @RequestBody @Valid UserArrivalDto userArrivalDto,
+                                    @RequestBody @Valid UserArrivalDto userArrivalDto, BindingResult bindingResult,
                                     @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
-        alarmService.receiveUserArrival(user, scheduleId, userArrivalDto.getArrivalTime());
+        if (bindingResult.hasErrors()){
+            String field = bindingResult.getFieldError().getField();
+            Object value = bindingResult.getFieldValue(field);
+            log.info("localdateTime오류 {}:{}", field, value);
+        }
+//        alarmService.receiveUserArrival(user, scheduleId, userArrivalDto.getArrivalTime());
         return new ResponseEntity(HttpStatus.OK);
     }
 

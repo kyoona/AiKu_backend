@@ -12,8 +12,8 @@ class MessageSenderTest {
     @Autowired
     private MessageSender messageSender;
 
-//    @Test
-//    public void test() {
-//        messageSender.testSend();
-//    }
+    @Test
+    public void test() {
+        messageSender.testSend();
+    }
 }
