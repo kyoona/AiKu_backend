@@ -30,6 +30,7 @@ public class ScheduleEventHandler {
         LocalDateTime scheduleTime = event.getScheduleTime();
 
         Long delay = schedulerService.getTimeDelay(scheduleTime);
+        log.info("delay = {}", delay);
 
         //스케줄 24시전
         if(delay > 1440){
