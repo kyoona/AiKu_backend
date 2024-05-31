@@ -51,7 +51,7 @@ public class ScheduleEventHandler {
 
     //맵 오픈(스케줄 30분 전) -> 스케줄 상태 변경, 맵 오픈 알림
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void openSchedule(ScheduleOpenEvent event){
         Long scheduleId = event.getScheduleId();
 
@@ -78,7 +78,7 @@ public class ScheduleEventHandler {
 
     //스케줄 종료 이벤트 -> 모든 유저가 도착했는지 검증(맵 자동 종료 or 유저 전원 도착), 검증 후 유저 도착 정보 생성, 맵 닫힘 알림
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void closeSchedule(ScheduleCloseEvent event) {
         Long scheduleId = event.getScheduleId();
 
