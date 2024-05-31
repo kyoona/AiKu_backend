@@ -92,7 +92,7 @@ public class AlarmService {
         bettingEventPublisher.userArriveInBettingEvent(user, schedule);
     }
 
-    public Runnable sendScheduleMapOpen(Long scheduleId){
+    public void sendScheduleMapOpen(Long scheduleId){
         Schedule schedule = findScheduleWithUser(scheduleId);
 
         List<String> userTokens = getScheduleUsersFcmToken(schedule);
