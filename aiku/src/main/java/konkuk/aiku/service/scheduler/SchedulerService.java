@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerService {
     private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> schedulerList = new ConcurrentHashMap();
 
+    //Schedule
     public void addScheduleFinishAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
@@ -43,26 +44,22 @@ public class SchedulerService {
         schedulerList.put(key, scheduler);
     }
 
+    public void deleteSchedule(Long scheduleId){
+        SchedulerKey nextAlarmKey = new SchedulerKey(SchedulerType.NEXT_SCHEDULE_ALARM, scheduleId);
+        SchedulerKey finishAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
+        SchedulerKey openAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_OPEN_ALARM, scheduleId);
+        SchedulerKey closeEventKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE, scheduleId);
+
+        schedulerList.get(nextAlarmKey).cancel(false);
+        schedulerList.get(finishAlarmKey).cancel(false);
+        schedulerList.get(openAlarmKey).cancel(false);
+        schedulerList.get(closeEventKey).cancel(false);
+    }
+
+    //Betting
     public void bettingAcceptDelay(Long bettingId, Runnable runnable){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, 10, TimeUnit.SECONDS);
 
-        SchedulerKey key = new SchedulerKey(SchedulerType.BETTING_ACCEPT_DELAY, bettingId);
-        schedulerList.put(key, scheduler);
-    }
-
-    //TODO
-    public void deleteScheduleAlarm(Long scheduleId){
-        SchedulerKey finishAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
-        SchedulerKey nextAlarmKey = new SchedulerKey(SchedulerType.NEXT_SCHEDULE_ALARM, scheduleId);
-
-        schedulerList.get(finishAlarmKey).cancel(false);
-        schedulerList.get(nextAlarmKey).cancel(false);
-    }
-
-    public void addBettingWaiting(Long bettingId, Runnable runnable, Long delayMinutes){
-        ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
-
-        // SchedulerType이 다르기 때문에 bettingId를 넣어주어도 구분 가능
         SchedulerKey key = new SchedulerKey(SchedulerType.BETTING_ACCEPT_DELAY, bettingId);
         schedulerList.put(key, scheduler);
     }
