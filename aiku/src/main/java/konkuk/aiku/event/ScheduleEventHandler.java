@@ -5,6 +5,7 @@ import konkuk.aiku.service.ScheduleService;
 import konkuk.aiku.service.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -62,7 +63,7 @@ public class ScheduleEventHandler {
 
     //스케줄 등록 -> 약속 시간 30분 후 스케줄 자동 종료 이벤트 발생
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void registerScheduleAutoCloseEvent(ScheduleAddEvent event){
         Long scheduleId = event.getScheduleId();
         LocalDateTime scheduleTime = event.getScheduleTime();
