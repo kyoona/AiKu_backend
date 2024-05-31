@@ -66,6 +66,7 @@ public class SchedulerService {
 
     //==편의 메서드==
     public Long getTimeDelay(LocalDateTime scheduleTime){
-        return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();
+        log.info("LocalDateTime now = {}", LocalDateTime.now());
+        return Duration.between(LocalDateTime.now(), scheduleTime).toMinutes();
     }
 }
