@@ -92,6 +92,16 @@ public class AlarmService {
         bettingEventPublisher.userArriveInBettingEvent(user, schedule);
     }
 
+    public Runnable sendScheduleMapOpen(Long scheduleId){
+        Schedule schedule = findScheduleWithUser(scheduleId);
+
+        List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
+        Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_MAP_OPEN, schedule)
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
+    }
+
     //==이벤트 서비스==
     public Runnable sendScheduleFinishRunnable(Long scheduleId){
         return () -> {
@@ -112,18 +122,6 @@ public class AlarmService {
             List<String> userTokens = getScheduleUsersFcmToken(schedule);
 
             Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.NEXT_SCHEDULE, schedule)
-                    .toStringMap();
-            messageSender.sendMessageToUsers(messageDataMap, userTokens);
-        };
-    }
-
-    public Runnable sendScheduleMapOpenRunnable(Long scheduleId){
-        return () -> {
-            Schedule schedule = findScheduleWithUser(scheduleId);
-
-            List<String> userTokens = getScheduleUsersFcmToken(schedule);
-
-            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_MAP_OPEN, schedule)
                     .toStringMap();
             messageSender.sendMessageToUsers(messageDataMap, userTokens);
         };

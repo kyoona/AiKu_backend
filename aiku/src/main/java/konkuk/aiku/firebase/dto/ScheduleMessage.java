@@ -1,6 +1,7 @@
 package konkuk.aiku.firebase.dto;
 
 import konkuk.aiku.domain.Schedule;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +12,7 @@ public class ScheduleMessage extends Message{
     protected String locationName;
     protected LocalDateTime scheduleTime;
 
-    protected ScheduleMessage(MessageTitle messageTitle, Long scheduleId, String scheduleName, String locationName, LocalDateTime scheduleTime) {
+    public ScheduleMessage(MessageTitle messageTitle, Long scheduleId, String scheduleName, String locationName, LocalDateTime scheduleTime) {
         this.title = messageTitle.getTitle();
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;

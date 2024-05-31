@@ -1,5 +1,6 @@
 package konkuk.aiku.service.scheduler;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SchedulerService {
 
+    @Getter
     private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> schedulerList = new ConcurrentHashMap();
 
     //Schedule
@@ -53,10 +55,10 @@ public class SchedulerService {
         SchedulerKey openAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_OPEN_ALARM, scheduleId);
         SchedulerKey closeEventKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE, scheduleId);
 
-        schedulerList.get(nextAlarmKey).cancel(false);
-        schedulerList.get(finishAlarmKey).cancel(false);
-        schedulerList.get(openAlarmKey).cancel(false);
-        schedulerList.get(closeEventKey).cancel(false);
+        findSchedulerAndDelete(nextAlarmKey);
+        findSchedulerAndDelete(finishAlarmKey);
+        findSchedulerAndDelete(openAlarmKey);
+        findSchedulerAndDelete(closeEventKey);
     }
 
     //Betting
@@ -68,6 +70,14 @@ public class SchedulerService {
     }
 
     //==편의 메서드==
+    public void findSchedulerAndDelete(SchedulerKey key){
+        ScheduledFuture<?> scheduledFuture = schedulerList.get(key);
+        if (scheduledFuture != null) {
+            scheduledFuture.cancel(false);
+            schedulerList.remove(key);
+        }
+    }
+
     public Long getTimeDelay(LocalDateTime scheduleTime){
         ZoneId zoneId = ZoneId.of("Asia/Seoul");
 

@@ -56,7 +56,7 @@ public class ScheduleEventHandler {
 
         scheduleService.openScheduleMap(scheduleId);
 
-        alarmService.sendScheduleMapOpenRunnable(scheduleId);
+        alarmService.sendScheduleMapOpen(scheduleId);
         log.info("Handel ScheduleOpenEvent completion");
     }
 
