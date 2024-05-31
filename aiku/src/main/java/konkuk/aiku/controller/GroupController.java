@@ -104,4 +104,14 @@ public class GroupController {
         AnalyticsLateRatingResponseDto responseDto = AnalyticsLateRatingResponseDto.toDto(serviceDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
+
+    @GetMapping("/{groupId}/analytics/betting")
+    public ResponseEntity<AnalyticsLateRatingResponseDto> analyticsBettingRanking(@PathVariable Long groupId,
+                                                                               @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+        AnalyticsLateRatingServiceDto serviceDto = groupService.getLateAnalytics(user, groupId);
+
+        AnalyticsLateRatingResponseDto responseDto = AnalyticsLateRatingResponseDto.toDto(serviceDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
 }
