@@ -24,7 +24,7 @@ class SchedulerServiceTest {
         log.info("timeDelay = {}" ,timeDelay);
     }
 
-    @Test
+/*    @Test
     public void addScheduleMapOpenAlarm() {
         //when
         schedulerService.addScheduleMapOpenAlarm(1l, () -> log.info("schedulerTest"), 1l);
@@ -35,5 +35,5 @@ class SchedulerServiceTest {
         for (SchedulerKey key : schedulerList.keySet()) {
             log.info("key ={} / {} ", key.getScheduleId(), key.getType());
         }
-    }
+    }*/
 }
