@@ -89,4 +89,8 @@ public class Schedule extends TimeEntity{
     public void addRacing(Betting betting) {
         this.racings.add(betting);
     }
+
+    public void setStatus(ScheduleStatus status) {
+        this.status = status;
+    }
 }

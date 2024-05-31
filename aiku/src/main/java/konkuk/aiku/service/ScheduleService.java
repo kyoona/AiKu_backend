@@ -154,6 +154,17 @@ public class ScheduleService {
     }
 
     //==이벤트 서비스==
+    public void openScheduleMap(Long scheduleId){
+        Schedule schedule = findScheduleById(scheduleId);
+        schedule.setStatus(ScheduleStatus.RUN);
+    }
+
+    public Runnable publishScheduleMapOpenRunnable(Long scheduleId){
+        return () -> {
+            scheduleEventPublisher.scheduleOpenEvent(scheduleId);
+        };
+    }
+
     @Transactional
     public boolean createUserArrivalData(Long userId, Long scheduleId, LocalDateTime arriveTime){
         Users user = findUserById(userId);
@@ -183,6 +194,7 @@ public class ScheduleService {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
         }
 
+        schedule.setStatus(ScheduleStatus.TERM);
         return schedule.getUserArrivalDatas().size() == schedule.getUserCount();
     }
 

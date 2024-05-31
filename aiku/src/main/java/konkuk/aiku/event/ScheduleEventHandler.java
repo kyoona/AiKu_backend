@@ -31,19 +31,32 @@ public class ScheduleEventHandler {
 
         Long delay = schedulerService.getTimeDelay(scheduleTime);
 
-        //스케줄 이전
-        if(delay > 1440){//24시
+        //스케줄 24시전
+        if(delay > 1440){
             schedulerService.addNextScheduleAlarm(scheduleId, alarmService.sendNextScheduleRunnable(scheduleId), delay - 1440);
         }
+
+        //스케줄 30분 전
         if (delay > 30){
-            schedulerService.addScheduleMapOpenAlarm(scheduleId, alarmService.sendScheduleMapOpenRunnable(scheduleId), delay - 30);
+            schedulerService.addScheduleMapOpenAlarm(scheduleId, scheduleService.publishScheduleMapOpenRunnable(scheduleId), delay - 30);
         }
 
-        log.info("딜레이 {}", delay);
-        //스케줄 시간 완료
+        //스케줄 시간
         schedulerService.addScheduleFinishAlarm(scheduleId, alarmService.sendScheduleFinishRunnable(scheduleId), delay);
 
         log.info("Handel ScheduleAddEvent completion");
+    }
+
+    //맵 오픈(스케줄 30분 전) -> 스케줄 상태 변경, 맵 오픈 알림
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void openSchedule(ScheduleOpenEvent event){
+        Long scheduleId = event.getScheduleId();
+
+        scheduleService.openScheduleMap(scheduleId);
+
+        alarmService.sendScheduleMapOpenRunnable(scheduleId);
+        log.info("Handel ScheduleOpenEvent completion");
     }
 
     //스케줄 등록 -> 약속 시간 30분 후 스케줄 자동 종료 이벤트 발생
@@ -76,16 +89,13 @@ public class ScheduleEventHandler {
         log.info("Handel ScheduleCloseEvent completion");
     }
 
-    //TODO
-    /**
-     * 스케줄 삭제 시 발생
-     *  예약된 알림을 다 삭제해야 됨
-     */
+    //스케줄 삭제 -> 스케줄과 관련된 예약된 작업들 삭제
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
     public void registerScheduleDeleteEvent(ScheduleDeleteEvent event){
         Long scheduleId = event.getScheduleId();
-        schedulerService.deleteScheduleAlarm(scheduleId);
+        schedulerService.deleteSchedule(scheduleId);
+        log.info("Handel ScheduleDeleteEvent completion");
     }
 
     //유저 도착 -> 도착 정보 생성, 도착 알림

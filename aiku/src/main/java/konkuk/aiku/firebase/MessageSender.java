@@ -21,6 +21,7 @@ import java.util.Map;
 public class MessageSender {
 
     public void sendMessageToUsers(Map<String, String> messageDataMap, List<String> receiverTokens) {
+        log.info("Firebase sendMessageToUsers");
         MulticastMessage message = MulticastMessage.builder()
                 .putAllData(messageDataMap)
                 .addAllTokens(receiverTokens)
@@ -30,6 +31,7 @@ public class MessageSender {
     }
 
     public void sendMessageToUser(Map<String, String> messageDataMap, String receiverToken) {
+        log.info("Firebase sendMessageToUser");
         Message message = Message.builder()
                 .putAllData(messageDataMap)
                 .setToken(receiverToken)
