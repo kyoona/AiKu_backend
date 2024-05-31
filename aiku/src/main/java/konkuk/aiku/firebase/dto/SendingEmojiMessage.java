@@ -18,16 +18,16 @@ public class SendingEmojiMessage extends Message{
     protected String senderImg;
     protected ImgType senderImgData;
     protected String senderColorCode;
-    private String senderLatitude;
-    private String senderLongitude;
+    private Double senderLatitude;
+    private Double senderLongitude;
 
     protected Long receiverId;
     protected String receiverName;
     protected String receiverImg;
     protected ImgType receiverImgData;
     protected String receiverColorCode;
-    private String receiverLatitude;
-    private String receiverLongitude;
+    private Double receiverLatitude;
+    private Double receiverLongitude;
 
     protected EmojiType emojiType;
 
