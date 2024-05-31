@@ -104,4 +104,7 @@ public class GroupController {
         AnalyticsLateRatingResponseDto responseDto = AnalyticsLateRatingResponseDto.toDto(serviceDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
+
+//    @GetMapping("/{groupId}/analytics/betting")
+//    pu
 }
