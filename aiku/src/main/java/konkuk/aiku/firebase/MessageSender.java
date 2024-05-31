@@ -46,19 +46,18 @@ public class MessageSender {
         }
     }
 
-/*    public void testSend() {
+    public void testSend() {
         String token = "d0z74H_JTt2FkdmnFv_Rau:APA91bG4Q197dWCa9wd4790ivh6s4whhj8Ier5dQ0BU_g-a7fUAyJgR-bM-lTJZRGo78fkBT4JyG5-D-2-1JSwclB_LvdDjOjhWbH626m3sjfWTvMBGMlrUNG9uSjTLbRwfGko65kYK0";
 
         Map<String, String> stringMap = RealTimeLocationMessage.builder()
                 .title(MessageTitle.USER_REAL_TIME_LOCATION.getTitle())
                 .scheduleId(5L)
-                .userId(4L)
-                .userName("정세훈")
+                .userId(5L)
+                .userName("김대영")
                 .userImg("url")
                 .imgData(UserImgData.ImgType.DEFAULT1)
                 .colorCode("#000000")
-//                .latitude(37.549186395087)
-//                .longitude(127.07505567644)
+                //세종
                 .latitude(37.549186395087)
                 .longitude(127.07505567644)
                 //건국
@@ -67,7 +66,7 @@ public class MessageSender {
                 .build()
                 .toStringMap();
 
-*//*        Map<String, String> stringMap2 = UserArrivalMessage.builder()
+        Map<String, String> stringMap2 = UserArrivalMessage.builder()
                 .title(MessageTitle.USER_SCHEDULE_ARRIVAL.getTitle())
                 .scheduleId(1L)
                 .scheduleName("모각코")
@@ -77,7 +76,7 @@ public class MessageSender {
                 .imgData(UserImgData.ImgType.DEFAULT1)
                 .colorCode("#000000")
                 .build()
-                .toStringMap();*//*
+                .toStringMap();
 //        Map<String, String> stringMap = new ScheduleMessage(MessageTitle.SCHEDULE_MAP_OPEN, 5l, "모각코", "케이큐브", LocalDateTime.now()).toStringMap();
 
         Message message = Message.builder()
@@ -93,5 +92,5 @@ public class MessageSender {
             System.err.println("Failed to send message: " + e.getMessage());
             throw new MessagingException(ErrorCode.FAIL_TO_SEND_MESSAGE);
         }
-    }*/
+    }
 }

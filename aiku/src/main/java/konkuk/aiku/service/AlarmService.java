@@ -147,7 +147,7 @@ public class AlarmService {
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
-        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, scheduleId, receiver, emojiMessageDto.getEmojiType())
+        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, scheduleId, receiver, emojiMessageDto)
                 .toStringMap();
 
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
