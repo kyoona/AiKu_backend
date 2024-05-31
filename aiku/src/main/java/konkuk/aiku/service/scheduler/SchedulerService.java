@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -13,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class SchedulerService {
+
     private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> schedulerList = new ConcurrentHashMap();
 
     //Schedule
@@ -66,6 +69,11 @@ public class SchedulerService {
 
     //==편의 메서드==
     public Long getTimeDelay(LocalDateTime scheduleTime){
-        return Duration.between(LocalDateTime.now(), scheduleTime).toMinutes();
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        ZonedDateTime getScheduleTime = ZonedDateTime.of(scheduleTime, zoneId);
+
+        return Duration.between(now, getScheduleTime).toMinutes();
     }
 }
