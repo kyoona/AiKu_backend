@@ -154,6 +154,8 @@ public class ScheduleService {
     }
 
     //==이벤트 서비스==
+
+    @Transactional
     public void openScheduleMap(Long scheduleId){
         Schedule schedule = findScheduleById(scheduleId);
         schedule.setStatus(ScheduleStatus.RUN);
