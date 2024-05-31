@@ -12,7 +12,7 @@ public class ScheduleMessage extends Message{
     protected String locationName;
     protected LocalDateTime scheduleTime;
 
-    public ScheduleMessage(MessageTitle messageTitle, Long scheduleId, String scheduleName, String locationName, LocalDateTime scheduleTime) {
+    protected ScheduleMessage(MessageTitle messageTitle, Long scheduleId, String scheduleName, String locationName, LocalDateTime scheduleTime) {
         this.title = messageTitle.getTitle();
         this.scheduleId = scheduleId;
         this.scheduleName = scheduleName;
