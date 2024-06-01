@@ -14,7 +14,7 @@ public class UserImgData {
     private String colorCode;
 
     public enum ImgType {
-        CUSTOM, DEFAULT1, DEFAULT2, DEFAULT3
+        CUSTOM, DEFAULT0, DEFAULT1, DEFAULT2
     }
 
     @Builder
