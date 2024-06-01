@@ -40,8 +40,15 @@ public class ScheduleEventHandler {
         }
 
         //스케줄 30분 전
-        if (delay > 30) {
+/*        if (delay > 30) {
             schedulerService.addScheduleMapOpenAlarm(scheduleId, scheduleService.publishScheduleMapOpenRunnable(scheduleId), delay - 30);
+        } else {
+            scheduleService.publishScheduleMapOpen(scheduleId);
+        }*/
+
+        //TODO test용
+        if (delay > 3) {
+            schedulerService.addScheduleMapOpenAlarm(scheduleId, scheduleService.publishScheduleMapOpenRunnable(scheduleId), delay - 3);
         } else {
             scheduleService.publishScheduleMapOpen(scheduleId);
         }
@@ -77,7 +84,10 @@ public class ScheduleEventHandler {
 
         Long delay = schedulerService.getTimeDelay(scheduleTime);
 
-        schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 30);
+//        schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 30);
+
+        //TODO test용
+        schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 3);
         log.info("Handel ScheduleAddEvent completion");
     }
 
