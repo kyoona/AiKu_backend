@@ -36,7 +36,7 @@ public class ExceptionHandlers  {
         return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({Exception.class})
+    @ExceptionHandler({VoiceApiException.class})
     public ResponseEntity<ErrorDTO> voiceException(VoiceApiException e){
         log.error("ERROR", e);
         return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

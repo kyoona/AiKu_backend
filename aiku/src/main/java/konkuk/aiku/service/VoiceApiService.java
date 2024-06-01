@@ -4,6 +4,8 @@ import konkuk.aiku.controller.dto.VoiceApiStatus;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.VoiceApiException;
 import konkuk.aiku.service.dto.VoiceApiResponseDto;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,10 +17,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Service
 @Transactional
+@Slf4j
 public class VoiceApiService {
-    private static final String URL = "http://54.180.117.190:5000/";
+    private static final String URL = "http://13.124.181.63:5000";
 
     public String test() {
         RestTemplate restTemplate = new RestTemplate();
@@ -28,14 +33,23 @@ public class VoiceApiService {
         return result;
     }
 
-    public VoiceApiResponseDto voiceToData(MultipartFile file) {
+    public VoiceApiResponseDto voiceToData(MultipartFile file) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", file);
+
+        ByteArrayResource fileResource = new ByteArrayResource(file.getBytes()) {
+            // 기존 ByteArrayResource의 getFilename 메서드 override
+            @Override
+            public String getFilename() {
+                return "requestFile.wav";
+            }
+        };
+
+        body.add("file", fileResource);
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(body, headers);
@@ -44,7 +58,9 @@ public class VoiceApiService {
                 .postForEntity(URL + "/transcribe/", requestEntity, VoiceApiResponseDto.class);
 
         VoiceApiResponseDto responseBody = response.getBody();
-        String status = responseBody.getStatus();
+        String status = responseBody.getSTATUS();
+
+        log.info("Voice Api Response = {}", responseBody);
 
         if (status.equals(VoiceApiStatus.PAST_DATE))
             throw new VoiceApiException(ErrorCode.PAST_DATE);
