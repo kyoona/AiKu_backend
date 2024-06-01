@@ -14,7 +14,7 @@ public class SchedulerKey {
     @Override
     public boolean equals(Object o) {
         SchedulerKey object = (SchedulerKey) o;
-        return this.type == object.getType() && this.scheduleId == object.getScheduleId();
+        return this.type.equals(((SchedulerKey) o).getType()) && this.scheduleId == object.getScheduleId();
     }
 
     @Override

@@ -1,10 +1,13 @@
 package konkuk.aiku.service.scheduler;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -13,8 +16,11 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class SchedulerService {
+
+    @Getter
     private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> schedulerList = new ConcurrentHashMap();
 
+    //Schedule
     public void addScheduleFinishAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
@@ -43,6 +49,19 @@ public class SchedulerService {
         schedulerList.put(key, scheduler);
     }
 
+    public void deleteSchedule(Long scheduleId){
+        SchedulerKey nextAlarmKey = new SchedulerKey(SchedulerType.NEXT_SCHEDULE_ALARM, scheduleId);
+        SchedulerKey finishAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
+        SchedulerKey openAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_OPEN_ALARM, scheduleId);
+        SchedulerKey closeEventKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE, scheduleId);
+
+        findSchedulerAndDelete(nextAlarmKey);
+        findSchedulerAndDelete(finishAlarmKey);
+        findSchedulerAndDelete(openAlarmKey);
+        findSchedulerAndDelete(closeEventKey);
+    }
+
+    //Betting
     public void bettingAcceptDelay(Long bettingId, Runnable runnable){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, 10, TimeUnit.SECONDS);
 
@@ -50,25 +69,21 @@ public class SchedulerService {
         schedulerList.put(key, scheduler);
     }
 
-    //TODO
-    public void deleteScheduleAlarm(Long scheduleId){
-        SchedulerKey finishAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
-        SchedulerKey nextAlarmKey = new SchedulerKey(SchedulerType.NEXT_SCHEDULE_ALARM, scheduleId);
-
-        schedulerList.get(finishAlarmKey).cancel(false);
-        schedulerList.get(nextAlarmKey).cancel(false);
-    }
-
-    public void addBettingWaiting(Long bettingId, Runnable runnable, Long delayMinutes){
-        ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
-
-        // SchedulerType이 다르기 때문에 bettingId를 넣어주어도 구분 가능
-        SchedulerKey key = new SchedulerKey(SchedulerType.BETTING_ACCEPT_DELAY, bettingId);
-        schedulerList.put(key, scheduler);
-    }
-
     //==편의 메서드==
+    public void findSchedulerAndDelete(SchedulerKey key){
+        ScheduledFuture<?> scheduledFuture = schedulerList.get(key);
+        if (scheduledFuture != null) {
+            scheduledFuture.cancel(false);
+            schedulerList.remove(key);
+        }
+    }
+
     public Long getTimeDelay(LocalDateTime scheduleTime){
-        return Duration.between(LocalDateTime.now(), scheduleTime).toSeconds();
+        ZoneId zoneId = ZoneId.of("Asia/Seoul");
+
+        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        ZonedDateTime getScheduleTime = ZonedDateTime.of(scheduleTime, zoneId);
+
+        return Duration.between(now, getScheduleTime).toMinutes();
     }
 }

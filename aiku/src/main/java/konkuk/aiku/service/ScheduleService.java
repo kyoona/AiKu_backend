@@ -55,6 +55,7 @@ public class ScheduleService {
 
         scheduleEventPublisher.scheduleAddEvent(schedule.getId(), schedule.getScheduleTime());
         userPointEventPublisher.userPointChangeEvent(user.getId(), 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt()); //스케줄 등록 시 보상으로 100아쿠 적립
+
         return schedule.getId();
     }
 
@@ -155,6 +156,18 @@ public class ScheduleService {
 
     //==이벤트 서비스==
     @Transactional
+    public void openScheduleMap(Long scheduleId){
+        Schedule schedule = findScheduleById(scheduleId);
+        schedule.setStatus(ScheduleStatus.RUN);
+    }
+
+    public Runnable publishScheduleMapOpenRunnable(Long scheduleId){
+        return () -> {
+            scheduleEventPublisher.scheduleOpenEvent(scheduleId);
+        };
+    }
+
+    @Transactional
     public boolean createUserArrivalData(Long userId, Long scheduleId, LocalDateTime arriveTime){
         Users user = findUserById(userId);
 
@@ -183,6 +196,7 @@ public class ScheduleService {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
         }
 
+        schedule.setStatus(ScheduleStatus.TERM);
         return schedule.getUserArrivalDatas().size() == schedule.getUserCount();
     }
 

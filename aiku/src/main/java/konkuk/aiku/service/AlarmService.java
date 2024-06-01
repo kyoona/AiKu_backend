@@ -92,6 +92,16 @@ public class AlarmService {
         bettingEventPublisher.userArriveInBettingEvent(user, schedule);
     }
 
+    public void sendScheduleMapOpen(Long scheduleId){
+        Schedule schedule = findScheduleWithUser(scheduleId);
+
+        List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
+        Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_MAP_OPEN, schedule)
+                .toStringMap();
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
+    }
+
     //==이벤트 서비스==
     public Runnable sendScheduleFinishRunnable(Long scheduleId){
         return () -> {
@@ -117,18 +127,6 @@ public class AlarmService {
         };
     }
 
-    public Runnable sendScheduleMapOpenRunnable(Long scheduleId){
-        return () -> {
-            Schedule schedule = findScheduleWithUser(scheduleId);
-
-            List<String> userTokens = getScheduleUsersFcmToken(schedule);
-
-            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_MAP_OPEN, schedule)
-                    .toStringMap();
-            messageSender.sendMessageToUsers(messageDataMap, userTokens);
-        };
-    }
-
     public void sendUserArrival(Long userId, Long scheduleId, LocalDateTime arrivalTime){
         Users user = findUserById(userId);
         Schedule schedule = findScheduleWithUser(scheduleId);
@@ -149,7 +147,7 @@ public class AlarmService {
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
-        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, scheduleId, receiver, emojiMessageDto.getEmojiType())
+        Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, scheduleId, receiver, emojiMessageDto)
                 .toStringMap();
 
         messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());

@@ -1,6 +1,7 @@
 package konkuk.aiku.firebase.dto;
 
 import konkuk.aiku.domain.Schedule;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 

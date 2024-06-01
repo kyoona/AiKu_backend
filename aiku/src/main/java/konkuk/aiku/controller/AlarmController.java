@@ -44,12 +44,13 @@ public class AlarmController {
     }
 
     @PostMapping("/schedules/{scheduleId}/location")
-    public void realTimeLocation(@PathVariable Long scheduleId,
+    public ResponseEntity realTimeLocation(@PathVariable Long scheduleId,
                                  @RequestBody @Valid RealTimeLocationDto realTimeLocationDto,
                                  @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
         alarmService.receiveRealTimeLocation(user, scheduleId, realTimeLocationDto);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping("/schedules/{scheduleId}/location/arrival")

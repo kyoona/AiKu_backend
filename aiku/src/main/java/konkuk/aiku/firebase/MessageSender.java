@@ -6,11 +6,13 @@ import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.MessagingException;
 import konkuk.aiku.firebase.dto.MessageTitle;
 import konkuk.aiku.firebase.dto.RealTimeLocationMessage;
+import konkuk.aiku.firebase.dto.ScheduleMessage;
 import konkuk.aiku.firebase.dto.UserArrivalMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ import java.util.Map;
 public class MessageSender {
 
     public void sendMessageToUsers(Map<String, String> messageDataMap, List<String> receiverTokens) {
+        log.info("Firebase sendMessageToUsers");
         MulticastMessage message = MulticastMessage.builder()
                 .putAllData(messageDataMap)
                 .addAllTokens(receiverTokens)
@@ -30,6 +33,7 @@ public class MessageSender {
     }
 
     public void sendMessageToUser(Map<String, String> messageDataMap, String receiverToken) {
+        log.info("Firebase sendMessageToUser");
         Message message = Message.builder()
                 .putAllData(messageDataMap)
                 .setToken(receiverToken)
@@ -43,20 +47,19 @@ public class MessageSender {
     }
 
     public void testSend() {
-        String token = "dUwihOGnQ4WMj-f8FL7Uid:APA91bGaRQU8HRfocNHR7V-jzVU5BPARhYdh0hcY1jAbkDTVJhO1qdyFcXYKtDhg34WJnnqqSgfIDHzGWiSnfIvPr_bN0J4khES2IZjpfTxL0ZNUQ1mU__9FthMM4ZZ-BoydPpssVSYN";
+        String token = "d0z74H_JTt2FkdmnFv_Rau:APA91bG4Q197dWCa9wd4790ivh6s4whhj8Ier5dQ0BU_g-a7fUAyJgR-bM-lTJZRGo78fkBT4JyG5-D-2-1JSwclB_LvdDjOjhWbH626m3sjfWTvMBGMlrUNG9uSjTLbRwfGko65kYK0";
 
         Map<String, String> stringMap = RealTimeLocationMessage.builder()
                 .title(MessageTitle.USER_REAL_TIME_LOCATION.getTitle())
                 .scheduleId(5L)
-                .userId(3L)
-                .userName("최원탁")
+                .userId(5L)
+                .userName("김대영")
                 .userImg("url")
                 .imgData(UserImgData.ImgType.DEFAULT1)
                 .colorCode("#000000")
-//                .latitude(37.549186395087)
-//                .longitude(127.07505567644)
-                .latitude(37.540957955052)
-                .longitude(127.08278172427)
+                //세종
+                .latitude(37.549186395087)
+                .longitude(127.07505567644)
                 //건국
 //                .latitude(37.544947955055)
 //                .longitude(127.08198172427)
@@ -74,6 +77,7 @@ public class MessageSender {
                 .colorCode("#000000")
                 .build()
                 .toStringMap();
+//        Map<String, String> stringMap = new ScheduleMessage(MessageTitle.SCHEDULE_MAP_OPEN, 5l, "모각코", "케이큐브", LocalDateTime.now()).toStringMap();
 
         Message message = Message.builder()
                 .putAllData(stringMap)

@@ -24,6 +24,10 @@ public class ScheduleEventPublisher {
         publisher.publishEvent(new ScheduleDeleteEvent(scheduleId));
     }
 
+    public void scheduleOpenEvent(Long scheduleId){
+        publisher.publishEvent(new ScheduleOpenEvent(scheduleId));
+    }
+
     public void scheduleCloseEvent(Long scheduleId){
         publisher.publishEvent(new ScheduleCloseEvent(scheduleId));
     }

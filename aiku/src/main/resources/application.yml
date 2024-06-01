@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://172.31.39.61:9092/~/aikuDB
-#    url: jdbc:h2:tcp://localhost/~/Downloads/aikuTest
-#    username: sa
-    username: aiku
-#    password:
-    password: aiku
+#    url: jdbc:h2:tcp://172.31.39.61:9092/~/aikuDB
+    url: jdbc:h2:tcp://localhost/~/Downloads/aikuTest
+    username: sa
+#    username: aiku
+    password:
+#    password: aiku
     driver-class-name: org.h2.Driver
 
   jpa:

@@ -14,4 +14,8 @@ public class EmojiMessageDto {
     private Long receiverId;
     @NotNull
     private EmojiType emojiType;
+    private Double senderLatitude;
+    private Double senderLongitude;
+    private Double receiverLatitude;
+    private Double receiverLongitude;
 }
