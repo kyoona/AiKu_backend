@@ -19,6 +19,11 @@ public enum ErrorCode {
     PAST_DATE(4007, "과거의 날짜입니다."),
     NOT_AVAILABLE_DATE(4008, "존재하지 않는 날짜입니다."),
 
+    NOT_AVAILABLE_TOKEN(4011, "토큰이 유효하지 않습니다."),
+    WRONG_TOKEN_TYPE(4012, "올바르지 않은 토큰입니다."),
+    EXPIRED_TOKEN(4013, "토큰이 만료되었습니다. 다시 로그인하세요."),
+    BAD_CREDENTIALS(4014, "회원정보가 없습니다."),
+
     //403 Forbidden
     NO_ATHORITY_TO_ACCESS(4031, "데이터에 접근 권한이 없습니다."),
     SCHEDULE_TO_WAIT(4032, "아직 열리지 않은 스케줄입니다."),

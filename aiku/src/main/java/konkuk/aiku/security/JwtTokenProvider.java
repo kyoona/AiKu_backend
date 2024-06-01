@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import konkuk.aiku.service.CustomUserDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,6 +36,9 @@ public class JwtTokenProvider {
 
     // 유저 정보 -> Token 생성
     public JwtToken generateToken(Authentication authentication) {
+        if (authentication == null)
+            throw new BadCredentialsException("자격 증명에 실패하였습니다.");
+
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
