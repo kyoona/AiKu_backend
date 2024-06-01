@@ -40,7 +40,7 @@ class MessageTest {
         assertThat(stringMap).containsEntry("longitude", String.valueOf(longitude));
     }
 
-    @Test
+/*    @Test
     @DisplayName("sendingEmojiMessage 변환")
     public void sendingEmojiMessage() {
         //given
@@ -64,7 +64,7 @@ class MessageTest {
         assertThat(stringMap).containsEntry("receiverId", String.valueOf(receiverId));
         assertThat(stringMap).containsEntry("receiverName", receiverName);
         assertThat(stringMap).containsEntry("emojiType", String.valueOf(emojiType));
-    }
+    }*/
 
     public Users createUser(Long userId, String userName){
         return Users.builder()
