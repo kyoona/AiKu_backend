@@ -267,7 +267,11 @@ public class BettingService {
                 winners += 1;
             }
         }
-        int reward = bettingPoints / winners;
+
+        int reward = 0;
+        if (winners != 0) {
+            reward = bettingPoints / winners;
+        }
 
         for (Betting betting : bettings) {
             if (betting.getResultType().equals(ResultType.WIN)) {
