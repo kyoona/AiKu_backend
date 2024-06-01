@@ -23,4 +23,10 @@ public interface BettingRepository extends JpaRepository<Betting, Long> {
 
     @Query("select count(b) from Betting b where b.targetUser.id = ?1 and b.resultType = ?2")
     long countByTargetUserIdAndResultType(Long userId, ResultType resultType);
+
+    @Query("select b from Betting b where b.bettor.id = ?1 and b.schedule.group.id = ?2")
+    List<Betting> findAllByBettorIdAndScheduleGroupId(Long userId, Long groupId);
+
+    @Query("select b from Betting b where b.targetUser.id = ?1 and b.schedule.group.id = ?2")
+    List<Betting> findAllByTargetUserIdAndScheduleGroupId(Long userId, Long groupId);
 }

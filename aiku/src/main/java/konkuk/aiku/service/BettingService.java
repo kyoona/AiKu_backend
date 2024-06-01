@@ -194,18 +194,13 @@ public class BettingService {
 
     public void setRacingResult(Betting betting) {
         Users bettor = betting.getBettor();
-        Users targetUser = betting.getTargetUser();
 
-        ResultType resultType;
         int point = betting.getPoint();
 
         // 플러스 포인트 : 베팅 걸린 시점에서 베팅 포인트 가져갔기 때문에 2배로 더해준다.
         int plusPoint = point * 2;
 
-        // 베팅 건 사람 플러스 포인트
-        bettor.plusPoint(plusPoint);
-
-        userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        userPointEventPublisher.userPointChangeEvent(bettor.getId(), plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
         bettingEventPublisher.racingEndEvent(betting.getSchedule().getId(), betting.getId());
 
         betting.updateBettingResult(ResultType.WIN);
@@ -289,11 +284,8 @@ public class BettingService {
         Users bettor = betting.getBettor();
         Users targetUser = betting.getTargetUser();
 
-        bettor.plusPoint(point);
-        targetUser.plusPoint(point);
-
-        userPointEventPublisher.userPointChangeEvent(bettor, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
-        userPointEventPublisher.userPointChangeEvent(targetUser, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        userPointEventPublisher.userPointChangeEvent(bettor.getId(), point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        userPointEventPublisher.userPointChangeEvent(targetUser.getId(), point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
 
     }
 

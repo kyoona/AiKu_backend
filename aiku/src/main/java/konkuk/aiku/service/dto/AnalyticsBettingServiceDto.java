@@ -11,7 +11,7 @@ public class AnalyticsBettingServiceDto {
     private UserSimpleServiceDto user;
     private int winningRate;
 
-    public static AnalyticsBettingServiceDto createDto(Users arrivalUser, Integer totalLateTime){
-        return new AnalyticsBettingServiceDto(UserSimpleServiceDto.toDto(arrivalUser), totalLateTime);
+    public static AnalyticsBettingServiceDto createDto(Users arrivalUser, int winningRate){
+        return new AnalyticsBettingServiceDto(UserSimpleServiceDto.toDto(arrivalUser), winningRate);
     }
 }

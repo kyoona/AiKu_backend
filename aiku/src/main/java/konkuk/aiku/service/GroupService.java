@@ -5,6 +5,7 @@ import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
+import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.service.dto.*;
@@ -25,6 +26,7 @@ public class GroupService {
 
     private final GroupsRepository groupsRepository;
     private final ScheduleRepository scheduleRepository;
+    private final BettingRepository bettingRepository;
 
     @Transactional
     public Long addGroup(Users user, GroupServiceDto groupDto){
@@ -153,5 +155,51 @@ public class GroupService {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
         }
         return group;
+    }
+
+    public List<AnalyticsBettingServiceDto> getBettingAnalytics(Users user, Long groupId) {
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
+        List<AnalyticsBettingServiceDto> analyticsResult = new ArrayList<>();
+
+        List<UserGroup> userGroups = group.getUserGroups();
+
+        for (UserGroup userGroup : userGroups) {
+            Users userInGroup = userGroup.getUser();
+            Long userId = userInGroup.getId();
+
+            int winCount = 0;
+            int totalBettingCount = 0;
+
+            List<Betting> bettorBettings = bettingRepository.findAllByBettorIdAndScheduleGroupId(userId, groupId);
+            List<Betting> targetBettings = bettingRepository.findAllByTargetUserIdAndScheduleGroupId(userId, groupId);
+
+            for (Betting bettorBetting : bettorBettings) {
+                if (bettorBetting.getResultType().equals(ResultType.WIN)) {
+                    winCount += 1;
+                }
+            }
+            totalBettingCount += bettorBettings.size(); // 자신이 건 베팅/레이싱은 모두 포함
+
+            for (Betting targetBetting : targetBettings) {
+                if (targetBetting.getBettingType().equals(BettingType.RACING)) {
+                    totalBettingCount += 1; // 타겟일 때는 레이싱만 포함
+
+                    if (targetBetting.getResultType().equals(ResultType.LOSE)) {
+                        winCount += 1;
+                    }
+                }
+            }
+
+            int winningRate = winCount / totalBettingCount * 100; // 백분율
+
+            analyticsResult.add(
+                    AnalyticsBettingServiceDto.createDto(user, winningRate)
+            );
+        }
+
+        return analyticsResult;
     }
 }

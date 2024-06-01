@@ -5,16 +5,15 @@ import konkuk.aiku.controller.dto.*;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.GroupService;
-import konkuk.aiku.service.dto.AnalyticsLateRatingServiceDto;
-import konkuk.aiku.service.dto.GroupDetailServiceDto;
-import konkuk.aiku.service.dto.GroupListServiceDto;
-import konkuk.aiku.service.dto.GroupServiceDto;
+import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage.*;
 
@@ -106,12 +105,13 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/analytics/betting")
-    public ResponseEntity<AnalyticsLateRatingResponseDto> analyticsBettingRanking(@PathVariable Long groupId,
+    public ResponseEntity<AnalyticsBettingRatingResponseDto> analyticsBettingRanking(@PathVariable Long groupId,
                                                                                @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
-        AnalyticsLateRatingServiceDto serviceDto = groupService.getLateAnalytics(user, groupId);
+        List<AnalyticsBettingServiceDto> bettingAnalytics = groupService.getBettingAnalytics(user, groupId);
 
-        AnalyticsLateRatingResponseDto responseDto = AnalyticsLateRatingResponseDto.toDto(serviceDto);
+        AnalyticsBettingRatingResponseDto responseDto = AnalyticsBettingRatingResponseDto.toDto(bettingAnalytics);
+
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }
