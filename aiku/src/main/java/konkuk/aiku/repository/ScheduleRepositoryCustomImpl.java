@@ -89,7 +89,7 @@ public class ScheduleRepositoryCustomImpl implements ScheduleRepositoryCustom{
         return entityManager.createQuery(
                 "SELECT s" +
                         " FROM Schedule s" +
-                        " JOIN FETCH s.userArrivalDatas uad" +
+                        " LEFT JOIN FETCH s.userArrivalDatas uad" +
                         " WHERE s.id = :scheduleId", Schedule.class
         )
                 .setParameter("scheduleId", scheduleId)

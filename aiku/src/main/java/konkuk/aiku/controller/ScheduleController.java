@@ -117,4 +117,15 @@ public class ScheduleController {
         ScheduleResultReponseDto responseDto = ScheduleResultReponseDto.toDto(serviceDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
+
+    @PostMapping("/{scheduleId}/arrival")
+    public ResponseEntity scheduleArrival(@PathVariable Long groupId,
+                                          @PathVariable Long scheduleId,
+                                          @RequestBody @Valid UserArrivalDto userArrivalDto,
+                                          @AuthenticationPrincipal UserAdaptor userAdaptor){
+        Users user = userAdaptor.getUsers();
+
+        scheduleService.scheduleArrival(user, groupId, scheduleId, userArrivalDto.getArrivalTime());
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }

@@ -33,7 +33,6 @@ public class ScheduleEventHandler {
         LocalDateTime scheduleTime = event.getScheduleTime();
 
         Long delay = schedulerService.getTimeDelay(scheduleTime);
-        log.info("delay = {}", delay);
 
         //스케줄 24시전
         if(delay > 1440){
@@ -41,8 +40,10 @@ public class ScheduleEventHandler {
         }
 
         //스케줄 30분 전
-        if (delay > 30){
+        if (delay > 30) {
             schedulerService.addScheduleMapOpenAlarm(scheduleId, scheduleService.publishScheduleMapOpenRunnable(scheduleId), delay - 30);
+        } else {
+            scheduleService.publishScheduleMapOpen(scheduleId);
         }
 
         //스케줄 시간
@@ -86,7 +87,12 @@ public class ScheduleEventHandler {
     public void closeSchedule(ScheduleCloseEvent event) {
         Long scheduleId = event.getScheduleId();
 
-        boolean isAllArrive = scheduleService.checkAllUserArrive(event.getScheduleId());
+        boolean isAlreadyTerm = scheduleService.closeScheduleMap(scheduleId);
+        if (isAlreadyTerm) {
+            return; //종료된 스케줄
+        }
+
+        boolean isAllArrive = scheduleService.checkAllUserArrive(scheduleId);
         if(!isAllArrive){
             scheduleService.createAllUserArrivalData(scheduleId);
         }
@@ -104,15 +110,13 @@ public class ScheduleEventHandler {
         log.info("Handel ScheduleDeleteEvent completion");
     }
 
-    //유저 도착 -> 도착 정보 생성, 도착 알림
+    //유저 도착 -> 도착 알림
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userArriveInSchedule(UserArriveInScheduleEvent event) {
         Long userId = event.getUserId();
         Long scheduleId = event.getScheduleId();
         LocalDateTime arrivalTime = event.getArrivalTime();
-
-        scheduleService.createUserArrivalData(userId, scheduleId, arrivalTime);
 
         alarmService.sendUserArrival(userId, scheduleId, arrivalTime);
         log.info("Handel UserArriveInScheduleEvent completion");
