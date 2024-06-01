@@ -20,8 +20,8 @@ public class UserPointEventHandler {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userPointChangeEvent(UserPointChangeEvent event) {
-        Users user = event.getUser();
+        Long userId = event.getUserId();
 
-        userPointService.addUserPoint(user, event.getPoint(), event.getPointChangeType(), event.getPointType());
+        userPointService.addUserPoint(userId, event.getPoint(), event.getPointChangeType(), event.getPointType());
     }
 }

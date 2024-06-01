@@ -1,11 +1,11 @@
 package konkuk.aiku.service;
 
 import konkuk.aiku.domain.*;
-import konkuk.aiku.event.UserPointEventPublisher;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UserPointRepository;
+import konkuk.aiku.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +16,23 @@ import java.time.LocalDateTime;
 @Transactional
 @RequiredArgsConstructor
 public class UserPointService {
-
+    private final UsersRepository usersRepository;
     private final UserPointRepository userPointRepository;
     private final ScheduleRepository scheduleRepository;
 
-    private final UserPointEventPublisher userPointEventPublisher;
+    public Long addUserPoint(Long userId, int point, PointChangeType pointChangeType, PointType pointType) {
+        Users users = usersRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_USER));
 
-    public Long addUserPoint(Users users, int point, PointChangeType pointChangeType, PointType pointType) {
+        if (pointChangeType.equals(PointChangeType.PLUS)) {
+            // 포인트 추가된 경우
+            users.plusPoint(point);
+        }
+        else {
+            // 포인트 삭감된 경우
+            users.minusPoint(point);
+        }
+
         UserPoint userPoint = UserPoint.builder()
                 .user(users)
                 .point(point)
@@ -40,7 +50,7 @@ public class UserPointService {
         Schedule schedule = findScheduleWithUser(scheduleId);
         schedule.getUsers().stream()
                 .map(UserSchedule::getUser)
-                .forEach((user) -> addUserPoint(user, RewardPoint.SCHEDULE_ADD, PointChangeType.PLUS, PointType.REWARD));
+                .forEach((user) -> addUserPoint(user.getId(), RewardPoint.SCHEDULE_ADD, PointChangeType.PLUS, PointType.REWARD));
     }
 
     //레파지토리 조회 메서드

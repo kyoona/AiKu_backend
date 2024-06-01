@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class UserPointEventPublisher {
     private final ApplicationEventPublisher publisher;
 
-    public void userPointChangeEvent(Users users, int point, PointType pointType, PointChangeType pointChangeType, LocalDateTime eventTime) {
-        publisher.publishEvent(new UserPointChangeEvent(users, point, pointType, pointChangeType, eventTime));
+    public void userPointChangeEvent(Long userId, int point, PointType pointType, PointChangeType pointChangeType, LocalDateTime eventTime) {
+        publisher.publishEvent(new UserPointChangeEvent(userId, point, pointType, pointChangeType, eventTime));
     }
 }

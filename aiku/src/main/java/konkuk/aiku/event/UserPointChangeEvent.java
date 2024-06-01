@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class UserPointChangeEvent {
-    private final Users user;
+    private final Long userId;
     private final int point;
     private final PointType pointType;
     private final PointChangeType pointChangeType;

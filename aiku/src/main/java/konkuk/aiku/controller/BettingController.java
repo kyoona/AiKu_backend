@@ -1,13 +1,12 @@
 package konkuk.aiku.controller;
 
-import konkuk.aiku.controller.dto.BettingAddDto;
-import konkuk.aiku.controller.dto.BettingModifyDto;
-import konkuk.aiku.controller.dto.BettingResponseDto;
-import konkuk.aiku.controller.dto.SuccessResponseDto;
+import konkuk.aiku.controller.dto.*;
 import konkuk.aiku.controller.dto.SuccessResponseDto.SuccessMessage;
+import konkuk.aiku.domain.BettingType;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.BettingService;
 import konkuk.aiku.service.dto.BettingServiceDto;
+import konkuk.aiku.service.dto.UserBettingResultServiceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,11 +76,22 @@ public class BettingController {
 
     @GetMapping
     public ResponseEntity<List<BettingResponseDto>> getBettings(@PathVariable Long scheduleId, @RequestParam String bettingType) {
-        List<BettingServiceDto> bettingList = bettingService.getBettingsByType(scheduleId, bettingType);
+        List<BettingServiceDto> bettingList = bettingService.getBettingsByType(scheduleId, BettingType.valueOf(bettingType));
 
         List<BettingResponseDto> responseDtoList = bettingList.stream().map(BettingResponseDto::toDto).collect(Collectors.toList());
 
         return new ResponseEntity(responseDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/result")
+    public ResponseEntity<List<UserBettingResultResponseDto>> getBettingResult(@PathVariable Long scheduleId) {
+        List<UserBettingResultServiceDto> bettingServiceBettingResult = bettingService.getBettingResult(scheduleId);
+
+        List<UserBettingResultResponseDto> userBettingResultResponseDtoList = bettingServiceBettingResult.stream()
+                .map(b -> b.toResponseDto())
+                .collect(Collectors.toList());
+
+        return new ResponseEntity(userBettingResultResponseDtoList, HttpStatus.OK);
     }
 
 }

@@ -8,14 +8,19 @@ import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.ScheduleRepository;
+import konkuk.aiku.repository.UserPointRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.BettingServiceDto;
+import konkuk.aiku.service.dto.UserBettingResultServiceDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +35,7 @@ public class BettingService {
     private final BettingRepository bettingRepository;
     private final ScheduleRepository scheduleRepository;
     private final UsersRepository usersRepository;
+    private final UserPointRepository userPointRepository;
     private final UserPointEventPublisher userPointEventPublisher;
     private final BettingEventPublisher bettingEventPublisher;
 
@@ -157,8 +163,8 @@ public class BettingService {
         return bettingId;
     }
 
-    public List<BettingServiceDto> getBettingsByType(Long scheduleId, String bettingType) {
-        List<Betting> bettings = bettingRepository.findBettingsByScheduleIdAndBettingType(scheduleId, BettingType.valueOf(bettingType));
+    public List<BettingServiceDto> getBettingsByType(Long scheduleId, BettingType bettingType) {
+        List<Betting> bettings = bettingRepository.findBettingsByScheduleIdAndBettingType(scheduleId, bettingType);
 
         return bettings.stream()
                 .map(BettingServiceDto::toServiceDto)
@@ -188,18 +194,13 @@ public class BettingService {
 
     public void setRacingResult(Betting betting) {
         Users bettor = betting.getBettor();
-        Users targetUser = betting.getTargetUser();
 
-        ResultType resultType;
         int point = betting.getPoint();
 
         // 플러스 포인트 : 베팅 걸린 시점에서 베팅 포인트 가져갔기 때문에 2배로 더해준다.
         int plusPoint = point * 2;
 
-        // 베팅 건 사람 플러스 포인트
-        bettor.plusPoint(plusPoint);
-
-        userPointEventPublisher.userPointChangeEvent(bettor, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        userPointEventPublisher.userPointChangeEvent(bettor.getId(), plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
         bettingEventPublisher.racingEndEvent(betting.getSchedule().getId(), betting.getId());
 
         betting.updateBettingResult(ResultType.WIN);
@@ -283,11 +284,45 @@ public class BettingService {
         Users bettor = betting.getBettor();
         Users targetUser = betting.getTargetUser();
 
-        bettor.plusPoint(point);
-        targetUser.plusPoint(point);
+        userPointEventPublisher.userPointChangeEvent(bettor.getId(), point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        userPointEventPublisher.userPointChangeEvent(targetUser.getId(), point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
 
-        userPointEventPublisher.userPointChangeEvent(bettor, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
-        userPointEventPublisher.userPointChangeEvent(targetUser, point, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+    }
+
+    public List<UserBettingResultServiceDto> getBettingResult(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));
+
+        List<Users> users = schedule.getUsers().stream()
+                .map(s -> s.getUser())
+                .collect(Collectors.toList());
+
+        List<UserBettingResultServiceDto> userProfitList = new ArrayList<>();
+
+        for (Users user : users) {
+            userProfitList.add(
+                    new UserBettingResultServiceDto(user.getId(), user.getUsername(),
+                            user.getUserImg(), user.getUserImgData(), 0)
+            );
+        }
+
+        LocalDateTime scheduleStartTime = schedule.getScheduleTime();
+        List<UserArrivalData> userArrivalData = schedule.getUserArrivalDatas()
+                .stream()
+                .sorted(Comparator.comparing(UserArrivalData::getTimeDifference))
+                .collect(Collectors.toList());
+
+        LocalDateTime scheduleEndTime = userArrivalData.get(0).getArrivalTime();
+
+        for (UserBettingResultServiceDto userBetting : userProfitList) {
+            List<UserPoint> userPoints = userPointRepository.findAllByUserIdAndCreatedAtBetween(userBetting.getUserId(), scheduleStartTime, scheduleEndTime);
+            for (UserPoint userPoint : userPoints) {
+                int addPoint = (userPoint.getPointChangeType().equals(PointChangeType.PLUS)) ? userPoint.getPoint() : userPoint.getPoint() * (-1);
+                userBetting.addProfit(addPoint);
+            }
+        }
+
+        return userProfitList;
 
     }
 }

@@ -54,6 +54,8 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
 
         scheduleEventPublisher.scheduleAddEvent(schedule.getId(), schedule.getScheduleTime());
+        userPointEventPublisher.userPointChangeEvent(user.getId(), 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt()); //스케줄 등록 시 보상으로 100아쿠 적립
+
         return schedule.getId();
     }
 

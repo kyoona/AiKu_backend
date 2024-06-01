@@ -15,6 +15,10 @@ public enum ErrorCode {
     EXPIRATION_TOKEN(4005, "만료된 토큰입니다."),
     NO_GENERATED_TOKEN(4006, "등록되어 있는 토큰이 존재하지 않습니다."),
 
+    // VoiceApi에서 발생하는 오류
+    PAST_DATE(4007, "과거의 날짜입니다."),
+    NOT_AVAILABLE_DATE(4008, "존재하지 않는 날짜입니다."),
+
     //403 Forbidden
     NO_ATHORITY_TO_ACCESS(4031, "데이터에 접근 권한이 없습니다."),
     SCHEDULE_TO_WAIT(4032, "아직 열리지 않은 스케줄입니다."),

@@ -192,8 +192,8 @@ class BettingServiceTest {
         bettingService.addBetting(userA1, scheduleId, racingA1toA2.toServiceDto());
         bettingService.addBetting(userA1, scheduleId, racingA1toB.toServiceDto());
 
-        List<BettingServiceDto> bettingList = bettingService.getBettingsByType(scheduleId, "BETTING");
-        List<BettingServiceDto> racingList = bettingService.getBettingsByType(scheduleId, "RACING");
+        List<BettingServiceDto> bettingList = bettingService.getBettingsByType(scheduleId, BettingType.BETTING);
+        List<BettingServiceDto> racingList = bettingService.getBettingsByType(scheduleId, BettingType.RACING);
 
         log.info("betting={}", bettingList);
         log.info("racing={}", racingList);
