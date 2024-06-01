@@ -2,6 +2,7 @@ package konkuk.aiku.event;
 
 import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.ScheduleService;
+import konkuk.aiku.service.UserPointService;
 import konkuk.aiku.service.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class ScheduleEventHandler {
     private final ScheduleService scheduleService;
     private final AlarmService alarmService;
     private final SchedulerService schedulerService;
+    private final UserPointService userPointService;
 
     //스케줄 등록 -> 약속 전날, 약속 시간 30분 전(맵 오픈), 약속 시간 푸시 알림
     @Async
@@ -49,13 +51,15 @@ public class ScheduleEventHandler {
         log.info("Handel ScheduleAddEvent completion");
     }
 
-    //맵 오픈(스케줄 30분 전) -> 스케줄 상태 변경, 맵 오픈 알림
+    //맵 오픈(스케줄 30분 전) -> 스케줄 상태 변경, 아쿠 지급, 맵 오픈 알림
     @Async
     @EventListener
     public void openSchedule(ScheduleOpenEvent event){
         Long scheduleId = event.getScheduleId();
 
         scheduleService.openScheduleMap(scheduleId);
+
+        userPointService.rewardSchedulePoint(scheduleId);
 
         alarmService.sendScheduleMapOpen(scheduleId);
         log.info("Handel ScheduleOpenEvent completion");
