@@ -74,24 +74,6 @@ public class AlarmService {
         messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
     }
 
-    public void receiveUserArrival(Users user, Long scheduleId, LocalDateTime arrivalTime){
-        Schedule schedule = findScheduleWithUser(scheduleId);
-
-        checkUserInSchedule(user.getId(), scheduleId);
-        checkIsScheduleRun(schedule);
-
-        List<String> receiverTokens = getScheduleUsersFcmToken(schedule);
-
-        Map<String, String> messageDataMap = UserArrivalMessage
-                .createMessage(user, schedule, arrivalTime)
-                .toStringMap();
-        messageSender.sendMessageToUsers(messageDataMap, receiverTokens);
-
-        //유저가 도착했을 때 실행되어야 될 것들
-        scheduleEventPublisher.userArriveInScheduleEvent(user.getId(), scheduleId, arrivalTime);
-        bettingEventPublisher.userArriveInBettingEvent(user, schedule);
-    }
-
     public void sendScheduleMapOpen(Long scheduleId){
         Schedule schedule = findScheduleWithUser(scheduleId);
 

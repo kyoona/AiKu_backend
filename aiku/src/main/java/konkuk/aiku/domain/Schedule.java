@@ -40,7 +40,7 @@ public class Schedule extends TimeEntity{
     @OneToMany(mappedBy = "schedule")
     private List<Betting> racings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserArrivalData> userArrivalDatas = new ArrayList<>();
 
     @Builder

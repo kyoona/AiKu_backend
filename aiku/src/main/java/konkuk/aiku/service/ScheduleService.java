@@ -1,7 +1,9 @@
 package konkuk.aiku.service;
 
+import jakarta.validation.constraints.NotNull;
 import konkuk.aiku.controller.dto.ScheduleCond;
 import konkuk.aiku.domain.*;
+import konkuk.aiku.event.BettingEventPublisher;
 import konkuk.aiku.event.ScheduleEventPublisher;
 import konkuk.aiku.event.UserPointEventPublisher;
 import konkuk.aiku.exception.AlreadyInException;
@@ -35,6 +37,7 @@ public class ScheduleService {
 
     private final ScheduleEventPublisher scheduleEventPublisher;
     private final UserPointEventPublisher userPointEventPublisher;
+    private final BettingEventPublisher bettingEventPublisher;
 
     @Transactional
     public Long addSchedule(Users user, Long groupId, ScheduleServiceDto scheduleServiceDTO){
@@ -154,6 +157,19 @@ public class ScheduleService {
         return ScheduleResultServiceDto.toDto(schedule, userArrivalDatas);
     }
 
+    @Transactional
+    public void scheduleArrival(Users user, Long groupId, Long scheduleId, @NotNull LocalDateTime arrivalTime){
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
+        Schedule schedule = findScheduleById(scheduleId);
+        schedule.addUserArrivalData(user, arrivalTime);
+
+        scheduleEventPublisher.userArriveInScheduleEvent(user.getId(), scheduleId, arrivalTime);
+        bettingEventPublisher.userArriveInBettingEvent(user, schedule);
+    }
+
     //==이벤트 서비스==
     @Transactional
     public void openScheduleMap(Long scheduleId){
@@ -161,21 +177,24 @@ public class ScheduleService {
         schedule.setStatus(ScheduleStatus.RUN);
     }
 
+    @Transactional
+    public boolean closeScheduleMap(Long scheduleId){
+        Schedule schedule = findScheduleById(scheduleId);
+        boolean isAlreadyTerm = schedule.getStatus() == ScheduleStatus.TERM;
+
+        schedule.setStatus(ScheduleStatus.TERM);
+
+        return isAlreadyTerm;
+    }
+
+    public void publishScheduleMapOpen(Long scheduleId){
+        scheduleEventPublisher.scheduleOpenEvent(scheduleId);
+    }
+
     public Runnable publishScheduleMapOpenRunnable(Long scheduleId){
         return () -> {
             scheduleEventPublisher.scheduleOpenEvent(scheduleId);
         };
-    }
-
-    @Transactional
-    public boolean createUserArrivalData(Long userId, Long scheduleId, LocalDateTime arriveTime){
-        Users user = findUserById(userId);
-
-        if(checkUserAlreadyArrive(userId, scheduleId)) return false;
-
-        Schedule schedule = findScheduleById(scheduleId);
-        schedule.addUserArrivalData(user, arriveTime);
-        return true;
     }
 
     @Transactional
@@ -193,7 +212,6 @@ public class ScheduleService {
     public boolean checkAllUserArrive(Long scheduleId){
         Schedule schedule = findScheduleWithArrivalData(scheduleId);
 
-        schedule.setStatus(ScheduleStatus.TERM);
         return schedule.getUserArrivalDatas().size() == schedule.getUserCount();
     }
 
@@ -236,15 +254,6 @@ public class ScheduleService {
         }catch (NoAthorityToAccessException e){
             return true;
         }
-    }
-
-    private boolean checkUserAlreadyArrive(Long userId, Long scheduleId){
-        UserArrivalData userArrivalData = scheduleRepository
-                .findUserArrivalDataByUserIdAndScheduleId(userId, scheduleId).orElse(null);
-        if (userArrivalData == null) {
-            return false;
-        }
-        return true;
     }
 
     //==레파지토리 조회 메서드==
