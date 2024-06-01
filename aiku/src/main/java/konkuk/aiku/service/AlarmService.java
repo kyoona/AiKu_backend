@@ -177,16 +177,15 @@ public class AlarmService {
         Betting betting = findBettingWithUserAndSchedule(bettingId);
         Schedule schedule = betting.getSchedule();
 
-        List<String> userTokens = null;
         MessageTitle messageTitle = null;
 
         if (isAccept){
-            userTokens = getScheduleUsersFcmToken(schedule);
             messageTitle = MessageTitle.BETTING_ACCEPT;
         }else{
-            userTokens = getBettingUsersFcmToken(betting);
             messageTitle = MessageTitle.BETTING_DENY;
         }
+
+        List<String> userTokens = getBettingUsersFcmToken(betting);
 
         Map<String, String> messageDataMap = BettingAcceptDenyMessage.createMessage(messageTitle, schedule, betting, betting.getBettor(), betting.getTargetUser(), isAccept)
                 .toStringMap();

@@ -191,10 +191,7 @@ public class ScheduleService {
     }
 
     public boolean checkAllUserArrive(Long scheduleId){
-        Schedule schedule = scheduleRepository.findScheduleWithArrivalData(scheduleId).orElse(null);
-        if (schedule == null){
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
-        }
+        Schedule schedule = findScheduleWithArrivalData(scheduleId);
 
         schedule.setStatus(ScheduleStatus.TERM);
         return schedule.getUserArrivalDatas().size() == schedule.getUserCount();
@@ -289,6 +286,14 @@ public class ScheduleService {
             throw new NoSuchEntityException(ErrorCode.NO_SUCH_USER);
         }
         return user;
+    }
+
+    private Schedule findScheduleWithArrivalData(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findScheduleWithArrivalData(scheduleId).orElse(null);
+        if (schedule == null){
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE);
+        }
+        return schedule;
     }
 
     //==편의 메서드==
