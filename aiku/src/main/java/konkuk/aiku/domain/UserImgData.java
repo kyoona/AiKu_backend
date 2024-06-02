@@ -1,6 +1,8 @@
 package konkuk.aiku.domain;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +12,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserImgData {
+    @Enumerated(EnumType.STRING)
     private ImgType imgData;
+
     private String colorCode;
 
     public enum ImgType {

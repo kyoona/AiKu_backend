@@ -19,10 +19,10 @@ public class UserPoint extends TimeEntity{
     private Users user;
     private int point;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PointChangeType pointChangeType;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PointType pointType;
 
     @Builder

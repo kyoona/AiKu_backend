@@ -31,10 +31,10 @@ public class Betting extends TimeEntity {
     @Enumerated(value = EnumType.STRING)
     private ResultType resultType; // WIN, LOSE
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     private BettingType bettingType; // RACING, BETTING
 
-    @Enumerated
+    @Enumerated(value = EnumType.STRING)
     private BettingStatus bettingStatus;
 
     public void updateBettingResult(ResultType resultType) {
