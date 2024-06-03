@@ -185,25 +185,28 @@ public class BettingService {
         for (Betting racing : racings) {
             // 도착 유저에 대해서 아직 종료되지 않은 레이싱만 실행
             if (racing.getBettor().getId() == userId && racing.getBettingStatus().equals(BettingStatus.ACCEPT)) {
-                setRacingResult(racing);
+                setRacingResult(racing, ResultType.WIN);
+            }
+            else if (racing.getTargetUser().getId() == userId && racing.getBettingStatus().equals(BettingStatus.ACCEPT)) {
+                setRacingResult(racing, ResultType.LOSE);
             }
         }
 
         return userId;
     }
 
-    public void setRacingResult(Betting betting) {
-        Users bettor = betting.getBettor();
-
+    public void setRacingResult(Betting betting, ResultType resultType) {
         int point = betting.getPoint();
 
         // 플러스 포인트 : 베팅 걸린 시점에서 베팅 포인트 가져갔기 때문에 2배로 더해준다.
         int plusPoint = point * 2;
 
-        userPointEventPublisher.userPointChangeEvent(bettor.getId(), plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
+        Long winnerId = resultType.equals(ResultType.WIN) ? betting.getBettor().getId() : betting.getTargetUser().getId();
+
+        userPointEventPublisher.userPointChangeEvent(winnerId, plusPoint, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
         bettingEventPublisher.racingEndEvent(betting.getSchedule().getId(), betting.getId());
 
-        betting.updateBettingResult(ResultType.WIN);
+        betting.updateBettingResult(resultType);
         betting.setBettingStatus(BettingStatus.DONE);
     }
 
