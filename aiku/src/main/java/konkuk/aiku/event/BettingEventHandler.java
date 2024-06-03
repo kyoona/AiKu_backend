@@ -6,6 +6,7 @@ import konkuk.aiku.service.TitleProviderService;
 import konkuk.aiku.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -51,7 +52,7 @@ public class BettingEventHandler {
     }
 
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void racingDenyEvent(RacingDenyEvent event) {
         // 레이싱이 거절되었다는 메시지 To Bettor
         alarmService.sendBettingAcceptOrDeny(event.getBettingId(), false);
