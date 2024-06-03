@@ -48,22 +48,26 @@ public class ExceptionHandlers  {
 
     // 아래 내용 모두 추가
     @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<ErrorDTO> handleSignatureException() {
+    public ResponseEntity<ErrorDTO> handleSignatureException(SignatureException e) {
+        log.error("ERROR", e);
         return new ResponseEntity<>(new ErrorDTO(NOT_AVAILABLE_TOKEN.getCode(), NOT_AVAILABLE_TOKEN.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MalformedJwtException.class)
-    public ResponseEntity<ErrorDTO> handleMalformedJwtException() {
+    public ResponseEntity<ErrorDTO> handleMalformedJwtException(MalformedJwtException e) {
+        log.error("ERROR", e);
         return new ResponseEntity<>(new ErrorDTO(WRONG_TOKEN_TYPE.getCode(), WRONG_TOKEN_TYPE.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ErrorDTO> handleExpiredJwtException() {
+    public ResponseEntity<ErrorDTO> handleExpiredJwtException(ExpiredJwtException e) {
+        log.error("ERROR", e);
         return new ResponseEntity<>(new ErrorDTO(EXPIRED_TOKEN.getCode(), EXPIRED_TOKEN.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorDTO> badCredentialsException() {
+    public ResponseEntity<ErrorDTO> badCredentialsException(BadCredentialsException e) {
+        log.error("ERROR", e);
         return new ResponseEntity<>(new ErrorDTO(BAD_CREDENTIALS.getCode(), BAD_CREDENTIALS.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
