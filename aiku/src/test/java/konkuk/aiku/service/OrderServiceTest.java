@@ -8,6 +8,7 @@ import konkuk.aiku.domain.item.Item;
 import konkuk.aiku.repository.ItemRepository;
 import konkuk.aiku.repository.UsersRepository;
 import konkuk.aiku.service.dto.OrderFindServiceDto;
+import konkuk.aiku.service.dto.OrderServiceDto;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,14 +102,9 @@ class OrderServiceTest {
                 .items(orderList)
                 .build();
 
-        List<Long> orderIds = orderService.addOrders(userA1, ordersAddDto.toServiceDtos());
+        List<OrderServiceDto> orderServiceDtos = orderService.addOrders(userA1, ordersAddDto.toServiceDtos());
 
-        for (Long orderId : orderIds) {
-            Orders orders = orderService.findOrderById(orderId);
-            log.info("order={}", orders);
-        }
-
-        Assertions.assertThat(orderIds.size()).isEqualTo(3);
+        Assertions.assertThat(orderServiceDtos.size()).isEqualTo(3);
 
     }
 
