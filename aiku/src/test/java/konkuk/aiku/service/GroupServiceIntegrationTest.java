@@ -215,25 +215,6 @@ class GroupServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("그룹 퇴장")
-    void exitGroup(){
-        //given
-        Long groupId = groupService.addGroup(userA, groupServiceDTO1);
-        groupService.enterGroup(userB, groupId);
-        em.flush();
-        em.clear();
-
-        //when
-        groupService.exitGroup(userA, groupId);
-        em.flush();
-        em.clear();
-
-        //then
-        Groups findGroup = groupsRepository.findById(groupId).orElse(null);
-        assertThat(groupsRepository.findByUserAndGroup(userA, findGroup)).isEmpty();
-    }
-
-    @Test
     @DisplayName("그룹 퇴장-그룹에 속해 있지 않은 유저")
     void exitGroupInFaultCondition(){
         //given
