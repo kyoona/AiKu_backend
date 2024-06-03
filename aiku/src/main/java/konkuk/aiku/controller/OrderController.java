@@ -4,6 +4,7 @@ import konkuk.aiku.controller.dto.OrderItemSimpleDto;
 import konkuk.aiku.controller.dto.OrderResponseDto;
 import konkuk.aiku.controller.dto.OrdersAddDto;
 import konkuk.aiku.controller.dto.OrdersListResponseDto;
+import konkuk.aiku.domain.Orders;
 import konkuk.aiku.domain.Users;
 import konkuk.aiku.security.UserAdaptor;
 import konkuk.aiku.service.OrderService;
@@ -29,9 +30,18 @@ public class OrderController {
     public ResponseEntity<List<Long>> addOrders(@AuthenticationPrincipal UserAdaptor userAdaptor, @RequestBody List<OrderItemSimpleDto> items) {
         Users users = userAdaptor.getUsers();
         List<OrderServiceDto> orderServiceDtos = items.stream().map(i -> i.toServiceDto()).collect(Collectors.toList());
-        List<Long> orderIds = orderService.addOrders(users, orderServiceDtos);
+        List<OrderServiceDto> orders = orderService.addOrders(users, orderServiceDtos);
 
-        return new ResponseEntity(orderIds, HttpStatus.OK);
+        List<OrderResponseDto> orderResponseDtos = orders.stream()
+                .map(OrderResponseDto::toDto)
+                .collect(Collectors.toList());
+
+        OrdersListResponseDto ordersListResponseDto = OrdersListResponseDto.builder()
+                .orders(orderResponseDtos)
+                .userId(users.getId())
+                .build();
+
+        return new ResponseEntity(ordersListResponseDto, HttpStatus.OK);
     }
 
 

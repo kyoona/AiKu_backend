@@ -25,8 +25,8 @@ public class OrderService {
     private final ItemRepository itemRepository;
     private final OrdersRepository ordersRepository;
 
-    public List<Long> addOrders(Users users, List<OrderServiceDto> orderServiceDtos) {
-        List<Long> orderIds = new ArrayList<>();
+    public List<OrderServiceDto> addOrders(Users users, List<OrderServiceDto> orderServiceDtos) {
+        List<OrderServiceDto> ordersList = new ArrayList<>();
 
         for (OrderServiceDto orderServiceDto : orderServiceDtos) {
             ItemServiceDto itemDto = orderServiceDto.getItem();
@@ -37,10 +37,10 @@ public class OrderService {
             orders.changeStatus(OrderStatus.SUCCESS);
             ordersRepository.save(orders);
 
-            orderIds.add(orders.getId());
+            ordersList.add(OrderServiceDto.toDto(orders));
         }
 
-        return orderIds;
+        return ordersList;
     }
 
     public Item findItemById(Long itemId) {

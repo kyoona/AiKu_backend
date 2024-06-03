@@ -1,5 +1,6 @@
 package konkuk.aiku.controller;
 
+import konkuk.aiku.controller.dto.TitleListResponseDto;
 import konkuk.aiku.controller.dto.TitleResponseDto;
 import konkuk.aiku.service.TitleService;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,9 @@ public class TitleController {
     private final TitleService titleService;
 
     @GetMapping
-    public ResponseEntity<List<TitleResponseDto>> getTitles() {
+    public ResponseEntity<TitleListResponseDto> getTitles() {
         List<TitleResponseDto> titleList = titleService.getTitles();
 
-        return new ResponseEntity(titleList, HttpStatus.OK);
+        return new ResponseEntity(new TitleListResponseDto(titleList), HttpStatus.OK);
     }
 }

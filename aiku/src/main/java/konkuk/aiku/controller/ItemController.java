@@ -1,5 +1,6 @@
 package konkuk.aiku.controller;
 
+import konkuk.aiku.controller.dto.ItemListResponseDto;
 import konkuk.aiku.controller.dto.ItemResponseDto;
 import konkuk.aiku.service.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,17 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<List<ItemResponseDto>> getItems(@RequestParam String itemType) {
+    public ResponseEntity<ItemListResponseDto> getItems(@RequestParam String itemType) {
         List<ItemResponseDto> itemList = itemService.getItemList(itemType);
 
-        return new ResponseEntity<>(itemList, HttpStatus.OK);
+        return new ResponseEntity<>(new ItemListResponseDto(itemList), HttpStatus.OK);
     }
 
     @GetMapping("/sale")
-    public ResponseEntity<List<ItemResponseDto>> getSaleItems() {
+    public ResponseEntity<ItemListResponseDto> getSaleItems() {
         List<ItemResponseDto> itemList = itemService.getSaleItem();
 
-        return new ResponseEntity<>(itemList, HttpStatus.OK);
+        return new ResponseEntity<>(new ItemListResponseDto(itemList), HttpStatus.OK);
     }
 
 }
