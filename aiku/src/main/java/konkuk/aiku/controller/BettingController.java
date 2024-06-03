@@ -75,23 +75,23 @@ public class BettingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BettingResponseDto>> getBettings(@PathVariable Long scheduleId, @RequestParam String bettingType) {
+    public ResponseEntity<BettingListResponseDto> getBettings(@PathVariable Long scheduleId, @RequestParam String bettingType) {
         List<BettingServiceDto> bettingList = bettingService.getBettingsByType(scheduleId, BettingType.valueOf(bettingType));
 
         List<BettingResponseDto> responseDtoList = bettingList.stream().map(BettingResponseDto::toDto).collect(Collectors.toList());
 
-        return new ResponseEntity(responseDtoList, HttpStatus.OK);
+        return new ResponseEntity(new BettingListResponseDto(responseDtoList), HttpStatus.OK);
     }
 
     @GetMapping("/result")
-    public ResponseEntity<List<UserBettingResultResponseDto>> getBettingResult(@PathVariable Long scheduleId) {
+    public ResponseEntity<BettingResultListResponseDto> getBettingResult(@PathVariable Long scheduleId) {
         List<UserBettingResultServiceDto> bettingServiceBettingResult = bettingService.getBettingResult(scheduleId);
 
         List<UserBettingResultResponseDto> userBettingResultResponseDtoList = bettingServiceBettingResult.stream()
                 .map(b -> b.toResponseDto())
                 .collect(Collectors.toList());
 
-        return new ResponseEntity(userBettingResultResponseDtoList, HttpStatus.OK);
+        return new ResponseEntity(new BettingResultListResponseDto(userBettingResultResponseDtoList), HttpStatus.OK);
     }
 
 }

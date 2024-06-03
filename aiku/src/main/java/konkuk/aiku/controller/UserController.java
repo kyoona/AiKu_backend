@@ -113,11 +113,11 @@ public class UserController {
     }
 
     @GetMapping("/titles")
-    public ResponseEntity<List<TitleResponseDto>> getUserTitles(@AuthenticationPrincipal UserAdaptor userAdaptor) {
+    public ResponseEntity<TitleListResponseDto> getUserTitles(@AuthenticationPrincipal UserAdaptor userAdaptor) {
         Users users = userAdaptor.getUsers();
         List<TitleResponseDto> titleList = userService.getUserTitles(users.getId());
 
-        return new ResponseEntity<>(titleList, HttpStatus.OK);
+        return new ResponseEntity<>(new TitleListResponseDto(titleList), HttpStatus.OK);
     }
 
     @PostMapping("/logout")

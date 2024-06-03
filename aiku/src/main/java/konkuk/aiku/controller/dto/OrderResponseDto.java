@@ -4,6 +4,7 @@ import konkuk.aiku.domain.OrderStatus;
 import konkuk.aiku.domain.item.Item;
 import konkuk.aiku.service.dto.ItemServiceDto;
 import konkuk.aiku.service.dto.OrderFindServiceDto;
+import konkuk.aiku.service.dto.OrderServiceDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -25,6 +26,19 @@ public class OrderResponseDto {
         return OrderResponseDto.builder()
                 .orderId(order.getOrderId())
                 .orderDate(order.getOrderDate())
+                .orderStatus(order.getStatus())
+                .item(itemResponseDto)
+                .count(order.getCount())
+                .build();
+    }
+
+    public static OrderResponseDto toDto(OrderServiceDto order) {
+        ItemServiceDto itemServiceDto = order.getItem();
+
+        ItemResponseDto itemResponseDto = ItemResponseDto.toDto(itemServiceDto);
+
+        return OrderResponseDto.builder()
+                .orderId(order.getId())
                 .orderStatus(order.getStatus())
                 .item(itemResponseDto)
                 .count(order.getCount())
