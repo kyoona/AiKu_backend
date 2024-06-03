@@ -131,25 +131,33 @@ public class GroupService {
         return dto;
     }
 
+    //TODO 수정s
     public AnalyticsLateRatingServiceDto getLateAnalytics(Users user, Long groupId){
-        Groups group = findGroupById(groupId);
+/*        Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
 
         List<UserArrivalData> userArrivalDatas = scheduleRepository.findUserArrivalDatasWithUserByGroupId(groupId);
 
         List<AnalyticsLateServiceDto> lateDto = new ArrayList<>();
+        Map<Users, Integer> userLateTimeMap = new LinkedHashMap<>();
         userArrivalDatas.stream()
-                .collect(Collectors.groupingBy(data -> data.getUser().getId()))
-                .forEach((userId, arrivalList) -> {
-                    Integer totalLateTime = arrivalList.stream().collect(Collectors.summingInt(UserArrivalData::getTimeDifference));
+                .collect(Collectors.groupingBy(data -> data.getUser()))
+                .forEach((arrivalUser, arrivalList) -> {
+                    Integer totalLateTime = (arrivalList == null) ? 0 :arrivalList.stream().collect(Collectors.summingInt(UserArrivalData::getTimeDifference));
+                    userLateTimeMap.put(arrivalUser, totalLateTime);
                     if (arrivalList.size() != 0){
                         Users arrivalUser = arrivalList.get(0).getUser();
                         lateDto.add(AnalyticsLateServiceDto.createDto(arrivalUser, totalLateTime));
                     }
                 });
+        userLateTimeMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect()
 
-        return new AnalyticsLateRatingServiceDto(lateDto);
+
+        return new AnalyticsLateRatingServiceDto(lateDto);*/
+        return null;
     }
 
     public List<AnalyticsBettingServiceDto> getBettingAnalytics(Users user, Long groupId) {

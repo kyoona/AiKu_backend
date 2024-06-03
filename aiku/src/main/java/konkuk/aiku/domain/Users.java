@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString
+@ToString(of = {"id", "username"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter @Builder

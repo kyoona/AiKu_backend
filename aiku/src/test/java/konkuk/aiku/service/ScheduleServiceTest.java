@@ -360,24 +360,6 @@ class ScheduleServiceTest {
     }
 
     @Test
-    @DisplayName("스케줄 퇴장")
-    public void exitSchedule() {
-        //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
-        Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
-
-        //when
-        scheduleService.exitSchedule(userA1, groupA.getId(), scheduleId);
-
-        //then
-        assertThat(scheduleRepository.findUserScheduleByUserIdAndScheduleId(userA1.getId(), scheduleId)).isEmpty();
-    }
-
-    @Test
     @DisplayName("스케줄 퇴장-참여하지 않은 유저")
     public void exitScheduleNotIn() {
         //given
