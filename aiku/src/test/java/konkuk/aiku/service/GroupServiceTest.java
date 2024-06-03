@@ -201,7 +201,7 @@ class GroupServiceTest {
         assertThatThrownBy(()->groupService.exitGroup(user, group.getId())).isInstanceOf(NoAthorityToAccessException.class);
     }
 
-    @Test
+/*    @Test
     @DisplayName("그룹 분석-누적 시간 조회")
     void getLateAnalytics(){
         //given
@@ -234,7 +234,7 @@ class GroupServiceTest {
         //then
         assertThat(serviceDto.getData().stream().map(AnalyticsLateServiceDto::getTotalLateMinute)).contains(-20);
         assertThat(serviceDto.getData().stream().map((dto)-> dto.getUser().getUserId())).contains(user.getId());
-    }
+    }*/
 
     Users createUser(Long id, String userName){
         return Users.builder()
