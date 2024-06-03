@@ -3,7 +3,7 @@ package konkuk.aiku.event;
 import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.BettingService;
 import konkuk.aiku.service.TitleProviderService;
-import konkuk.aiku.service.scheduler.SchedulerService;
+import konkuk.aiku.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +20,7 @@ public class BettingEventHandler {
     private final BettingService bettingService;
     private final TitleProviderService titleProviderService;
     private final AlarmService alarmService;
+
     private final SchedulerService schedulerService;
 
     @Async

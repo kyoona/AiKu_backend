@@ -34,10 +34,10 @@ public class Schedule extends TimeEntity{
     private List<UserSchedule> users = new ArrayList<>();
     private int userCount = 1; //스케줄 생성한 사람
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true)
     private List<Betting> bettings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule", orphanRemoval = true)
     private List<Betting> racings = new ArrayList<>();
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)

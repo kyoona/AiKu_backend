@@ -1,4 +1,4 @@
-package konkuk.aiku.service.scheduler;
+package konkuk.aiku.scheduler;
 
 public enum SchedulerType{
     //Schedule

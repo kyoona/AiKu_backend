@@ -137,7 +137,7 @@ class GroupServiceIntegrationTest {
                 .isInstanceOf(NoAthorityToAccessException.class);
     }
 
-    @Test
+/*    @Test
     @DisplayName("그룹 삭제")
     void deleteGroup(){
         //given
@@ -148,7 +148,7 @@ class GroupServiceIntegrationTest {
 
         //then
         assertThat(groupsRepository.findById(groupId)).isEmpty();
-    }
+    }*/
 
     @Test
     @DisplayName("그룹 상세 조회")
@@ -219,9 +219,14 @@ class GroupServiceIntegrationTest {
     void exitGroup(){
         //given
         Long groupId = groupService.addGroup(userA, groupServiceDTO1);
+        groupService.enterGroup(userB, groupId);
+        em.flush();
+        em.clear();
 
         //when
         groupService.exitGroup(userA, groupId);
+        em.flush();
+        em.clear();
 
         //then
         Groups findGroup = groupsRepository.findById(groupId).orElse(null);

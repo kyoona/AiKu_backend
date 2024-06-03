@@ -1,4 +1,4 @@
-package konkuk.aiku.service.scheduler;
+package konkuk.aiku.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

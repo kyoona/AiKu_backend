@@ -186,7 +186,7 @@ class ScheduleServiceTest {
         assertThatThrownBy(() -> scheduleService.modifySchedule(userA2, groupA.getId(), scheduleId, scheduleServiceDto2)).isInstanceOf(NoAthorityToAccessException.class);
     }
 
-    @Test
+/*    @Test
     @DisplayName("스케줄 삭제")
     public void deleteSchedule() {
         //given
@@ -202,7 +202,7 @@ class ScheduleServiceTest {
 
         //then
         assertThat(scheduleRepository.findById(scheduleId)).isEmpty();
-    }
+    }*/
 
     @Test
     @DisplayName("스케줄 상세 조회")

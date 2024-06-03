@@ -48,14 +48,14 @@ public class GroupController {
         return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{groupId}")
+/*    @DeleteMapping("/{groupId}")
     public ResponseEntity<SuccessResponseDto> groupDelete(@PathVariable Long groupId,
                                                           @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
 
         Long deleteId = groupService.deleteGroup(user, groupId);
         return SuccessResponseDto.getResponseEntity(deleteId, DELETE_SUCCESS, HttpStatus.OK);
-    }
+    }*/
 
     @GetMapping
     public ResponseEntity<GroupListResponseDto> groupsList(@AuthenticationPrincipal UserAdaptor userAdaptor){

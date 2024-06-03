@@ -8,6 +8,7 @@ import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
+import konkuk.aiku.scheduler.SchedulerService;
 import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,8 @@ public class GroupService {
     private final ScheduleRepository scheduleRepository;
     private final BettingRepository bettingRepository;
 
+    private final SchedulerService schedulerService;
+
     @Transactional
     public Long addGroup(Users user, GroupServiceDto groupDto){
         Groups group = Groups.createGroups(user, groupDto.getGroupName(), groupDto.getDescription());
@@ -46,16 +49,56 @@ public class GroupService {
         return group.getId();
     }
 
-    @Transactional
+/*    @Transactional
     public Long deleteGroup(Users user, Long groupId) {
-        Groups group = findGroupById(groupId);
+        Groups group = findGroupWithSchedule(groupId);
 
         checkUserInGroup(user, group);
 
         groupsRepository.deleteById(groupId);
         return groupId;
+    }*/
+
+    @Transactional
+    public Long enterGroup(Users user, Long groupId){
+        Groups group = findGroupById(groupId);
+
+        checkUserAlreadyInGroup(user, group);
+
+        group.addUser(user);
+        groupsRepository.upGroupUserCount(groupId);
+        return groupId;
     }
 
+    @Transactional
+    public Long exitGroup(Users user, Long groupId){
+        Groups group = findGroupById(groupId);
+
+        UserGroup userGroup = checkUserInGroup(user, group);
+
+        group.deleteUser(userGroup);
+        groupsRepository.downGroupUserCount(groupId);
+
+        int userCount = group.getUserCount();
+        if(userCount == 1){ //해당 유저
+            deleteGroup(groupId);
+        }
+        return groupId;
+    }
+
+    public void deleteGroup(Long groupId){
+        Groups group = findGroupWithSchedule(groupId);
+
+        List<Long> scheduleIdList = group.getSchedules().stream()
+                .map(Schedule::getId)
+                .toList();
+
+        groupsRepository.delete(group);
+
+        scheduleIdList.forEach((scheduleId) -> schedulerService.deleteSchedule(scheduleId));
+    }
+
+    //==뷰 조회 메서드==
     public GroupDetailServiceDto findGroupDetail(Users user, Long groupId) {
         Groups group = findGroupById(groupId);
 
@@ -88,28 +131,6 @@ public class GroupService {
         return dto;
     }
 
-    @Transactional
-    public Long enterGroup(Users user, Long groupId){
-        Groups group = findGroupById(groupId);
-
-        checkUserAlreadyInGroup(user, group);
-
-        group.addUser(user);
-        groupsRepository.upGroupUserCount(groupId);
-        return groupId;
-    }
-
-    @Transactional
-    public Long exitGroup(Users user, Long groupId){
-        Groups group = findGroupById(groupId);
-
-        UserGroup userGroup = checkUserInGroup(user, group);
-
-        group.deleteUser(userGroup);
-        groupsRepository.downGroupUserCount(groupId);
-        return groupId;
-    }
-
     public AnalyticsLateRatingServiceDto getLateAnalytics(Users user, Long groupId){
         Groups group = findGroupById(groupId);
 
@@ -129,32 +150,6 @@ public class GroupService {
                 });
 
         return new AnalyticsLateRatingServiceDto(lateDto);
-    }
-
-    //==검증 메서드==
-    private UserGroup checkUserInGroup(Users user, Groups groups){
-        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
-        if(userGroup == null){
-            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
-        }
-        return userGroup;
-    }
-
-    private UserGroup checkUserAlreadyInGroup(Users user, Groups groups){
-        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
-        if(userGroup != null){
-            throw new AlreadyInException(ErrorCode.ALREADY_IN_GROUP);
-        }
-        return userGroup;
-    }
-
-    //==레파지토리 조회 메서드==
-    private Groups findGroupById(Long groupId){
-        Groups group = groupsRepository.findById(groupId).orElse(null);
-        if (group == null) {
-            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
-        }
-        return group;
     }
 
     public List<AnalyticsBettingServiceDto> getBettingAnalytics(Users user, Long groupId) {
@@ -201,5 +196,39 @@ public class GroupService {
         }
 
         return analyticsResult;
+    }
+
+    //==검증 메서드==
+    private UserGroup checkUserInGroup(Users user, Groups groups){
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
+        if(userGroup == null){
+            throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
+        }
+        return userGroup;
+    }
+
+    private UserGroup checkUserAlreadyInGroup(Users user, Groups groups){
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
+        if(userGroup != null){
+            throw new AlreadyInException(ErrorCode.ALREADY_IN_GROUP);
+        }
+        return userGroup;
+    }
+
+    //==엔티티 조회 메서드==
+    private Groups findGroupById(Long groupId){
+        Groups group = groupsRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
+    }
+
+    private Groups findGroupWithSchedule(Long groupId){
+        Groups group = groupsRepository.findGroupWithSchedule(groupId);
+        if (group == null) {
+            throw new NoSuchEntityException(ErrorCode.NO_SUCH_GROUP);
+        }
+        return group;
     }
 }

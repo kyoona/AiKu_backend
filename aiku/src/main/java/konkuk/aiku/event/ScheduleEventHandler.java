@@ -3,7 +3,6 @@ package konkuk.aiku.event;
 import konkuk.aiku.service.AlarmService;
 import konkuk.aiku.service.ScheduleService;
 import konkuk.aiku.service.UserPointService;
-import konkuk.aiku.service.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -22,39 +21,23 @@ public class ScheduleEventHandler {
 
     private final ScheduleService scheduleService;
     private final AlarmService alarmService;
-    private final SchedulerService schedulerService;
     private final UserPointService userPointService;
 
     //스케줄 등록 -> 약속 전날, 약속 시간 30분 전(맵 오픈), 약속 시간 푸시 알림
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void scheduleAddAlarmEvent(ScheduleAddEvent event){
+    public void scheduleAdd(ScheduleAddEvent event){
         Long scheduleId = event.getScheduleId();
         LocalDateTime scheduleTime = event.getScheduleTime();
 
-        Long delay = schedulerService.getTimeDelay(scheduleTime);
+        //스케줄 24시전 푸시 알람 예약
+        alarmService.reserveNextScheduleAlarm(scheduleId, scheduleTime);
 
-        //스케줄 24시전
-        if(delay > 1440){
-            schedulerService.addNextScheduleAlarm(scheduleId, alarmService.sendNextScheduleRunnable(scheduleId), delay - 1440);
-        }
-
-        //스케줄 30분 전
-/*        if (delay > 30) {
-            schedulerService.addScheduleMapOpenAlarm(scheduleId, scheduleService.publishScheduleMapOpenRunnable(scheduleId), delay - 30);
-        } else {
-            scheduleService.publishScheduleMapOpen(scheduleId);
-        }*/
-
-        //TODO test용
-        if (delay > 3) {
-            schedulerService.addScheduleMapOpenAlarm(scheduleId, scheduleService.publishScheduleMapOpenRunnable(scheduleId), delay - 3);
-        } else {
-            scheduleService.publishScheduleMapOpen(scheduleId);
-        }
+        //스케줄 30분 전 맵 오픈 이벤트 예약
+        scheduleService.reserveScheduleMapOpenEvent(scheduleId, scheduleTime);
 
         //스케줄 시간
-        schedulerService.addScheduleFinishAlarm(scheduleId, alarmService.sendScheduleFinishRunnable(scheduleId), delay);
+        alarmService.reserveScheduleFinishAlarm(scheduleId, scheduleTime);
 
         log.info("Handel ScheduleAddEvent completion");
     }
@@ -80,14 +63,8 @@ public class ScheduleEventHandler {
         Long scheduleId = event.getScheduleId();
         LocalDateTime scheduleTime = event.getScheduleTime();
 
-        Runnable runnable = scheduleService.publishScheduleCloseEventRunnable(scheduleId);
+        scheduleService.reserveScheduleCloseEvent(scheduleId, scheduleTime);
 
-        Long delay = schedulerService.getTimeDelay(scheduleTime);
-
-//        schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 30);
-
-        //TODO test용
-        schedulerService.scheduleAutoClose(scheduleId, runnable, delay + 3);
         log.info("Handel ScheduleAddEvent completion");
     }
 
@@ -111,12 +88,14 @@ public class ScheduleEventHandler {
         log.info("Handel ScheduleCloseEvent completion");
     }
 
-    //스케줄 삭제 -> 스케줄과 관련된 예약된 작업들 삭제
+    //스케줄 삭제(유저 전부 퇴장) -> 스케줄과 관련된 예약된 작업들 삭제, 스케줄 삭제
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION)
     public void registerScheduleDeleteEvent(ScheduleDeleteEvent event){
         Long scheduleId = event.getScheduleId();
-        schedulerService.deleteSchedule(scheduleId);
+
+        scheduleService.deleteSchedule(scheduleId);
+
         log.info("Handel ScheduleDeleteEvent completion");
     }
 
