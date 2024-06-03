@@ -131,33 +131,34 @@ public class GroupService {
         return dto;
     }
 
-    //TODO 수정s
     public AnalyticsLateRatingServiceDto getLateAnalytics(Users user, Long groupId){
-/*        Groups group = findGroupById(groupId);
+        Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, group);
 
         List<UserArrivalData> userArrivalDatas = scheduleRepository.findUserArrivalDatasWithUserByGroupId(groupId);
 
-        List<AnalyticsLateServiceDto> lateDto = new ArrayList<>();
         Map<Users, Integer> userLateTimeMap = new LinkedHashMap<>();
         userArrivalDatas.stream()
                 .collect(Collectors.groupingBy(data -> data.getUser()))
                 .forEach((arrivalUser, arrivalList) -> {
                     Integer totalLateTime = (arrivalList == null) ? 0 :arrivalList.stream().collect(Collectors.summingInt(UserArrivalData::getTimeDifference));
                     userLateTimeMap.put(arrivalUser, totalLateTime);
-                    if (arrivalList.size() != 0){
-                        Users arrivalUser = arrivalList.get(0).getUser();
-                        lateDto.add(AnalyticsLateServiceDto.createDto(arrivalUser, totalLateTime));
-                    }
                 });
+
+        List<AnalyticsLateServiceDto> lateDto = new ArrayList<>();
         userLateTimeMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .collect()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ))
+                .forEach((arrivalUser, totalLateTime) -> lateDto.add(AnalyticsLateServiceDto.createDto(arrivalUser, totalLateTime)));
 
 
-        return new AnalyticsLateRatingServiceDto(lateDto);*/
-        return null;
+        return new AnalyticsLateRatingServiceDto(lateDto);
     }
 
     public List<AnalyticsBettingServiceDto> getBettingAnalytics(Users user, Long groupId) {
