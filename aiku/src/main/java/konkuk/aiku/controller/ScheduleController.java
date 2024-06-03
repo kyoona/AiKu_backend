@@ -49,14 +49,14 @@ public class ScheduleController {
         return SuccessResponseDto.getResponseEntity(modifyId, MODIFY_SUCCESS, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{scheduleId}")
+/*    @DeleteMapping("/{scheduleId}")
     public ResponseEntity<SuccessResponseDto> scheduleDelete(@PathVariable Long groupId,
                                                              @PathVariable Long scheduleId,
                                                              @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
         Long deleteId = scheduleService.deleteSchedule(user, groupId, scheduleId);
         return SuccessResponseDto.getResponseEntity(deleteId, DELETE_SUCCESS, HttpStatus.OK);
-    }
+    }*/
 
     @GetMapping("/{scheduleId}")
     public ResponseEntity<ScheduleResponseDto> scheduleDetails(@PathVariable Long groupId,

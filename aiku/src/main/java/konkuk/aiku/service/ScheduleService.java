@@ -13,6 +13,7 @@ import konkuk.aiku.exception.NoSuchEntityException;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
+import konkuk.aiku.scheduler.SchedulerService;
 import konkuk.aiku.service.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,8 @@ public class ScheduleService {
     private final ScheduleEventPublisher scheduleEventPublisher;
     private final UserPointEventPublisher userPointEventPublisher;
     private final BettingEventPublisher bettingEventPublisher;
+
+    private final SchedulerService schedulerService;
 
     @Transactional
     public Long addSchedule(Users user, Long groupId, ScheduleServiceDto scheduleServiceDTO){
@@ -75,20 +78,63 @@ public class ScheduleService {
         return schedule.getId();
     }
 
-    @Transactional
+/*    @Transactional
     public Long deleteSchedule(Users user, Long groupId, Long scheduleId) {
         Schedule schedule = findScheduleById(scheduleId);
 
         checkUserInSchedule(user.getId(), scheduleId);
         scheduleRepository.deleteById(scheduleId);
 
-        if(schedule.getStatus() == ScheduleStatus.WAIT){
-            scheduleEventPublisher.scheduleDeleteEvent(scheduleId);
-//            userPointEventPublisher.userPointChangeEvent(); //여러명도 가능하게끔
-        }
+        scheduleEventPublisher.scheduleDeleteEvent(scheduleId);
+
         return scheduleId;
+    }*/
+
+    @Transactional
+    public Long enterSchedule(Users user, Long groupId, Long scheduleId){
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+        Schedule schedule = findScheduleById(scheduleId);
+        checkUserAlreadyInSchedule(user.getId(), scheduleId);
+
+        schedule.addUser(user, new UserSchedule());
+        scheduleRepository.upScheduleUserCount(scheduleId);
+        return schedule.getId();
     }
 
+    @Transactional
+    public Long exitSchedule(Users user, Long groupId, Long scheduleId) {
+        Long userId = user.getId();
+
+        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
+
+        Schedule schedule = userSchedule.getSchedule();
+        schedule.deleteUser(user, userSchedule);
+        scheduleRepository.downScheduleUserCount(scheduleId);
+
+        int userCount = schedule.getUserCount();
+        if (userCount == 1){//해당 유저만 남아있었을 경우
+            scheduleEventPublisher.scheduleDeleteEvent(scheduleId);
+        }
+
+        return schedule.getId();
+    }
+
+    @Transactional
+    public void scheduleArrival(Users user, Long groupId, Long scheduleId, @NotNull LocalDateTime arrivalTime){
+        Groups group = findGroupById(groupId);
+
+        checkUserInGroup(user, group);
+
+        Schedule schedule = findScheduleById(scheduleId);
+        schedule.addUserArrivalData(user, arrivalTime);
+
+        scheduleEventPublisher.userArriveInScheduleEvent(user.getId(), scheduleId, arrivalTime);
+        bettingEventPublisher.userArriveInBettingEvent(user, schedule);
+    }
+
+    //==뷰 조회==
     public ScheduleDetailServiceDto findScheduleDetail(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupWithUser(groupId);
 
@@ -122,31 +168,6 @@ public class ScheduleService {
         return UserScheduleListServiceDto.toDto(user, scheduleStatus[0], scheduleStatus[1], scheduleStatus[2], dataDto);
     }
 
-    @Transactional
-    public Long enterSchedule(Users user, Long groupId, Long scheduleId){
-        Groups group = findGroupById(groupId);
-
-        checkUserInGroup(user, group);
-        Schedule schedule = findScheduleById(scheduleId);
-        checkUserAlreadyInSchedule(user.getId(), scheduleId);
-
-        schedule.addUser(user, new UserSchedule());
-        scheduleRepository.upScheduleUserCount(scheduleId);
-        return schedule.getId();
-    }
-
-    @Transactional
-    public Long exitSchedule(Users user, Long groupId, Long scheduleId) {
-        Long userId = user.getId();
-
-        UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
-
-        Schedule schedule = userSchedule.getSchedule();
-        schedule.deleteUser(user, userSchedule);
-        scheduleRepository.downScheduleUserCount(scheduleId);
-        return schedule.getId();
-    }
-
     public ScheduleResultServiceDto findScheduleResult(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupById(groupId);
 
@@ -157,20 +178,13 @@ public class ScheduleService {
         return ScheduleResultServiceDto.toDto(schedule, userArrivalDatas);
     }
 
+    //==이벤트 서비스==
     @Transactional
-    public void scheduleArrival(Users user, Long groupId, Long scheduleId, @NotNull LocalDateTime arrivalTime){
-        Groups group = findGroupById(groupId);
-
-        checkUserInGroup(user, group);
-
-        Schedule schedule = findScheduleById(scheduleId);
-        schedule.addUserArrivalData(user, arrivalTime);
-
-        scheduleEventPublisher.userArriveInScheduleEvent(user.getId(), scheduleId, arrivalTime);
-        bettingEventPublisher.userArriveInBettingEvent(user, schedule);
+    public void deleteSchedule(Long scheduleId) {
+        schedulerService.deleteSchedule(scheduleId);
+        scheduleRepository.deleteById(scheduleId);
     }
 
-    //==이벤트 서비스==
     @Transactional
     public void openScheduleMap(Long scheduleId){
         Schedule schedule = findScheduleById(scheduleId);
@@ -185,16 +199,6 @@ public class ScheduleService {
         schedule.setStatus(ScheduleStatus.TERM);
 
         return isAlreadyTerm;
-    }
-
-    public void publishScheduleMapOpen(Long scheduleId){
-        scheduleEventPublisher.scheduleOpenEvent(scheduleId);
-    }
-
-    public Runnable publishScheduleMapOpenRunnable(Long scheduleId){
-        return () -> {
-            scheduleEventPublisher.scheduleOpenEvent(scheduleId);
-        };
     }
 
     @Transactional
@@ -215,8 +219,34 @@ public class ScheduleService {
         return schedule.getUserArrivalDatas().size() == schedule.getUserCount();
     }
 
+    public boolean reserveScheduleMapOpenEvent(Long scheduleId, LocalDateTime scheduleTime){
+        Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
+        if(timeDelay >= 30){
+            schedulerService.addScheduleMapOpenAlarm(scheduleId, publishScheduleMapOpenRunnable(scheduleId), timeDelay - 30);
+            return true;
+        }else {
+            publishScheduleMapOpen(scheduleId);
+            return false;
+        }
+    }
+
+    public void reserveScheduleCloseEvent(Long scheduleId, LocalDateTime scheduleTime){
+        Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
+        schedulerService.scheduleAutoClose(scheduleId, publishScheduleCloseEventRunnable(scheduleId), timeDelay + 30);
+    }
+
+    public void publishScheduleMapOpen(Long scheduleId){
+        scheduleEventPublisher.scheduleOpenEvent(scheduleId);
+    }
+
     public void publishScheduleCloseEvent(Long scheduleId){
         scheduleEventPublisher.scheduleCloseEvent(scheduleId);
+    }
+
+    public Runnable publishScheduleMapOpenRunnable(Long scheduleId){
+        return () -> {
+            scheduleEventPublisher.scheduleOpenEvent(scheduleId);
+        };
     }
 
     public Runnable publishScheduleCloseEventRunnable(Long scheduleId){

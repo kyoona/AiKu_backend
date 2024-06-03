@@ -16,6 +16,7 @@ import konkuk.aiku.firebase.dto.*;
 import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
+import konkuk.aiku.scheduler.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,8 @@ public class AlarmService {
 
     private final ScheduleEventPublisher scheduleEventPublisher;
     private final BettingEventPublisher bettingEventPublisher;
+
+    private final SchedulerService schedulerService;
 
 
     @Transactional
@@ -85,28 +88,20 @@ public class AlarmService {
     }
 
     //==이벤트 서비스==
-    public Runnable sendScheduleFinishRunnable(Long scheduleId){
-        return () -> {
-            Schedule schedule = findScheduleWithUser(scheduleId);
-
-            List<String> userTokens = getScheduleUsersFcmToken(schedule);
-
-            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_FINISH, schedule)
-                    .toStringMap();
-            messageSender.sendMessageToUsers(messageDataMap, userTokens);
-        };
+    public void reserveScheduleFinishAlarm(Long scheduleId, LocalDateTime scheduleTime){
+        Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
+        schedulerService
+                .addScheduleFinishAlarm(scheduleId, sendScheduleFinishAlarmRunnable(scheduleId), timeDelay);
     }
 
-    public Runnable sendNextScheduleRunnable(Long scheduleId) {
-        return () -> {
-            Schedule schedule = findScheduleWithUser(scheduleId);
-
-            List<String> userTokens = getScheduleUsersFcmToken(schedule);
-
-            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.NEXT_SCHEDULE, schedule)
-                    .toStringMap();
-            messageSender.sendMessageToUsers(messageDataMap, userTokens);
-        };
+    public boolean reserveNextScheduleAlarm(Long scheduleId, LocalDateTime scheduleTime) {
+        Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
+        if(timeDelay >= 1440){
+            schedulerService
+                    .addNextScheduleAlarm(scheduleId, sendNextScheduleAlarmRunnable(scheduleId), timeDelay - 1440); //24시 전
+            return true;
+        }
+        return false;
     }
 
     public void sendUserArrival(Long userId, Long scheduleId, LocalDateTime arrivalTime){
@@ -174,31 +169,56 @@ public class AlarmService {
         messageSender.sendMessageToUsers(messageDataMap, userTokens);
     }
 
-    //TODO 스케줄에 참여한 유저 전원에게 알림
     public void sendBettingStart(Long bettingId){
         Betting betting = findBettingWithUserAndSchedule(bettingId);
+        Schedule schedule = betting.getSchedule();
 
-        List<String> userTokens = getBettingUsersFcmToken(betting);
+        List<String> userTokens = getScheduleUsersFcmToken(schedule);
 
         Map<String, String> messageDataMap = BettingMessage
-                .createMessage(MessageTitle.BETTING_START, betting.getSchedule(), betting, betting.getBettor(), betting.getTargetUser())
+                .createMessage(MessageTitle.BETTING_START, schedule, betting, betting.getBettor(), betting.getTargetUser())
                 .toStringMap();
         messageSender.sendMessageToUsers(messageDataMap, userTokens);
     }
 
-    //TODO 스케줄에 참여한 유저 전원에게 알림
     public void sendBettingFinish(Long bettingId){
         Betting betting = findBettingWithUserAndSchedule(bettingId);
+        Schedule schedule = betting.getSchedule();
 
-        List<String> userTokens = getBettingUsersFcmToken(betting);
+        List<String> userTokens = getScheduleUsersFcmToken(schedule);
 
         Map<String, String> messageDataMap = BettingMessage
-                .createMessage(MessageTitle.BETTING_FINISH, betting.getSchedule(), betting, betting.getBettor(), betting.getTargetUser())
+                .createMessage(MessageTitle.BETTING_FINISH, schedule, betting, betting.getBettor(), betting.getTargetUser())
                 .toStringMap();
         messageSender.sendMessageToUsers(messageDataMap, userTokens);
     }
 
-    //==유저 검증 메서드==
+    //==예약 runnable 메서드==
+    private Runnable sendNextScheduleAlarmRunnable(Long scheduleId){
+        return () -> {
+            Schedule schedule = findScheduleWithUser(scheduleId);
+
+            List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
+            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.NEXT_SCHEDULE, schedule)
+                    .toStringMap();
+            messageSender.sendMessageToUsers(messageDataMap, userTokens);
+        };
+    }
+
+    private Runnable sendScheduleFinishAlarmRunnable(Long scheduleId){
+        return () -> {
+            Schedule schedule = findScheduleWithUser(scheduleId);
+
+            List<String> userTokens = getScheduleUsersFcmToken(schedule);
+
+            Map<String, String> messageDataMap = ScheduleMessage.createMessage(MessageTitle.SCHEDULE_FINISH, schedule)
+                    .toStringMap();
+            messageSender.sendMessageToUsers(messageDataMap, userTokens);
+        };
+    }
+
+    //==검증 메서드==
     private UserSchedule checkUserInSchedule(Long userId, Long scheduleId){
         UserSchedule userSchedule = scheduleRepository.findUserScheduleByUserIdAndScheduleId(userId, scheduleId).orElse(null);
         if (userSchedule == null) {

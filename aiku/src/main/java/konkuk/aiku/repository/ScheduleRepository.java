@@ -17,10 +17,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
     @Query("SELECT s FROM Schedule s WHERE s.group.id = :groupId AND s.id = :scheduleId")
     Optional<Schedule> findScheduleByGroupIdAndScheduleId(@Param("groupId") Long groupId, @Param("scheduleId") Long scheduleId);
 
-    @Modifying
+    @Query("SELECT COUNT(us) FROM UserSchedule us WHERE us.schedule.id = :scheduleId")
+    int countOfScheduleUser(@Param("scheduleId") Long scheduleId);
+
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Schedule s SET s.userCount = s.userCount + 1 WHERE s.id = :scheduleId")
     void upScheduleUserCount(@Param("scheduleId") Long scheduleId);
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Schedule s SET s.userCount = s.userCount - 1 WHERE s.id = :scheduleId")
     void downScheduleUserCount(@Param("scheduleId") Long scheduleId);
 

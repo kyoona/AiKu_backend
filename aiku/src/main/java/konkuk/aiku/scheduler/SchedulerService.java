@@ -1,6 +1,5 @@
-package konkuk.aiku.service.scheduler;
+package konkuk.aiku.scheduler;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,36 +16,36 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SchedulerService {
 
-    @Getter
-    private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> schedulerList = new ConcurrentHashMap();
+    private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> scheduleList = new ConcurrentHashMap();
+    private final ConcurrentHashMap<SchedulerKey, ScheduledFuture<?>> bettingList = new ConcurrentHashMap();
 
     //Schedule
     public void addScheduleFinishAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
         SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_FINISH_ALARM, scheduleId);
-        schedulerList.put(key, scheduler);
+        scheduleList.put(key, scheduler);
     }
 
     public void addNextScheduleAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
         SchedulerKey key = new SchedulerKey(SchedulerType.NEXT_SCHEDULE_ALARM, scheduleId);
-        schedulerList.put(key, scheduler);
+        scheduleList.put(key, scheduler);
     }
 
     public void addScheduleMapOpenAlarm(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
         SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_MAP_OPEN_ALARM, scheduleId);
-        schedulerList.put(key, scheduler);
+        scheduleList.put(key, scheduler);
     }
 
     public void scheduleAutoClose(Long scheduleId, Runnable runnable, Long delayMinutes){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, delayMinutes, TimeUnit.MINUTES);
 
         SchedulerKey key = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE, scheduleId);
-        schedulerList.put(key, scheduler);
+        scheduleList.put(key, scheduler);
     }
 
     public void deleteSchedule(Long scheduleId){
@@ -55,26 +54,26 @@ public class SchedulerService {
         SchedulerKey openAlarmKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_OPEN_ALARM, scheduleId);
         SchedulerKey closeEventKey = new SchedulerKey(SchedulerType.SCHEDULE_MAP_CLOSE, scheduleId);
 
-        findSchedulerAndDelete(nextAlarmKey);
-        findSchedulerAndDelete(finishAlarmKey);
-        findSchedulerAndDelete(openAlarmKey);
-        findSchedulerAndDelete(closeEventKey);
+        findScheduleAndDelete(nextAlarmKey);
+        findScheduleAndDelete(finishAlarmKey);
+        findScheduleAndDelete(openAlarmKey);
+        findScheduleAndDelete(closeEventKey);
     }
 
-    //Betting
+    //==Betting==
     public void bettingAcceptDelay(Long bettingId, Runnable runnable){
         ScheduledFuture<?> scheduler = Executors.newScheduledThreadPool(1).schedule(runnable, 10, TimeUnit.SECONDS);
 
         SchedulerKey key = new SchedulerKey(SchedulerType.BETTING_ACCEPT_DELAY, bettingId);
-        schedulerList.put(key, scheduler);
+        bettingList.put(key, scheduler);
     }
 
     //==편의 메서드==
-    public void findSchedulerAndDelete(SchedulerKey key){
-        ScheduledFuture<?> scheduledFuture = schedulerList.get(key);
+    public void findScheduleAndDelete(SchedulerKey key){
+        ScheduledFuture<?> scheduledFuture = scheduleList.get(key);
         if (scheduledFuture != null) {
             scheduledFuture.cancel(false);
-            schedulerList.remove(key);
+            scheduleList.remove(key);
         }
     }
 
