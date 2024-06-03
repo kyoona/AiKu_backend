@@ -194,7 +194,8 @@ public class GroupService {
                     AnalyticsBettingServiceDto.createDto(user, winningRate)
             );
         }
-        analyticsResult.sort(Comparator.comparingInt(AnalyticsBettingServiceDto::getWinningRate)
+        analyticsResult.sort(
+                Comparator.comparingInt(AnalyticsBettingServiceDto::getWinningRate).reversed()
         );
 
         return analyticsResult;
