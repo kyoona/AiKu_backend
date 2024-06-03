@@ -32,8 +32,4 @@ public class BettingEventPublisher {
         publisher.publishEvent(new RacingEndEvent(scheduleId, bettingId));
     }
 
-    public void scheduleEndBettingEvent(Schedule schedule){
-        publisher.publishEvent(new ScheduleCloseEvent(schedule.getId()));
-    }
-
 }
