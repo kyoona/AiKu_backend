@@ -66,7 +66,7 @@ public class BettingEventHandler {
     }
 
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void scheduleEndEvent(ScheduleCloseEvent event) {
         Long scheduleId = event.getScheduleId();
 
