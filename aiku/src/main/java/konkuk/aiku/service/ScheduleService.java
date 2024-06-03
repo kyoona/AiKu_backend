@@ -221,8 +221,15 @@ public class ScheduleService {
 
     public boolean reserveScheduleMapOpenEvent(Long scheduleId, LocalDateTime scheduleTime){
         Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
-        if(timeDelay >= 30){
+/*        if(timeDelay >= 30){
             schedulerService.addScheduleMapOpenAlarm(scheduleId, publishScheduleMapOpenRunnable(scheduleId), timeDelay - 30);
+            return true;
+        }else {
+            publishScheduleMapOpen(scheduleId);
+            return false;
+        }*/
+        if(timeDelay >= 3){
+            schedulerService.addScheduleMapOpenAlarm(scheduleId, publishScheduleMapOpenRunnable(scheduleId), timeDelay - 3);
             return true;
         }else {
             publishScheduleMapOpen(scheduleId);
@@ -232,7 +239,8 @@ public class ScheduleService {
 
     public void reserveScheduleCloseEvent(Long scheduleId, LocalDateTime scheduleTime){
         Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
-        schedulerService.scheduleAutoClose(scheduleId, publishScheduleCloseEventRunnable(scheduleId), timeDelay + 30);
+//        schedulerService.scheduleAutoClose(scheduleId, publishScheduleCloseEventRunnable(scheduleId), timeDelay + 30);
+        schedulerService.scheduleAutoClose(scheduleId, publishScheduleCloseEventRunnable(scheduleId), timeDelay + 3);
     }
 
     public void publishScheduleMapOpen(Long scheduleId){
