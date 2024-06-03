@@ -91,7 +91,7 @@ public class BettingService {
         } else {
             // 베팅인 경우
             // 베팅 금액 지불
-            users.minusPoint(betting.getPoint());
+            userPointEventPublisher.userPointChangeEvent(users.getId(), betting.getPoint(), PointType.BETTING, PointChangeType.MINUS, LocalDateTime.now());
             betting.setBettingStatus(BettingStatus.ACCEPT);
             schedule.addBetting(betting);
         }
@@ -109,8 +109,8 @@ public class BettingService {
         // 베팅 거는 비용
         int point = betting.getPoint();
 
-        bettor.minusPoint(point);
-        targetUser.minusPoint(point);
+        userPointEventPublisher.userPointChangeEvent(bettor.getId(), point, PointType.BETTING, PointChangeType.MINUS, LocalDateTime.now());
+        userPointEventPublisher.userPointChangeEvent(targetUser.getId(), point, PointType.BETTING, PointChangeType.MINUS, LocalDateTime.now());
 
         // schedule에 레이싱 추가
         betting.getSchedule().addRacing(betting);
@@ -216,10 +216,8 @@ public class BettingService {
      * @return 해당 스케줄 아이디
      */
     public Long setAllBettings(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));
-
-        List<Betting> bettings = schedule.getBettings();
         // 베팅 결과 설정
+        List<Betting> bettings = bettingRepository.findBettingsByScheduleIdAndBettingType(scheduleId, BettingType.BETTING);
         for (Betting betting : bettings) {
             setBettingResult(betting);
         }
@@ -227,7 +225,7 @@ public class BettingService {
         bettingPointCalculate(bettings);
 
         // 둘 다 지각한 경우에 대한 레이싱 로직
-        List<Betting> racings = schedule.getRacings();
+        List<Betting> racings = bettingRepository.findBettingsByScheduleIdAndBettingType(scheduleId, BettingType.RACING);
         for (Betting racing : racings) {
             // 아직 레이싱이 종료되지 않은 레이싱에 대해 실행
             if (racing.getBettingStatus().equals(BettingStatus.ACCEPT)) {
@@ -278,7 +276,7 @@ public class BettingService {
 
         for (Betting betting : bettings) {
             if (betting.getResultType().equals(ResultType.WIN)) {
-                betting.getBettor().plusPoint(reward);
+                userPointEventPublisher.userPointChangeEvent(betting.getBettor().getId(), reward, PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
             }
         }
 
