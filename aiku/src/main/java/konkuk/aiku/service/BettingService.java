@@ -128,6 +128,8 @@ public class BettingService {
             // 베팅이 수락되지 않은 경우
             if (!betting.getBettingStatus().equals(BettingStatus.ACCEPT)) {
                 bettingEventPublisher.racingDenyEvent(betting.getSchedule().getId(), bettingId);
+                // 건 금액 돌려주기
+                userPointEventPublisher.userPointChangeEvent(betting.getBettor().getId(), betting.getPoint(), PointType.BETTING, PointChangeType.PLUS, LocalDateTime.now());
                 bettingRepository.deleteById(bettingId);
             }
         };
