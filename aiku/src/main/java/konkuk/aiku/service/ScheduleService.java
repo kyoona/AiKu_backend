@@ -10,6 +10,7 @@ import konkuk.aiku.exception.AlreadyInException;
 import konkuk.aiku.exception.ErrorCode;
 import konkuk.aiku.exception.NoAthorityToAccessException;
 import konkuk.aiku.exception.NoSuchEntityException;
+import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
 import konkuk.aiku.repository.UsersRepository;
@@ -35,6 +36,7 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final GroupsRepository groupsRepository;
     private final UsersRepository usersRepository;
+    private final BettingRepository bettingRepository;
 
     private final ScheduleEventPublisher scheduleEventPublisher;
     private final UserPointEventPublisher userPointEventPublisher;
@@ -142,9 +144,12 @@ public class ScheduleService {
         checkScheduleInGroup(groupId, scheduleId);
 
         Schedule schedule = findScheduleWithUser(scheduleId);
-
         List<Users> waitUsers = getWaitUsers(group, schedule);
-        return ScheduleDetailServiceDto.toDto(schedule, waitUsers);
+
+        Betting userBetting = bettingRepository.findBettingsWithTargetByUserIdAndScheduleIdAndBettingType(user.getId(), scheduleId, BettingType.BETTING);
+        Long targetUserId = userBetting == null? null: userBetting.getTargetUser().getId();
+
+        return ScheduleDetailServiceDto.toDto(schedule, waitUsers, targetUserId);
     }
 
     public GroupScheduleListServiceDto findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
