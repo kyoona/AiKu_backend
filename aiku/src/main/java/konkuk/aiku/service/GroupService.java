@@ -43,7 +43,7 @@ public class GroupService {
     public Long modifyGroup(Users user, Long groupId, GroupServiceDto groupDto) {
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         group.updateGroup(groupDto.getGroupName(), groupDto.getDescription());
         return group.getId();
@@ -53,7 +53,7 @@ public class GroupService {
     public Long enterGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);
 
-        checkUserAlreadyInGroup(user, group);
+        checkUserAlreadyInGroup(user, groupId);
 
         group.addUser(user);
         groupsRepository.upGroupUserCount(groupId);
@@ -64,7 +64,7 @@ public class GroupService {
     public Long exitGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);
 
-        UserGroup userGroup = checkUserInGroup(user, group);
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groupId).get();
 
         group.deleteUser(userGroup);
         groupsRepository.downGroupUserCount(groupId);
@@ -92,7 +92,7 @@ public class GroupService {
     public GroupDetailServiceDto findGroupDetail(Users user, Long groupId) {
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         List<UserGroup> userGroups = groupsRepository.findUserGroupWithUser(groupId);
 
@@ -124,7 +124,7 @@ public class GroupService {
     public AnalyticsLateRatingServiceDto getLateAnalytics(Users user, Long groupId){
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         List<UserArrivalData> userArrivalDatas = scheduleRepository.findUserArrivalDatasWithUserByGroupId(groupId);
 
@@ -154,7 +154,7 @@ public class GroupService {
     public List<AnalyticsBettingServiceDto> getBettingAnalytics(Users user, Long groupId) {
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         List<AnalyticsBettingServiceDto> analyticsResult = new ArrayList<>();
 
@@ -201,16 +201,16 @@ public class GroupService {
     }
 
     //==검증 메서드==
-    private UserGroup checkUserInGroup(Users user, Groups groups){
-        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
+    private UserGroup checkUserInGroup(Users user, Long groupId){
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groupId).orElse(null);
         if(userGroup == null){
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
         return userGroup;
     }
 
-    private UserGroup checkUserAlreadyInGroup(Users user, Groups groups){
-        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
+    private UserGroup checkUserAlreadyInGroup(Users user, Long groupId){
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groupId).orElse(null);
         if(userGroup != null){
             throw new AlreadyInException(ErrorCode.ALREADY_IN_GROUP);
         }

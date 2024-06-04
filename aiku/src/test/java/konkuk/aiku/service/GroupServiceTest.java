@@ -64,7 +64,7 @@ class GroupServiceTest {
         GroupServiceDto dto = createDto(4L, "group4", "modifyGroup");
 
         when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
-        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any())).thenReturn(Optional.of(userGroup));
 
         //when
         Long groupId = groupService.modifyGroup(user, group.getId(), dto);
@@ -156,7 +156,7 @@ class GroupServiceTest {
         UserGroup userGroup = group.getUserGroups().get(0);
 
         when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
-        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any())).thenReturn(Optional.of(userGroup));
         when(groupsRepository.findUserGroupWithUser(any())).thenReturn(List.of(userGroup));
 
         //when
@@ -232,7 +232,7 @@ class GroupServiceTest {
 
 
         when(groupsRepository.findById(any())).thenReturn(Optional.of(group));
-        when(groupsRepository.findByUserAndGroup(any(Users.class), any(Groups.class))).thenReturn(Optional.of(userGroup));
+        when(groupsRepository.findByUserAndGroup(any(Users.class), any())).thenReturn(Optional.of(userGroup));
 
         List<UserArrivalData> userArrivalDatas = group.getSchedules().stream()
                 .map(Schedule::getUserArrivalDatas)
@@ -264,7 +264,7 @@ class GroupServiceTest {
         return Schedule.builder()
                 .id(id)
                 .scheduleName(scheduleName)
-                .scheduleTime(LocalDateTime.of(2024, 6,4, 28, 30))
+                .scheduleTime(LocalDateTime.of(2024, 6,4, 1, 30))
                 .build();
     }
 

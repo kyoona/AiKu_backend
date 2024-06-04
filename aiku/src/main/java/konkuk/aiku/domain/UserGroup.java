@@ -24,4 +24,9 @@ public class UserGroup extends TimeEntity{
         this.user = user;
         this.group = group;
     }
+
+    //==연관 관계 편의 메서드==
+    public void setGroup(Groups group) {
+        this.group = group;
+    }
 }

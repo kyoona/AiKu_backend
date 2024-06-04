@@ -49,6 +49,7 @@ public class Groups extends TimeEntity{
     }
 
     public void deleteUser(UserGroup userGroup){
+        userGroup.setGroup(null);
         userGroups.remove(userGroup);
     }
 
@@ -59,6 +60,7 @@ public class Groups extends TimeEntity{
 
     public void deleteSchedule(Schedule schedule){
         schedules.remove(schedule);
+        schedule.setGroup(null);
     }
 
     public void clearSchedule(){
