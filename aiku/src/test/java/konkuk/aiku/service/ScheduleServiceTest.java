@@ -33,10 +33,12 @@ class ScheduleServiceTest {
     EntityManager em;
     @Autowired
     EntityManager entityManager;
+
     @Autowired
     ScheduleService scheduleService;
     @Autowired
     GroupService groupService;
+
     @Autowired
     ScheduleRepository scheduleRepository;
     @Autowired
@@ -44,12 +46,8 @@ class ScheduleServiceTest {
     @Autowired
     GroupsRepository groupsRepository;
 
-    Users userA1;
-    Users userA2;
-    Users userB;
-
-    Groups groupA;
-    Groups groupB;
+    Users userA1, userA2, userB;
+    Groups groupA, groupB;
 
     @BeforeEach
     void beforeEach(){
@@ -65,7 +63,7 @@ class ScheduleServiceTest {
 
         userA2 = Users.builder()
                 .username("userA2")
-                .phoneNumber("010-1111-2222")
+                .phoneNumber("010-2222-2222")
                 .userImg("http://userA2.img")
                 .point(2000)
                 .fcmToken("fcm")
@@ -94,8 +92,7 @@ class ScheduleServiceTest {
 
     @AfterEach
     void afterEach(){
-        groupService.exitGroup(userA1, groupA.getId());
-        groupService.exitGroup(userA2, groupA.getId());
+        scheduleRepository.deleteAll();
         groupsRepository.deleteAll();
         usersRepository.deleteAll();
     }
@@ -103,19 +100,14 @@ class ScheduleServiceTest {
     @Test
     @Commit
     @DisplayName("스케줄 등록")
-    public void addSchedule() {
+     void addSchedule() {
         //when
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
+        ScheduleServiceDto scheduleServiceDTO = createScheduleDto("schedule1");
         Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
 
         //then
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
         assertThat(schedule.getScheduleName()).isEqualTo(scheduleServiceDTO.getScheduleName());
-        assertThat(schedule.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
         assertThat(schedule.getLocation().getLocationName()).isEqualTo(scheduleServiceDTO.getLocation().getLocationName());
         assertThat(schedule.getLocation().getLatitude()).isEqualTo(scheduleServiceDTO.getLocation().getLatitude());
         assertThat(schedule.getLocation().getLongitude()).isEqualTo(scheduleServiceDTO.getLocation().getLongitude());
@@ -123,44 +115,28 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 등록-그룹에 속해 있지 않은 유저")
-    public void addScheduleInFaultCondition() {
+     void addScheduleInFaultCondition() {
         //when
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
+        ScheduleServiceDto scheduleServiceDTO = createScheduleDto("schedule1");
 
         assertThatThrownBy(() -> scheduleService.addSchedule(userB, groupA.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
     }
 
     @Test
     @DisplayName("스케줄 수정")
-    public void modifySchedule() {
+     void modifySchedule() {
         //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
+        ScheduleServiceDto scheduleServiceDTO = createScheduleDto("schedule1");
         Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
 
         //when
-        ScheduleServiceDto scheduleServiceDto2 = ScheduleServiceDto.builder()
-                .scheduleName("modify")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
+        ScheduleServiceDto scheduleServiceDto2 = createScheduleDto("modify");
         scheduleService.modifySchedule(userA1, groupA.getId(), scheduleId, scheduleServiceDto2);
 
         //then
         Schedule schedule = scheduleRepository.findById(scheduleId).get();
         assertThat(schedule.getScheduleName()).isEqualTo(scheduleServiceDto2.getScheduleName());
-
-        assertThat(schedule.getScheduleTime()).isNotNull();
         assertThat(schedule.getScheduleTime()).isEqualTo(scheduleServiceDto2.getScheduleTime());
-
-        assertThat(schedule.getLocation()).isNotNull();
         assertThat(schedule.getLocation().getLocationName()).isEqualTo(scheduleServiceDto2.getLocation().getLocationName());
         assertThat(schedule.getLocation().getLatitude()).isEqualTo(scheduleServiceDto2.getLocation().getLatitude());
         assertThat(schedule.getLocation().getLongitude()).isEqualTo(scheduleServiceDto2.getLocation().getLongitude());
@@ -168,27 +144,20 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 수정-스케줄에 속해 있지 않은 유저")
-    public void modifyScheduleInFaultCondition() {
+     void modifyScheduleInFaultCondition() {
         //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
+        ScheduleServiceDto scheduleServiceDTO = createScheduleDto("schedule1");
         Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
 
         //when
-        ScheduleServiceDto scheduleServiceDto2 = ScheduleServiceDto.builder()
-                .scheduleName("modify")
-                .location(null)
-                .scheduleTime(null)
-                .build();
+        ScheduleServiceDto scheduleServiceDto2 = createScheduleDto("modify");
         assertThatThrownBy(() -> scheduleService.modifySchedule(userA2, groupA.getId(), scheduleId, scheduleServiceDto2)).isInstanceOf(NoAthorityToAccessException.class);
     }
 
-/*    @Test
-    @DisplayName("스케줄 삭제")
-    public void deleteSchedule() {
+    @Test
+    @Commit
+    @DisplayName("스케줄 참가")
+    void enterSchedule() {
         //given
         ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
@@ -198,51 +167,96 @@ class ScheduleServiceTest {
         Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
 
         //when
-        scheduleService.deleteSchedule(userA1, groupA.getId(), scheduleId);
+        scheduleService.enterSchedule(userA2, groupA.getId(), scheduleId);
 
         //then
-        assertThat(scheduleRepository.findById(scheduleId)).isEmpty();
-    }*/
+        assertThat(scheduleRepository.findUserScheduleByUserIdAndScheduleId(userA2.getId(), scheduleId)).isNotEmpty();
+    }
 
+    @Test
+    @DisplayName("스케줄 참가-이미 참여중인 유저")
+    void enterScheduleNotInGroup() {
+        //given
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
+
+        //when
+        assertThatThrownBy(() -> scheduleService.enterSchedule(userA1, groupA.getId(), scheduleId)).isInstanceOf(AlreadyInException.class);
+    }
+
+    @Test
+    @DisplayName("스케줄 참가-그룹에 속해 있지 않은 유저")
+    void enterScheduleAlreadyIn() {
+        //given
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+
+        //when
+        assertThatThrownBy(() -> scheduleService.addSchedule(userB, groupA.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
+    }
+
+    @Test
+    @DisplayName("스케줄 퇴장-참여하지 않은 유저")
+    void exitScheduleNotIn() {
+        //given
+        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
+                .scheduleName("schedule1")
+                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+                .scheduleTime(LocalDateTime.now())
+                .build();
+        Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
+
+        //when
+        assertThatThrownBy(() -> scheduleService.exitSchedule(userA2, groupA.getId(), scheduleId)).isInstanceOf(NoAthorityToAccessException.class);
+    }
+
+    //==뷰 조회==
     @Test
     @DisplayName("스케줄 상세 조회")
     @Commit
-    public void findScheduleDetail() {
+     void findScheduleDetail() {
         //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
+        ScheduleServiceDto scheduleServiceDTO = createScheduleDto("schedule1");
         Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
+
         em.flush();
         em.clear();
+        log.info("<given> finish");
 
         //when
-        ScheduleDetailServiceDto scheduleDetailServiceDTO = scheduleService.findScheduleDetail(userA1, groupA.getId(), scheduleId);
+        ScheduleDetailServiceDto response = scheduleService.findScheduleDetail(userA1, groupA.getId(), scheduleId);
+
+        em.flush();
+        em.clear();
+        log.info("<when> finish");
 
         //then
-        assertThat(scheduleDetailServiceDTO.getId()).isEqualTo(scheduleId);
-        assertThat(scheduleDetailServiceDTO.getScheduleName()).isEqualTo(scheduleServiceDTO.getScheduleName());
-//        assertThat(scheduleDetailServiceDTO.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
+        assertThat(response.getId()).isEqualTo(scheduleId);
+        assertThat(response.getScheduleName()).isEqualTo(scheduleServiceDTO.getScheduleName());
+        assertThat(response.getScheduleTime()).isEqualTo(scheduleServiceDTO.getScheduleTime());
+        assertThat(response.getLocation().getLatitude()).isEqualTo(scheduleServiceDTO.getLocation().getLatitude());
+        assertThat(response.getLocation().getLongitude()).isEqualTo(scheduleServiceDTO.getLocation().getLongitude());
+        assertThat(response.getLocation().getLocationName()).isEqualTo(scheduleServiceDTO.getLocation().getLocationName());
 
-        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUsername()).isEqualTo(userA1.getUsername());
-        assertThat(scheduleDetailServiceDTO.getAcceptUsers().get(0).getUserId()).isEqualTo(userA1.getId());
+        assertThat(response.getAcceptUsers().get(0).getUserId()).isEqualTo(userA1.getId());
+        assertThat(response.getAcceptUsers().get(0).getUsername()).isEqualTo(userA1.getUsername());
 
-        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUsername()).isEqualTo(userA2.getUsername());
-        assertThat(scheduleDetailServiceDTO.getWaitUsers().get(0).getUserId()).isEqualTo(userA2.getId());
+        assertThat(response.getWaitUsers().get(0).getUserId()).isEqualTo(userA2.getId());
+        assertThat(response.getWaitUsers().get(0).getUsername()).isEqualTo(userA2.getUsername());
     }
 
     @Test
     @DisplayName("그룹 스케줄 목록 조회")
-    public void findGroupScheduleList() {
+     void findGroupScheduleList() {
         //given
-        ScheduleServiceDto scheduleServiceDTO1 = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .status(ScheduleStatus.WAIT)
-                .build();
+        ScheduleServiceDto scheduleServiceDTO1 = createScheduleDto("schedule1");
         Long scheduleId1 = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO1);
 
         ScheduleServiceDto scheduleServiceDTO2 = ScheduleServiceDto.builder()
@@ -257,9 +271,14 @@ class ScheduleServiceTest {
 
         em.flush();
         em.clear();
+        log.info("<given> finish");
 
         //when
         GroupScheduleListServiceDto serviceDto = scheduleService.findGroupScheduleList(userA1, groupA.getId(), new ScheduleCond(null, null, null));
+
+        em.flush();
+        em.clear();
+        log.info("<when> finish");
 
         //then
         assertThat(serviceDto.getGroupId()).isEqualTo(groupA.getId());
@@ -275,7 +294,7 @@ class ScheduleServiceTest {
 
     @Test
     @DisplayName("유저 스케줄 목록 조회")
-    public void findUserScheduleList() {
+     void findUserScheduleList() {
         //given
         ScheduleServiceDto scheduleServiceDTO1 = ScheduleServiceDto.builder()
                 .scheduleName("schedule1")
@@ -310,67 +329,14 @@ class ScheduleServiceTest {
         assertThat(dtoData.stream().map(ScheduleSimpleServiceDto::getScheduleId)).contains(scheduleId1, scheduleId2);
         assertThat(dtoData.stream().map(ScheduleSimpleServiceDto::getUserCount)).contains(1, 2);
     }
-
-    @Test
-    @Commit
-    @DisplayName("스케줄 참가")
-    public void enterSchedule() {
-        //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
+    
+    //==편의 메서드==
+    ScheduleServiceDto createScheduleDto(String scheduleName) {
+        return ScheduleServiceDto.builder()
+                .scheduleName(scheduleName)
+                .location(new LocationServiceDto(127.11111111111, 127.11111111111, "Konkuk University"))
                 .scheduleTime(LocalDateTime.now())
+                .status(ScheduleStatus.WAIT)
                 .build();
-        Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
-
-        //when
-        scheduleService.enterSchedule(userA2, groupA.getId(), scheduleId);
-
-        //then
-        assertThat(scheduleRepository.findUserScheduleByUserIdAndScheduleId(userA2.getId(), scheduleId)).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("스케줄 참가-이미 참여중인 유저")
-    public void enterScheduleNotInGroup() {
-        //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
-        Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
-
-        //when
-        assertThatThrownBy(() -> scheduleService.enterSchedule(userA1, groupA.getId(), scheduleId)).isInstanceOf(AlreadyInException.class);
-    }
-
-    @Test
-    @DisplayName("스케줄 참가-그룹에 속해 있지 않은 유저")
-    public void enterScheduleAlreadyIn() {
-        //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
-
-        //when
-        assertThatThrownBy(() -> scheduleService.addSchedule(userB, groupA.getId(), scheduleServiceDTO)).isInstanceOf(NoAthorityToAccessException.class);
-    }
-
-    @Test
-    @DisplayName("스케줄 퇴장-참여하지 않은 유저")
-    public void exitScheduleNotIn() {
-        //given
-        ScheduleServiceDto scheduleServiceDTO = ScheduleServiceDto.builder()
-                .scheduleName("schedule1")
-                .location(new LocationServiceDto(127.1, 127.1, "Konkuk University"))
-                .scheduleTime(LocalDateTime.now())
-                .build();
-        Long scheduleId = scheduleService.addSchedule(userA1, groupA.getId(), scheduleServiceDTO);
-
-        //when
-        assertThatThrownBy(() -> scheduleService.exitSchedule(userA2, groupA.getId(), scheduleId)).isInstanceOf(NoAthorityToAccessException.class);
     }
 }

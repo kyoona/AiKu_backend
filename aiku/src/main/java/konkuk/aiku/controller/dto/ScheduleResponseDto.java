@@ -17,6 +17,7 @@ public class ScheduleResponseDto {
     private LocalDateTime scheduleTime;
     @Builder.Default private List<UserSimpleResponseDto> acceptUsers = new ArrayList<>();
     @Builder.Default private List<UserSimpleResponseDto> waitUsers = new ArrayList<>();
+    private Long targetUserId;
     private LocalDateTime createdAt;
 
     public static ScheduleResponseDto toDto(ScheduleDetailServiceDto serviceDto){
@@ -27,6 +28,7 @@ public class ScheduleResponseDto {
                 .scheduleTime(serviceDto.getScheduleTime())
                 .acceptUsers(UserSimpleResponseDto.toDtos(serviceDto.getAcceptUsers()))
                 .waitUsers(UserSimpleResponseDto.toDtos(serviceDto.getWaitUsers()))
+                .targetUserId(serviceDto.getTargetUserId())
                 .createdAt(serviceDto.getCreatedAt())
                 .build();
         return dto;

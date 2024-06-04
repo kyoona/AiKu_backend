@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface BettingRepository extends JpaRepository<Betting, Long> {
     List<Betting> findBettingsByScheduleIdAndBettingType(Long scheduleId, BettingType bettingType);
 
+    @Query("select b from Betting b join fetch b.targetUser tu where b.bettor.id = ?1 and b.schedule.id = ?2 and b.bettingType = ?3")
+    Betting findBettingsWithTargetByUserIdAndScheduleIdAndBettingType(Long userId, Long scheduleId, BettingType bettingType);
+
     @Query("select b from Betting b where b.schedule.id = ?1 and b.bettor.id = ?2")
     List<Betting> findBettingsByScheduleIdAndBettorId(Long scheduleId, Long userId);
 
