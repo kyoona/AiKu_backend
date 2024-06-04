@@ -49,16 +49,6 @@ public class GroupService {
         return group.getId();
     }
 
-/*    @Transactional
-    public Long deleteGroup(Users user, Long groupId) {
-        Groups group = findGroupWithSchedule(groupId);
-
-        checkUserInGroup(user, group);
-
-        groupsRepository.deleteById(groupId);
-        return groupId;
-    }*/
-
     @Transactional
     public Long enterGroup(Users user, Long groupId){
         Groups group = findGroupById(groupId);
@@ -92,7 +82,7 @@ public class GroupService {
         List<Long> scheduleIdList = group.getSchedules().stream()
                 .map(Schedule::getId)
                 .toList();
-
+        group.clearSchedule();
         groupsRepository.delete(group);
 
         scheduleIdList.forEach((scheduleId) -> schedulerService.deleteSchedule(scheduleId));
