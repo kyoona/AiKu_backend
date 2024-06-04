@@ -37,7 +37,7 @@ public class Groups extends TimeEntity{
         return group;
     }
 
-    //==편의 메서드==
+    //==연관 관계 메서드==
     public void updateGroup(String groupName, String description){
         this.groupName = groupName;
         this.description = description;
@@ -49,11 +49,21 @@ public class Groups extends TimeEntity{
     }
 
     public void deleteUser(UserGroup userGroup){
+        userGroup.setGroup(null);
         userGroups.remove(userGroup);
     }
 
     public void addSchedule(Schedule schedule){
         schedule.setGroup(this);
         schedules.add(schedule);
+    }
+
+    public void deleteSchedule(Schedule schedule){
+        schedules.remove(schedule);
+        schedule.setGroup(null);
+    }
+
+    public void clearSchedule(){
+        schedules.clear();
     }
 }

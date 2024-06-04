@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GroupsRepositoryCustom {
-    Optional<UserGroup> findByUserAndGroup(Users user, Groups group);
+    Optional<UserGroup> findByUserAndGroup(Users user, Long groupId);
     Optional<Groups> findGroupWithUser(Long groupId);
 }

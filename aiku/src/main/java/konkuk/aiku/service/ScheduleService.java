@@ -45,7 +45,7 @@ public class ScheduleService {
     @Transactional
     public Long addSchedule(Users user, Long groupId, ScheduleServiceDto scheduleServiceDTO){
         Groups group = findGroupById(groupId);
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         Schedule schedule = Schedule.builder()
                 .scheduleName(scheduleServiceDTO.getScheduleName())
@@ -94,7 +94,7 @@ public class ScheduleService {
     public Long enterSchedule(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
         Schedule schedule = findScheduleById(scheduleId);
         checkUserAlreadyInSchedule(user.getId(), scheduleId);
 
@@ -125,7 +125,7 @@ public class ScheduleService {
     public void scheduleArrival(Users user, Long groupId, Long scheduleId, @NotNull LocalDateTime arrivalTime){
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         Schedule schedule = findScheduleById(scheduleId);
         schedule.addUserArrivalData(user, arrivalTime);
@@ -138,7 +138,7 @@ public class ScheduleService {
     public ScheduleDetailServiceDto findScheduleDetail(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupWithUser(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
         checkScheduleInGroup(groupId, scheduleId);
 
         Schedule schedule = findScheduleWithUser(scheduleId);
@@ -150,7 +150,7 @@ public class ScheduleService {
     public GroupScheduleListServiceDto findGroupScheduleList(Users user, Long groupId, ScheduleCond cond){
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         List<Schedule> schedules = scheduleRepository.findScheduleWithUserByGroupId(groupId, cond.getStartDate(), cond.getEndDate(), cond.getStatus());
 
@@ -171,7 +171,7 @@ public class ScheduleService {
     public ScheduleResultServiceDto findScheduleResult(Users user, Long groupId, Long scheduleId){
         Groups group = findGroupById(groupId);
 
-        checkUserInGroup(user, group);
+        checkUserInGroup(user, groupId);
 
         Schedule schedule = findScheduleById(scheduleId);
         List<UserArrivalData> userArrivalDatas = schedule.getUserArrivalDatas();
@@ -262,8 +262,8 @@ public class ScheduleService {
     }
 
     //==검증 메서드==
-    private UserGroup checkUserInGroup(Users user, Groups groups){
-        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groups).orElse(null);
+    private UserGroup checkUserInGroup(Users user, Long groupId){
+        UserGroup userGroup = groupsRepository.findByUserAndGroup(user, groupId).orElse(null);
         if(userGroup == null){
             throw new NoAthorityToAccessException(ErrorCode.NO_ATHORITY_TO_ACCESS);
         }
