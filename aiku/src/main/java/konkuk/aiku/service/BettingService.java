@@ -287,6 +287,7 @@ public class BettingService {
     public void setDrawRacing(Betting betting) {
         int point = betting.getPoint();
         betting.setResultType(ResultType.DRAW);
+        betting.setBettingStatus(BettingStatus.DONE);
         // 베팅 건 금액 돌려주기
         Users bettor = betting.getBettor();
         Users targetUser = betting.getTargetUser();
