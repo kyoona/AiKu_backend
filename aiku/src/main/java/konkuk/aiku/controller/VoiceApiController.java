@@ -18,7 +18,7 @@ import java.io.IOException;
 public class VoiceApiController {
     private final VoiceApiService voiceApiService;
 
-    @GetMapping("/voice")
+    @PostMapping("/voice")
     public ResponseEntity<VoiceResponseDto> voiceToData(@RequestPart MultipartFile file) throws IOException {
         VoiceApiResponseDto voiceApiResponseDto = voiceApiService.voiceToData(file);
         return new ResponseEntity<>(voiceApiResponseDto.toResponseDto(), HttpStatus.OK);

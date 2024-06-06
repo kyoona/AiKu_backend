@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -171,22 +172,20 @@ public class GroupService {
             List<Betting> bettorBettings = bettingRepository.findAllByBettorIdAndScheduleGroupId(userId, groupId);
             List<Betting> targetBettings = bettingRepository.findAllByTargetUserIdAndScheduleGroupId(userId, groupId);
 
-            for (Betting bettorBetting : bettorBettings) {
-                if (bettorBetting.getResultType().equals(ResultType.WIN)) {
-                    winCount += 1;
-                }
-            }
+            winCount += bettorBettings.stream()
+                    .filter(betting -> betting.getBettingStatus().equals(BettingStatus.DONE))
+                    .filter(betting -> betting.getResultType().equals(ResultType.WIN))
+                    .count();
+
             totalBettingCount += bettorBettings.size(); // 자신이 건 베팅/레이싱은 모두 포함
 
-            for (Betting targetBetting : targetBettings) {
-                if (targetBetting.getBettingType().equals(BettingType.RACING)) {
-                    totalBettingCount += 1; // 타겟일 때는 레이싱만 포함
+            Stream<Betting> targetResultRacingStream = targetBettings.stream()
+                    .filter(betting -> betting.getBettingStatus().equals(BettingStatus.DONE))
+                    .filter(betting -> betting.getBettingType().equals(BettingType.RACING));
 
-                    if (targetBetting.getResultType().equals(ResultType.LOSE)) {
-                        winCount += 1;
-                    }
-                }
-            }
+            totalBettingCount += targetResultRacingStream.count();
+            winCount += targetResultRacingStream
+                    .filter(betting -> betting.getResultType().equals(ResultType.LOSE)).count();
 
             int winningRate = totalBettingCount == 0 ? 0 : winCount / totalBettingCount * 100; // 백분율
 
