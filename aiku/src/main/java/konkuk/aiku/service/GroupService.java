@@ -185,7 +185,9 @@ public class GroupService {
 
             totalBettingCount += targetResultRacingStream.count();
             winCount += targetResultRacingStream
-                    .filter(betting -> betting.getResultType().equals(ResultType.LOSE)).count();
+                    .filter(betting -> betting.getBettingStatus().equals(BettingStatus.DONE))
+                    .filter(betting -> betting.getResultType().equals(ResultType.LOSE))
+                    .count();
 
             int winningRate = totalBettingCount == 0 ? 0 : winCount / totalBettingCount * 100; // 백분율
 
