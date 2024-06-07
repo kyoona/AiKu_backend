@@ -31,6 +31,7 @@ public class AlarmController {
     public ResponseEntity<SuccessResponseDto> tokenSave(@RequestBody @Valid FcmToken fcmToken,
                                                         @AuthenticationPrincipal UserAdaptor userAdaptor){
         Users user = userAdaptor.getUsers();
+        log.info("userAdapter = {} : {}", user.getUsername(), user.getId());
         alarmService.saveToken(user, fcmToken);
         return SuccessResponseDto.getResponseEntity(user.getId(), ADD_SUCCESS, HttpStatus.OK);
     }

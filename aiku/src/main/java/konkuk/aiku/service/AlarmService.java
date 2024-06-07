@@ -43,6 +43,7 @@ public class AlarmService {
     @Transactional
     public void saveToken(Users user, FcmToken fcmToken){
         Users findUser = findUserById(user.getId());
+        log.info("findUser = {} : {}", findUser.getUsername(), findUser.getId());
         String token = fcmToken.getToken();
         if (findUser.getFcmToken() != null) {
             throw new TokenException(ErrorCode.DUPLICATE_FCM_TOKEN);
