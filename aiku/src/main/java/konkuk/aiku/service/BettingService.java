@@ -180,9 +180,7 @@ public class BettingService {
      * @return 유저 아이디
      */
     public Long userRacingArrival(Long scheduleId, Long userId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> new NoSuchEntityException(ErrorCode.NO_SUCH_SCHEDULE));
-
-        List<Betting> racings = schedule.getRacings();
+        List<Betting> racings = bettingRepository.findBettingsByScheduleIdAndBettingType(scheduleId, BettingType.RACING);
 
         for (Betting racing : racings) {
             // 도착 유저에 대해서 아직 종료되지 않은 레이싱만 실행
