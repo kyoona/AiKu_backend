@@ -23,7 +23,7 @@ import java.io.IOException;
 @Transactional
 @Slf4j
 public class VoiceApiService {
-    private static final String URL = "http://13.124.181.63:5000";
+    private static final String URL = "http://15.164.234.88:5000";
 
     public String test() {
         RestTemplate restTemplate = new RestTemplate();
