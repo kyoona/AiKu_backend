@@ -118,17 +118,18 @@ public class AlarmService {
     }
 
     public void sendEmojiToUser(Users user, Long scheduleId, EmojiMessageDto emojiMessageDto){
-        Schedule schedule = findScheduleById(scheduleId);
+        Schedule schedule = findScheduleWithUser(scheduleId);
         Users receiver = findUserById(emojiMessageDto.getReceiverId());
 
         checkUserInSchedule(user.getId(), scheduleId);
         checkUserInSchedule(receiver.getId(), scheduleId);
         checkIsScheduleRun(schedule);
 
+        List<String> userTokens = getScheduleUsersFcmToken(schedule);
         Map<String, String> messageDataMap = SendingEmojiMessage.createMessage(user, scheduleId, receiver, emojiMessageDto)
                 .toStringMap();
 
-        messageSender.sendMessageToUser(messageDataMap, receiver.getFcmToken());
+        messageSender.sendMessageToUsers(messageDataMap, userTokens);
     }
 
     public void sendScheduleMapClose(Long scheduleId){
