@@ -179,13 +179,18 @@ public class GroupService {
 
             totalBettingCount += bettorBettings.size(); // 자신이 건 베팅/레이싱은 모두 포함
 
-            Stream<Betting> targetResultRacingStream = targetBettings.stream()
-                    .filter(betting -> betting.getBettingStatus().equals(BettingStatus.DONE))
-                    .filter(betting -> betting.getBettingType().equals(BettingType.RACING));
+            // 타겟은 레이싱만 포함
+            List<Betting> targetDoneRacing = new ArrayList<>();
+            for (Betting targetBetting : targetBettings) {
+                if (targetBetting.getBettingStatus().equals(BettingStatus.DONE)
+                        && targetBetting.getBettingType().equals(BettingType.RACING)) {
+                    targetDoneRacing.add(targetBetting);
+                }
+            }
 
-            totalBettingCount += targetResultRacingStream.count();
-            winCount += targetResultRacingStream
-                    .filter(betting -> betting.getBettingStatus().equals(BettingStatus.DONE))
+            totalBettingCount += targetDoneRacing.size();
+
+            winCount += targetDoneRacing.stream()
                     .filter(betting -> betting.getResultType().equals(ResultType.LOSE))
                     .count();
 
