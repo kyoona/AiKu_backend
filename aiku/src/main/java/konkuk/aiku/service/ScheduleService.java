@@ -62,7 +62,6 @@ public class ScheduleService {
         scheduleRepository.save(schedule);
 
         scheduleEventPublisher.scheduleAddEvent(schedule.getId(), schedule.getScheduleTime());
-        userPointEventPublisher.userPointChangeEvent(user.getId(), 100, PointType.REWARD, PointChangeType.PLUS, schedule.getCreatedAt()); //스케줄 등록 시 보상으로 100아쿠 적립
 
         return schedule.getId();
     }
@@ -73,10 +72,15 @@ public class ScheduleService {
         UserSchedule userSchedule = checkUserInSchedule(userId, scheduleId);
 
         Schedule schedule = userSchedule.getSchedule();
+        LocalDateTime originalScheduleTime = schedule.getScheduleTime();
 
         Location location = createLocation(scheduleServiceDTO.getLocation());
         schedule.updateSchedule(scheduleServiceDTO.getScheduleName(), location, scheduleServiceDTO.getScheduleTime());
 
+        if(!originalScheduleTime.equals(scheduleServiceDTO.getScheduleTime())){
+            schedulerService.deleteSchedule(scheduleId);
+            scheduleEventPublisher.scheduleAddEvent(schedule.getId(), schedule.getScheduleTime());
+        }
         return schedule.getId();
     }
 
@@ -226,14 +230,8 @@ public class ScheduleService {
 
     public boolean reserveScheduleMapOpenEvent(Long scheduleId, LocalDateTime scheduleTime){
         Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
-/*        if(timeDelay >= 30){
-            schedulerService.addScheduleMapOpenAlarm(scheduleId, publishScheduleMapOpenRunnable(scheduleId), timeDelay - 30);
-            return true;
-        }else {
-            publishScheduleMapOpen(scheduleId);
-            return false;
-        }*/
-        if(timeDelay >= 3){
+
+        if(timeDelay >= 30){
             schedulerService.addScheduleMapOpenAlarm(scheduleId, publishScheduleMapOpenRunnable(scheduleId), timeDelay - 30);
             return true;
         }else {
@@ -244,7 +242,6 @@ public class ScheduleService {
 
     public void reserveScheduleCloseEvent(Long scheduleId, LocalDateTime scheduleTime){
         Long timeDelay = schedulerService.getTimeDelay(scheduleTime);
-//        schedulerService.scheduleAutoClose(scheduleId, publishScheduleCloseEventRunnable(scheduleId), timeDelay + 30);
         schedulerService.scheduleAutoClose(scheduleId, publishScheduleCloseEventRunnable(scheduleId), timeDelay + 30);
     }
 
