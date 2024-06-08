@@ -210,6 +210,9 @@ public class AlarmService {
     private Runnable sendScheduleFinishAlarmRunnable(Long scheduleId){
         return () -> {
             Schedule schedule = findScheduleWithUser(scheduleId);
+            if(schedule.getStatus() == ScheduleStatus.TERM){ //유저가 전원 도착하여 맵 닫힘
+                return;
+            }
 
             List<String> userTokens = getScheduleUsersFcmToken(schedule);
 
