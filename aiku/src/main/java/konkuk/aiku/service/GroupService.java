@@ -196,7 +196,7 @@ public class GroupService {
             int winningRate = totalBettingCount == 0 ? 0 : winCount / totalBettingCount * 100; // 백분율
 
             analyticsResult.add(
-                    AnalyticsBettingServiceDto.createDto(user, winningRate)
+                    AnalyticsBettingServiceDto.createDto(userInGroup, winningRate)
             );
         }
         analyticsResult.sort(
