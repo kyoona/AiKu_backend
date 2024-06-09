@@ -84,6 +84,6 @@ public class SchedulerService {
         ZonedDateTime now = ZonedDateTime.now(zoneId);
         ZonedDateTime getScheduleTime = ZonedDateTime.of(scheduleTime, zoneId);
 
-        return ChronoUnit.MINUTES.between(now, scheduleTime);
+        return ChronoUnit.MINUTES.between(now, getScheduleTime);
     }
 }
