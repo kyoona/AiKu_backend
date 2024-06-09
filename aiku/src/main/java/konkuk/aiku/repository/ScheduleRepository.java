@@ -29,4 +29,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long>, Sched
 
     @Query("SELECT uad FROM UserArrivalData uad WHERE uad.user.id = :userId")
     List<UserArrivalData> findUserArrivalDataByUserId(Long userId);
+    @Query("SELECT uad FROM UserArrivalData uad WHERE uad.schedule.id = :scheduleId AND uad.user.id = :userId")
+    Optional<UserArrivalData> findUserArrivalDataByScheduleIdAndUserID(@Param("scheduleId") Long scheduleId, @Param("userId") Long userId);
 }
