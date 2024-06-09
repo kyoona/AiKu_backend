@@ -139,7 +139,7 @@ public class GroupService {
 
         List<AnalyticsLateServiceDto> lateDto = new ArrayList<>();
         userLateTimeMap.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
