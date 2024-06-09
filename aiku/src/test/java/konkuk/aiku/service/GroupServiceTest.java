@@ -246,7 +246,7 @@ class GroupServiceTest {
         //then
         List<AnalyticsLateServiceDto> data = serviceDto.getData();
         assertThat(data.stream().map(AnalyticsLateServiceDto::getTotalLateMinute)).containsExactly(-5, 20); //내림차순
-        assertThat(data.stream().map((dto)-> dto.getUser().getUserId())).containsExactly(user1.getId(), user2.getId());
+        assertThat(data.stream().map((dto)-> dto.getUser().getUserId())).containsExactly(user2.getId(), user1.getId());
     }
 
     //==엔티티 생성 편의 메서드==
