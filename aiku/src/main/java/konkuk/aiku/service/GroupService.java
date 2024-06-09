@@ -194,7 +194,7 @@ public class GroupService {
                     .filter(betting -> betting.getResultType().equals(ResultType.LOSE))
                     .count();
 
-            int winningRate = totalBettingCount == 0 ? 0 : winCount / totalBettingCount * 100; // 백분율
+            int winningRate = totalBettingCount == 0 ? 0 : (winCount / totalBettingCount) * 100; // 백분율
 
             analyticsResult.add(
                     AnalyticsBettingServiceDto.createDto(userInGroup, winningRate)
