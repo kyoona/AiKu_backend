@@ -14,6 +14,7 @@ public enum ErrorCode {
     NO_VALIDATE_FCM_TOKEN(4004, "유효하지 않은 토큰입니다."),
     EXPIRATION_TOKEN(4005, "만료된 토큰입니다."),
     NO_GENERATED_TOKEN(4006, "등록되어 있는 토큰이 존재하지 않습니다."),
+    AlreadyArrivalException(4015, "이미 도착한 사용자입니다."),
 
     // VoiceApi에서 발생하는 오류
     PAST_DATE(4007, "과거의 날짜입니다."),

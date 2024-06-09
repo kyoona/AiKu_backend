@@ -6,10 +6,7 @@ import konkuk.aiku.domain.*;
 import konkuk.aiku.event.BettingEventPublisher;
 import konkuk.aiku.event.ScheduleEventPublisher;
 import konkuk.aiku.event.UserPointEventPublisher;
-import konkuk.aiku.exception.AlreadyInException;
-import konkuk.aiku.exception.ErrorCode;
-import konkuk.aiku.exception.NoAthorityToAccessException;
-import konkuk.aiku.exception.NoSuchEntityException;
+import konkuk.aiku.exception.*;
 import konkuk.aiku.repository.BettingRepository;
 import konkuk.aiku.repository.GroupsRepository;
 import konkuk.aiku.repository.ScheduleRepository;
@@ -132,6 +129,7 @@ public class ScheduleService {
         Groups group = findGroupById(groupId);
 
         checkUserInGroup(user, groupId);
+        checkAlreadyUserArrival(user, scheduleId);
 
         Schedule schedule = findScheduleById(scheduleId);
         schedule.addUserArrivalData(user, arrivalTime);
@@ -293,6 +291,13 @@ public class ScheduleService {
             throw new AlreadyInException(ErrorCode.ALREADY_IN_SCHEDULE);
         }catch (NoAthorityToAccessException e){
             return true;
+        }
+    }
+
+    private void checkAlreadyUserArrival(Users user, Long scheduleId) {
+        UserArrivalData userArrivalData = scheduleRepository.findUserArrivalDataByScheduleIdAndUserID(scheduleId, user.getId()).orElse(null);
+        if (userArrivalData != null) {
+            throw new AlreadyArrivalException(ErrorCode.AlreadyArrivalException);
         }
     }
 

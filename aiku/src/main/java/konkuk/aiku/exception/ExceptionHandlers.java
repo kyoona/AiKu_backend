@@ -34,6 +34,12 @@ public class ExceptionHandlers  {
         return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({AlreadyArrivalException.class})
+    public ResponseEntity<ErrorDTO> handleAlreadyArrivalException(AlreadyArrivalException e){
+        log.error("ERROR", e);
+        return new ResponseEntity<>(new ErrorDTO(e.getErrorCode().getCode(), e.getErrorCode().getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({MessagingException.class})
     public ResponseEntity<ErrorDTO> handleMessagingException(MessagingException e){
         log.error("ERROR", e);
