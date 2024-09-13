@@ -49,10 +49,32 @@
 
 ### 곽유나
 <b>그룹 기능</b><br/>
+- @SpringBootTest를 통한 통합 테스트를 작성하고 실행하였습니다.
+- Mokito를 통해 외부 라이브러리의 의존성을 제거 하여 단위 테스트를 작성하고 실행하였습니다.
+
+
 <b>약속 기능</b><br/>
+- ApplicationEvent를 통해 서비스간 의존성 최소화
+  약속 서비스에는 약속 알람, 맵 오픈 로직 예약, 맵 자동 종료 로직 예약과 같은 많은 부가 기능을 요구합니다. 서비스에서 서비스를 호출 하며 SchedulerService에서 많은 책임을 지기 보다는 ApplicationEvent를 통해 event를 publish 하고 observer가 처리하며 서비스간 의존성을 최소화 했습니다.
+- Executors.newScheduledThreadPool()을 통해 지정된 시간에 실행되어야 할 로직들을 예약합니다. 반환받은 ScheduledFuture은 스케줄에 변동이 있을떄 예약한 로직에 대한 변동을 관리하기 위해 따로 저장하고 관리합니다.
+  
 <b>맵 기능</b><br/>
+- Firebase Messaging을 통해 다른 사용자들의 실시간 위치 공유, 다른 사용자에게 이모지 보내기 등의 기능을 구현하였습니다.
+
+<b>공통 클래스 개발</b><br/>
+- data transfer object를 conroller계층과 service계층, repository 계층으로 분리하였습니다.
+  DTO의 계층 구조는 controller dto, service dto, entity로 되어 있으며 controller dto와 service dto의 분리로 서비스 계층은 view에 대한 의존을 최소화 합니다. view에 변화가 생겨 제공해야 할 변수에 변경이 있어도 service계층은 영향을 받지 않습니다. 이는 디자인과 구현이 동시에 진행되어 뷰의 구조가 계속해서 바꼈던 저희 프로젝트에 알맞은 구조였습니다.
+- ExceptionHandler를 통해 오류를 감지하고 사용자에게 일관된 응답을 할 수 있도록 합니다.
+- MDC를 통해 Interception에서 다중 스레드 별 고유 id를 부여하고 이를 추적할 수 있도록 합니다.
 
 ### 최원탁
 <b>로그인 기능</b><br/>
 <b>사용사 정보 관리 및 포인트 정산</b><br/>
 <b>상점 내 아이템 구매 기능</b><br/>
+
+<h2>🤩개선하고 싶은 점</h2>
+- 개발 주기가 여유롭지 않았던 터라 전체적인 코드 리팩토링이 필요합니다.
+- 조회 기능에 paging을 처리해야합니다.
+- 예약해야할 로직을 Executors.newScheduledThreadPool()를 통해 시스템에서 관리하기 보다는 외부 서비스를 통해 관리할 필요성이 있습니다.
+- Git Issue, PR template을 통한 깃을 더 구체적으로 활용하고 싶습니다.
+현재 런칭을 위해 https://github.com/AiKU-Dev/Backend 에서 개선하여 프로젝트를 진행하고 있습니다 :)
