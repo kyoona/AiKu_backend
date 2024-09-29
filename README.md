@@ -76,4 +76,4 @@
 - Git Issue, PR template, Code Review를 통해 깃을 효율적으로 활용하고 싶습니다.
 
 
-현재 런칭을 위해 https://github.com/AiKU-Dev/Backend 에서 개선하여 프로젝트를 진행하고 있습니다 :)
+현재 런칭을 위해 https://github.com/kyoona/AIKU_NEW 에서 개선하여 프로젝트를 진행하고 있습니다 :)
