@@ -63,14 +63,15 @@
 
 <b>공통 클래스 개발</b><br/>
 - data transfer object를 conroller계층과 service계층, repository 계층으로 분리하였습니다.
-  DTO의 계층 구조는 controller dto, service dto, entity로 되어 있으며 controller dto와 service dto의 분리로 서비스 계층은 view에 대한 의존을 최소화 합니다. view에 변화가 생겨 제공해야 할 변수에 변경이 있어도 service계층은 영향을 받지 않습니다. 이는 디자인과 구현이 동시에 진행되어 뷰의 구조가 계속해서 바꼈던 저희 프로젝트에 알맞은 구조였습니다.
+  DTO의 계층 구조는 controller dto, service dto, entity로 되어 있으며 controller dto와 service dto의 분리로 서비스 계층은 view에 대한 의존을 최소화 합니다. view에 변화가 생겨 제공해야 할 변수에 변경이 있어도 service계층은 영향을 받지 않습니다. 디자인과 구현이 동시에 진행되어 뷰의 구조가 계속해서 바꼈던 저희 프로젝트를 위해 이와 같은 구조를 채택하였습니다.
 - ExceptionHandler를 통해 오류를 감지하고 사용자에게 일관된 응답을 할 수 있도록 합니다.
 - MDC를 통해 Interception에서 다중 스레드 별 고유 id를 부여하고 이를 추적할 수 있도록 합니다.
 
 <h2>🤩개선하고 싶은 점</h2>
 
+- 현재 서비스 내 어그리거트 개념이 도입되어 있지만, 학습하지 못한 상태로 도입했기 떄문에 DDD를 공부하고 적용하고 싶습니다.
 - 개발 주기가 여유롭지 않았던 터라 전체적인 코드 리팩토링이 필요합니다.
 - 조회 기능에 paging을 처리해야합니다.
-- 예약해야할 로직을 Executors.newScheduledThreadPool()를 통해 시스템에서 관리하기 보다는 외부 서비스를 통해 관리할 필요성이 있습니다.
-- Git Issue, PR template을 통한 깃을 더 구체적으로 활용하고 싶습니다.
+- 예약해야할 로직을 Executors.newScheduledThreadPool()를 통해 실행하기 때문에 서버가 종료되면 초기화됩니다. 이를 복구 시킬 수 있는 로직을 개발해야합니다.
+- Git Issue, PR template, Code Review를 통해 깃을 효율적으로 활용하고 싶습니다.
 현재 런칭을 위해 https://github.com/AiKU-Dev/Backend 에서 개선하여 프로젝트를 진행하고 있습니다 :)
