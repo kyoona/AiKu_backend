@@ -74,4 +74,6 @@
 - 조회 기능에 paging을 처리해야합니다.
 - 예약해야할 로직을 Executors.newScheduledThreadPool()를 통해 실행하기 때문에 서버가 종료되면 초기화됩니다. 이를 복구 시킬 수 있는 로직을 개발해야합니다.
 - Git Issue, PR template, Code Review를 통해 깃을 효율적으로 활용하고 싶습니다.
+
+
 현재 런칭을 위해 https://github.com/AiKU-Dev/Backend 에서 개선하여 프로젝트를 진행하고 있습니다 :)
